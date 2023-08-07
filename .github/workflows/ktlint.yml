@@ -19,5 +19,7 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
+    - name: Give gradlew permission
+      run: chmod +x ./gradlew
     - name: Check formatting using ktlint
       run: ./gradlew ktlintCheck
