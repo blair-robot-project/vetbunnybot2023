@@ -42,6 +42,9 @@ jobs:
         with: 
           gradle-version: current
 
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
       - name: Generate HTML with Dokka
         run: |
           ./gradlew dokkaHtml
