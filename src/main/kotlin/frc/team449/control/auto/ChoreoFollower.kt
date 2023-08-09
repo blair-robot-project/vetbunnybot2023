@@ -1,22 +1,16 @@
 package frc.team449.control.auto
 
 
-import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
-import edu.wpi.first.math.numbers.N2
-import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandBase
-import edu.wpi.first.wpilibj2.command.InstantCommand
-import edu.wpi.first.wpilibj2.command.PrintCommand
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import frc.team449.control.holonomic.HolonomicDrive
 import frc.team449.robot2023.auto.AutoConstants
-import java.time.Instant
+import kotlin.math.PI
 
 class ChoreoFollower(
   private val drivetrain: HolonomicDrive,
@@ -32,6 +26,8 @@ class ChoreoFollower(
 
   private val timer = Timer()
 
+  private val seenEventKeys = mutableListOf<Double>()
+
   init {
     addRequirements(drivetrain)
 
@@ -42,27 +38,20 @@ class ChoreoFollower(
     yController.setTolerance(poseTol.y)
 
     thetaController.reset()
+    thetaController.enableContinuousInput(-PI, PI)
     thetaController.setTolerance(poseTol.rotation.radians)
-
-    if (resetPose) {
-      drivetrain.pose = trajectory.initialPose
-    }
   }
 
-  private fun calculate(currPose: Pose2d, desiredMatrix: Matrix<N2, N3>): ChassisSpeeds {
-    val xFF = desiredMatrix[1, 0]
-    val yFF = desiredMatrix[1, 1]
-    val angFF = desiredMatrix[1, 2]
+  private fun calculate(currPose: Pose2d, desState: ChoreoTrajectory.ChoreoState): ChassisSpeeds {
+    val xFF = desState.xVel
+    val yFF = desState.yVel
+    val angFF = desState.thetaVel
 
-    val xPID = xController.calculate(currPose.x, desiredMatrix[0, 0])
-    val yPID = yController.calculate(currPose.y, desiredMatrix[0, 1])
-    val angPID = thetaController.calculate(currPose.rotation.radians, desiredMatrix[0, 2])
+    val xPID = xController.calculate(currPose.x, desState.xPos)
+    val yPID = yController.calculate(currPose.y, desState.yPos)
+    val angPID = thetaController.calculate(currPose.rotation.radians, desState.theta)
 
     return ChassisSpeeds.fromFieldRelativeSpeeds(xFF + xPID, yFF + yPID, angFF + angPID, currPose.rotation)
-  }
-
-  private fun parallelEventPop() {
-    parallelEvents.remove(parallelEvents.keys.first())
   }
 
   private fun allControllersAtReference(): Boolean {
@@ -74,6 +63,10 @@ class ChoreoFollower(
     yController.reset()
     thetaController.reset()
 
+    if (resetPose) {
+      drivetrain.pose = trajectory.initialPose()
+    }
+
     timer.restart()
   }
 
@@ -81,11 +74,11 @@ class ChoreoFollower(
     val eventTime = timer.get()
 
     for (event in parallelEvents) {
-      if (eventTime >= event.key) {
+      if (eventTime >= event.key && event.key !in seenEventKeys) {
 
         event.value.schedule()
 
-        parallelEventPop()
+        seenEventKeys.add(event.key)
       }
     }
 
@@ -104,7 +97,7 @@ class ChoreoFollower(
     timer.stop()
     timer.reset()
 
-    println("${trajectory.filename} auto completed.")
+    println("${trajectory.name} auto completed.")
     drivetrain.stop()
   }
 }

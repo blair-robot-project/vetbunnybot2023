@@ -3,9 +3,7 @@ package frc.team449.control.auto
 import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
-import edu.wpi.first.math.trajectory.Trajectory
 import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.CommandBase
 import edu.wpi.first.wpilibj2.command.InstantCommand
 import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
@@ -19,8 +17,8 @@ class ChoreoRoutine(
   @field:Config.PIDController(name = "Y PID") var yController: PIDController = PIDController(AutoConstants.DEFAULT_Y_KP, 0.0, 0.0),
   @field:Config.PIDController(name = "Rotation PID") var thetaController: PIDController = PIDController(AutoConstants.DEFAULT_ROTATION_KP, 0.0, 0.0),
   private val drive: HolonomicDrive,
-  private val stopEventMap: HashMap<Int, Command>,
-  private val trajectories: MutableList<ChoreoTrajectory>,
+  private val stopEventMap: HashMap<Int, Command> = HashMap(),
+  private val parallelEventMap: HashMap<Int, HashMap<Double, Command>> = HashMap(),
   private val poseTol: Pose2d = Pose2d(0.05, 0.05, Rotation2d(0.05)),
   private val resetPosition: Boolean = false,
   private val resetPositionTolerance: Pose2d = Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0)),
@@ -28,7 +26,7 @@ class ChoreoRoutine(
 ) {
 
   private fun resetPose(trajectory: ChoreoTrajectory): Command {
-    val poseError = drive.pose.relativeTo(trajectory.initialPose)
+    val poseError = drive.pose.relativeTo(trajectory.initialPose())
 
     if (abs(poseError.x) < resetPositionTolerance.x &&
       abs(poseError.y) < resetPositionTolerance.y &&
@@ -37,21 +35,21 @@ class ChoreoRoutine(
       return PrintCommand("Pose not reset.")
     }
 
-    return InstantCommand({ drive.pose = trajectory.initialPose })
+    return InstantCommand({ drive.pose = trajectory.initialPose() })
   }
 
-  fun createRoutine(): Command {
+  fun createRoutine(trajectories: MutableList<ChoreoTrajectory>): Command {
     val commands = SequentialCommandGroup(
-      stopEventMap[0],
+      stopEventMap.getOrDefault(0, InstantCommand()),
       resetPose(trajectories[0])
     )
 
-    for (i in 0..trajectories.size) {
+    for (i in 0 until trajectories.size) {
       commands.addCommands(
         ChoreoFollower(
           drive,
           trajectories[i],
-          hashMapOf(),
+          parallelEventMap.getOrDefault(i, HashMap()),
           xController,
           yController,
           thetaController,
@@ -60,7 +58,7 @@ class ChoreoRoutine(
           resetPosition
         )
       )
-      commands.addCommands(stopEventMap[i + 1])
+      commands.addCommands(stopEventMap.getOrDefault(i + 1, InstantCommand()))
     }
 
     return commands

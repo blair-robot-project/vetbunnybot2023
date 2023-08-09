@@ -3,16 +3,11 @@ package frc.team449.control.auto
 import edu.wpi.first.math.InterpolatingMatrixTreeMap
 import edu.wpi.first.math.MatBuilder
 import edu.wpi.first.math.MathUtil
-import edu.wpi.first.math.Matrix
-import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.numbers.N2
 import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.wpilibj.Filesystem
-import edu.wpi.first.wpilibj.Timer
-import edu.wpi.first.wpilibj2.command.CommandBase
-import frc.team449.robot2023.auto.AutoConstants
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
@@ -21,55 +16,102 @@ import java.io.FileReader
 
 
 class ChoreoTrajectory(
-  val filename: String
+  val name: String,
+  val stateMap: InterpolatingMatrixTreeMap<Double, N2, N3>,
+  val totalTime: Double,
+  val objectiveTimestamps: ArrayList<Double>
 ) {
 
-  private val path = Filesystem.getDeployDirectory().absolutePath.plus("/trajectories/$filename.json")
-  private val trajectory = JSONParser().parse(FileReader(File(path).absolutePath)) as JSONArray
+  fun initialPose(): Pose2d {
+    val initialState = stateMap.get(0.0)
 
-  private val initialState = trajectory[0] as JSONObject
-  val initialPose = Pose2d(
-    initialState["x"] as Double,
-    initialState["y"] as Double,
-    Rotation2d(initialState["heading"] as Double)
+    return Pose2d(
+      initialState[0, 0],
+      initialState[0, 1],
+      Rotation2d(initialState[0, 2])
+    )
+  }
+
+  fun sample(t: Double): ChoreoState {
+    val timeSeconds = MathUtil.clamp(t, 0.0, totalTime)
+    val interpolatedMat = stateMap.get(timeSeconds)
+
+    return ChoreoState(
+      interpolatedMat[0, 0],
+      interpolatedMat[0, 1],
+      interpolatedMat[0, 2],
+      interpolatedMat[1, 0],
+      interpolatedMat[1, 1],
+      interpolatedMat[1, 2]
+    )
+  }
+
+  class ChoreoState(
+    val xPos: Double,
+    val yPos: Double,
+    val theta: Double,
+    val xVel: Double,
+    val yVel: Double,
+    val thetaVel: Double
   )
 
-  private var stateMap: InterpolatingMatrixTreeMap<Double, N2, N3> = InterpolatingMatrixTreeMap()
+  companion object {
+    fun createTrajectory(
+      filename: String,
+      trajName: String = filename
+    ): ChoreoTrajectory {
+      val path = Filesystem.getDeployDirectory().absolutePath.plus("/trajectories/$filename.json")
+      val trajectory = JSONParser().parse(FileReader(File(path).absolutePath)) as JSONArray
 
-  var totalTime = 0.0
+      val last = trajectory.last() as JSONObject
+      val totalTime = last["timestamp"] as Double
 
-  init {
-    parse()
-  }
+      val parseResults = parse(trajectory)
 
-  private fun parse() {
-    trajectory.forEach { state ->
-      state as JSONObject
-      val stateTime = state["timestamp"].toString().toDouble()
-
-      val builder = MatBuilder(N2.instance, N3.instance)
-      val matrix = builder.fill(
-        state["x"].toString().toDouble(),
-        state["y"].toString().toDouble(),
-        state["heading"].toString().toDouble(),
-        state["velocityX"].toString().toDouble(),
-        state["velocityY"].toString().toDouble(),
-        state["angularVelocity"].toString().toDouble())
-
-      stateMap.put(stateTime, matrix)
+      return ChoreoTrajectory(
+        trajName,
+        parseResults.first,
+        totalTime,
+        parseResults.second
+      )
     }
 
-    val last = trajectory.last() as JSONObject
-    totalTime = last["timestamp"] as Double
-  }
-  fun sample(t: Double): Matrix<N2, N3> {
-    val timeSeconds = MathUtil.clamp(t, 0.0, totalTime)
-    return stateMap.get(timeSeconds)
-  }
+    fun createTrajectoryGroup(folderName: String): MutableList<ChoreoTrajectory> {
+      val trajectoryList = mutableListOf<ChoreoTrajectory>()
 
-  companion object {
-    fun createTrajectory(filename: String): ChoreoTrajectory {
-      return ChoreoTrajectory(filename)
+      File(Filesystem.getDeployDirectory().absolutePath.plus("/trajectories/$folderName")).walk().forEach {
+        if (!it.name.equals(folderName)) {
+          trajectoryList.add(createTrajectory("$folderName/" + it.name.dropLast(5), folderName + it.name))
+        }
+      }
+
+      return trajectoryList
+    }
+
+    private fun parse(trajectory: JSONArray): Pair<InterpolatingMatrixTreeMap<Double, N2, N3>, ArrayList<Double>> {
+      val stateMap = InterpolatingMatrixTreeMap<Double, N2, N3>()
+
+      val timestamps = arrayListOf<Double>()
+
+      trajectory.forEach { state ->
+        state as JSONObject
+        val stateTime = state["timestamp"].toString().toDouble()
+
+        timestamps.add(stateTime)
+
+        val builder = MatBuilder(N2.instance, N3.instance)
+        val matrix = builder.fill(
+          state["x"].toString().toDouble(),
+          state["y"].toString().toDouble(),
+          state["heading"].toString().toDouble(),
+          state["velocityX"].toString().toDouble(),
+          state["velocityY"].toString().toDouble(),
+          state["angularVelocity"].toString().toDouble())
+
+        stateMap.put(stateTime, matrix)
+      }
+
+      return stateMap to timestamps
     }
   }
 }

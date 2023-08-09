@@ -151,7 +151,7 @@ class PPAStar(
     trajectory = PathPlanner.generatePath(constraints, fullPathPoints)
     // Display Trajectory
     // Change trajectory based on alliance color
-    trajectory = AutoUtil.transformForAlliance(
+    trajectory = AutoUtil.transformForAlliancePP(
       mutableListOf(trajectory)
     ) { RobotConstants.ALLIANCE_COLOR == Alliance.Red }[0]
     pathDrivingCommand = HolonomicFollower(

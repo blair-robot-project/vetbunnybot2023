@@ -1,18 +1,14 @@
 package frc.team449
 
 import com.pathplanner.lib.server.PathPlannerServer
-import edu.wpi.first.math.geometry.Pose2d
-import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.TimedRobot
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
-import edu.wpi.first.wpilibj2.command.*
+import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.CommandScheduler
 import frc.team449.control.DriveCommand
-import frc.team449.control.auto.ChoreoFollower
-import frc.team449.control.auto.ChoreoRoutine
-import frc.team449.control.auto.ChoreoTrajectory
 import frc.team449.robot2023.Robot
 import frc.team449.robot2023.auto.Paths
 import frc.team449.robot2023.auto.PositionChooser
@@ -22,7 +18,6 @@ import frc.team449.robot2023.constants.RobotConstants
 import frc.team449.robot2023.constants.vision.VisionConstants
 import frc.team449.robot2023.subsystems.ControllerBindings
 import io.github.oblarg.oblog.Logger
-import java.util.HashMap
 
 /** The main class of the robot, constructs all the subsystems and initializes default commands. */
 class RobotLoop : TimedRobot() {
@@ -71,8 +66,6 @@ class RobotLoop : TimedRobot() {
   }
 
   override fun autonomousInit() {
-    robot.drive.pose = Pose2d(1.820, 0.412, Rotation2d(0.0))
-
     VisionConstants.MAX_DISTANCE_SINGLE_TAG = VisionConstants.AUTO_MAX_DISTANCE_SINGLE_TAG
     VisionConstants.MAX_DISTANCE_MULTI_TAG = VisionConstants.AUTO_MAX_DISTANCE_MULTI_TAG
 
