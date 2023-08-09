@@ -25,6 +25,7 @@ class RobotLoop : TimedRobot() {
   private val robot = Robot()
   private val positionChooser: PositionChooser = PositionChooser()
   private val routineChooser: RoutineChooser = RoutineChooser(robot)
+
   private var autoCommand: Command? = null
   private var routineMap = hashMapOf<String, Command>()
 
@@ -53,7 +54,7 @@ class RobotLoop : TimedRobot() {
     SmartDashboard.putData("Routine Chooser", routineChooser)
     SmartDashboard.putData("Command Scheduler", CommandScheduler.getInstance())
 
-    ControllerBindings(robot.driveController, robot.mechanismController, robot).bindButtons()
+    ControllerBindings(robot.driveController, robot.mechController, robot).bindButtons()
 
     robot.light.defaultCommand = Rainbow(robot.light)
   }
@@ -73,9 +74,9 @@ class RobotLoop : TimedRobot() {
 
     routineChooser.updateOptions(positionChooser.selected, RobotConstants.ALLIANCE_COLOR == DriverStation.Alliance.Red)
 
-    /** Every time auto starts, we update the chosen auto command */
-    this.autoCommand = routineMap[routineChooser.selected]
 
+    /** Every time auto starts, we update the chosen auto command */
+    this.autoCommand = routineChooser.routineMap()[routineChooser.selected]
     CommandScheduler.getInstance().schedule(this.autoCommand)
   }
 

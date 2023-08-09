@@ -1,15 +1,19 @@
 package frc.team449.robot2023.auto
 
 import com.pathplanner.lib.PathPlannerTrajectory
+import edu.wpi.first.math.MatBuilder
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
+import edu.wpi.first.math.numbers.N2
+import edu.wpi.first.math.numbers.N3
 import edu.wpi.first.wpilibj.DriverStation
+import frc.team449.control.auto.ChoreoTrajectory
 import java.util.Collections
 import java.util.function.BooleanSupplier
 import kotlin.math.PI
 
 object AutoUtil {
-  fun transformForPosition2(trajList: MutableList<PathPlannerTrajectory>): MutableList<PathPlannerTrajectory> {
+  fun transformForPosition2PP(trajList: MutableList<PathPlannerTrajectory>): MutableList<PathPlannerTrajectory> {
     val correctedTrajList: MutableList<PathPlannerTrajectory> = MutableList(
       trajList.size
     ) { PathPlannerTrajectory() }
@@ -28,7 +32,10 @@ object AutoUtil {
     return correctedTrajList
   }
 
-  fun transformForAlliance(pathGroup: MutableList<PathPlannerTrajectory>, isRed: BooleanSupplier): MutableList<PathPlannerTrajectory> {
+  /**
+   * Note: This version of transform for alliance is for Charged Up where each alliance is mirrored across the y-axis instead of the usual diagonal
+   */
+  fun transformForAlliancePP(pathGroup: MutableList<PathPlannerTrajectory>, isRed: BooleanSupplier): MutableList<PathPlannerTrajectory> {
     val correctedPathGroup: MutableList<PathPlannerTrajectory> = MutableList(
       pathGroup.size
     ) { PathPlannerTrajectory() }
@@ -55,6 +62,47 @@ object AutoUtil {
     }
 
     return correctedPathGroup
+  }
+
+  fun transformForPos2(pathGroup: MutableList<ChoreoTrajectory>): MutableList<ChoreoTrajectory> {
+    for (index in 0 until pathGroup.size) {
+      for (time in pathGroup[index].objectiveTimestamps) {
+        val currentMatrix = pathGroup[index].stateMap.get(time)
+
+        val newMatrix = MatBuilder(N2.instance, N3.instance).fill(
+          currentMatrix[0, 0],
+          AutoConstants.FIELD_WIDTH - currentMatrix[0, 1],
+          -currentMatrix[0, 2],
+          currentMatrix[1, 0],
+          -currentMatrix[1, 1],
+          -currentMatrix[1, 2]
+        )
+
+        pathGroup[index].stateMap.put(time, newMatrix)
+      }
+    }
+
+    return pathGroup
+  }
+  fun transformForRed(pathGroup: MutableList<ChoreoTrajectory>): MutableList<ChoreoTrajectory> {
+    for (index in 0 until pathGroup.size) {
+      for (time in pathGroup[index].objectiveTimestamps) {
+        val currentMatrix = pathGroup[index].stateMap.get(time)
+
+        val newMatrix = MatBuilder(N2.instance, N3.instance).fill(
+          AutoConstants.FIELD_LENGTH - currentMatrix[0, 0],
+          currentMatrix[0, 1],
+          PI - currentMatrix[0, 2],
+          -currentMatrix[1, 0],
+          currentMatrix[1, 1],
+          -currentMatrix[1, 2]
+        )
+
+        pathGroup[index].stateMap.put(time, newMatrix)
+      }
+    }
+
+    return pathGroup
   }
 
   /** Add other methods that return commands that do groups of actions that are done
