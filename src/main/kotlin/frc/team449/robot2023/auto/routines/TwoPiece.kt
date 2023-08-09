@@ -35,15 +35,15 @@ class TwoPiece(
   override val trajectory: MutableList<ChoreoTrajectory> =
     if (position == PositionChooser.Positions.POSITION1) {
       if (isRed) AutoUtil.transformForRed(
-        ChoreoTrajectory.createTrajectoryGroup("ConeCubeCube")
-      ) else ChoreoTrajectory.createTrajectoryGroup("ConeCubeCube")
+        ChoreoTrajectory.createTrajectory("ConeCubeCube")
+      ) else ChoreoTrajectory.createTrajectory("ConeCubeCube")
     } else {
       if (isRed) AutoUtil.transformForPos2(
         AutoUtil.transformForRed(
-          ChoreoTrajectory.createTrajectoryGroup("ConeCubeCube")
+          ChoreoTrajectory.createTrajectory("ConeCubeCube")
         )
       ) else AutoUtil.transformForPos2(
-        ChoreoTrajectory.createTrajectoryGroup("ConeCubeCube")
+        ChoreoTrajectory.createTrajectory("ConeCubeCube")
       )
     }
 

@@ -58,35 +58,36 @@ class ChoreoTrajectory(
   companion object {
     fun createTrajectory(
       filename: String,
-      trajName: String = filename
-    ): ChoreoTrajectory {
+    ): MutableList<ChoreoTrajectory> {
       val path = Filesystem.getDeployDirectory().absolutePath.plus("/trajectories/$filename.json")
-      val trajectory = JSONParser().parse(FileReader(File(path).absolutePath)) as JSONArray
+      val document = (JSONParser().parse(FileReader(File(path).absolutePath)) as JSONObject)["paths"] as HashMap<*, *>
 
-      val last = trajectory.last() as JSONObject
-      val totalTime = last["timestamp"] as Double
+      val trajList = mutableListOf<ChoreoTrajectory>()
 
-      val parseResults = parse(trajectory)
+      document.forEach { (name, pathData) ->
+        name as String
+        pathData as JSONObject
+        val trajectory = pathData["trajectory"] as JSONArray
 
-      return ChoreoTrajectory(
-        trajName,
-        parseResults.first,
-        totalTime,
-        parseResults.second
-      )
-    }
+        val info = parse(trajectory)
 
-    fun createTrajectoryGroup(folderName: String): MutableList<ChoreoTrajectory> {
-      val trajectoryList = mutableListOf<ChoreoTrajectory>()
+        val last = trajectory.last() as JSONObject
+        val totalTime = last["timestamp"] as Double
 
-      File(Filesystem.getDeployDirectory().absolutePath.plus("/trajectories/$folderName")).walk().forEach {
-        if (!it.name.equals(folderName)) {
-          trajectoryList.add(createTrajectory("$folderName/" + it.name.dropLast(5), folderName + it.name))
-        }
+        trajList.add(
+          ChoreoTrajectory(
+            filename + name,
+            info.first,
+            totalTime,
+            info.second
+          )
+        )
+
       }
 
-      return trajectoryList
+      return trajList
     }
+
 
     private fun parse(trajectory: JSONArray): Pair<InterpolatingMatrixTreeMap<Double, N2, N3>, ArrayList<Double>> {
       val stateMap = InterpolatingMatrixTreeMap<Double, N2, N3>()
