@@ -84,6 +84,7 @@ object AutoUtil {
 
     return pathGroup
   }
+
   fun transformForRed(pathGroup: MutableList<ChoreoTrajectory>): MutableList<ChoreoTrajectory> {
     for (index in 0 until pathGroup.size) {
       for (time in pathGroup[index].objectiveTimestamps) {

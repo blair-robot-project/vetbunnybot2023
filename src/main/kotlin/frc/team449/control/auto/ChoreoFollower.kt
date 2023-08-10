@@ -22,7 +22,7 @@ class ChoreoFollower(
   poseTol: Pose2d = Pose2d(0.05, 0.05, Rotation2d(0.05)),
   private val timeout: Double = 0.65,
   private val resetPose: Boolean = false
-): CommandBase() {
+) : CommandBase() {
 
   private val timer = Timer()
 

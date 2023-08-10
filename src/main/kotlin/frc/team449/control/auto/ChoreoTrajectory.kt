@@ -107,7 +107,8 @@ class ChoreoTrajectory(
           state["heading"].toString().toDouble(),
           state["velocityX"].toString().toDouble(),
           state["velocityY"].toString().toDouble(),
-          state["angularVelocity"].toString().toDouble())
+          state["angularVelocity"].toString().toDouble()
+        )
 
         stateMap.put(stateTime, matrix)
       }

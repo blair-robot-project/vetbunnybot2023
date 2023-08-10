@@ -15,7 +15,7 @@ class TwoPiece(
   robot: Robot,
   position: PositionChooser.Positions,
   isRed: Boolean
-): ChoreoRoutineStructure {
+) : ChoreoRoutineStructure {
 
   override val routine = ChoreoRoutine(
     drive = robot.drive,

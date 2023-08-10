@@ -23,7 +23,7 @@ class BackupEncoder(
   @Log
   private var useFallback = false
 
-  protected override fun getPositionNative(): Double {
+  override fun getPositionNative(): Double {
     return if (useFallback) {
       fallback.position
     } else {
@@ -31,7 +31,7 @@ class BackupEncoder(
     }
   }
 
-  protected override fun pollVelocityNative(): Double {
+  override fun pollVelocityNative(): Double {
     val fallbackVel = fallback.velocity
     return if (useFallback) {
       fallbackVel

@@ -36,7 +36,9 @@ class RoutineChooser(private val robot: Robot) : SendableChooser<String>() {
         when (position) {
           PositionChooser.Positions.POSITION1 -> {
             "RedExample1"
-          } else -> {
+          }
+
+          else -> {
             "RedExample2"
           }
         }
@@ -44,7 +46,9 @@ class RoutineChooser(private val robot: Robot) : SendableChooser<String>() {
         when (position) {
           PositionChooser.Positions.POSITION1 -> {
             "BlueExample1"
-          } else -> {
+          }
+
+          else -> {
             "BlueExample2"
           }
         }
@@ -57,17 +61,21 @@ class RoutineChooser(private val robot: Robot) : SendableChooser<String>() {
         when (position) {
           PositionChooser.Positions.POSITION1 -> {
             "RedChoreoTest1"
-          } else -> {
-          "RedChoreoTest2"
-        }
+          }
+
+          else -> {
+            "RedChoreoTest2"
+          }
         }
       } else {
         when (position) {
           PositionChooser.Positions.POSITION1 -> {
             "BlueChoreoTest1"
-          } else -> {
-          "BlueChoreoTest2"
-        }
+          }
+
+          else -> {
+            "BlueChoreoTest2"
+          }
         }
       }
     )

@@ -76,7 +76,7 @@ class RobotLoop : TimedRobot() {
 
 
     /** Every time auto starts, we update the chosen auto command */
-    this.autoCommand = routineChooser.routineMap()[routineChooser.selected]
+    this.autoCommand = routineMap[routineChooser.selected]
     CommandScheduler.getInstance().schedule(this.autoCommand)
   }
 
