@@ -3,45 +3,11 @@ package frc.team449.robot2023.constants.field
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.util.Units
-import frc.team449.control.obstacleAvoidance.Obstacle
 import frc.team449.robot2023.constants.RobotConstants
 
 object FieldConstants {
   const val fieldLength = 16.54
   const val fieldWidth = 8.02
-
-  val withinNode = Pose2d(2.75, 2.75, Rotation2d.fromDegrees(90.0))
-
-  var obstacles = listOf( // Charging Station
-    Obstacle(
-      doubleArrayOf(
-        2.90 - RobotConstants.ROBOT_LENGTH / 2,
-        4.90 + RobotConstants.ROBOT_LENGTH / 2,
-        4.90 + RobotConstants.ROBOT_LENGTH / 2,
-        2.90 - RobotConstants.ROBOT_LENGTH / 2
-      ),
-      doubleArrayOf(
-        4.00 + RobotConstants.ROBOT_WIDTH / 2,
-        4.00 + RobotConstants.ROBOT_WIDTH / 2,
-        1.50 - RobotConstants.ROBOT_WIDTH / 2,
-        1.50 - RobotConstants.ROBOT_WIDTH / 2
-      )
-    ),
-    Obstacle(
-      doubleArrayOf(
-        3.33 + RobotConstants.ROBOT_LENGTH / 2,
-        3.33 + RobotConstants.ROBOT_LENGTH / 2,
-        1.4 - RobotConstants.ROBOT_LENGTH / 2,
-        1.4 - RobotConstants.ROBOT_LENGTH / 2
-      ),
-      doubleArrayOf(
-        5.3 - RobotConstants.ROBOT_WIDTH / 2,
-        5.75 + RobotConstants.ROBOT_WIDTH / 2,
-        5.3 - RobotConstants.ROBOT_WIDTH / 2,
-        5.75 + RobotConstants.ROBOT_WIDTH / 2
-      )
-    )
-  )
 
   val wallNodeY = Units.inchesToMeters(20.19)
   val nodeSeparationY = Units.inchesToMeters(22.0)

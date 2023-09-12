@@ -19,6 +19,7 @@ import frc.team449.robot2023.constants.RobotConstants
 import frc.team449.robot2023.constants.subsystem.ArmConstants
 import frc.team449.robot2023.subsystems.ControllerBindings
 import frc.team449.robot2023.subsystems.arm.ArmPaths
+import frc.team449.robot2023.subsystems.nodeTracker.NodeSelectorIOServer
 import io.github.oblarg.oblog.Logger
 
 /** The main class of the robot, constructs all the subsystems and initializes default commands. */
@@ -34,6 +35,8 @@ class RobotLoop : TimedRobot() {
   override fun robotInit() {
     // Yes this should be a print statement, it's useful to know that robotInit started.
     println("Started robotInit.")
+
+    NodeSelectorIOServer().setUp()
 
     if (RobotBase.isSimulation()) {
       // Don't complain about joysticks if there aren't going to be any
