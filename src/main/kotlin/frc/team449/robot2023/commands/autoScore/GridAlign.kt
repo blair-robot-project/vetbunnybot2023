@@ -44,14 +44,13 @@ class GridAlign(
       ArmConstants.backToArmBase - FieldConstants.highNodeFromEdge
   )
 
-  private fun autoScore(
+  fun autoScore(
     target: FieldConstants.TargetPosition,
     isRed: Boolean,
     endCondition: BooleanSupplier,
-    scoreCondition: BooleanSupplier,
     level: Levels,
     isConeNode: Boolean,
-    tolerance: Pose2d = Pose2d(0.035, 0.035, Rotation2d(0.025))
+    tolerance: Pose2d = Pose2d(0.075, 0.075, Rotation2d.fromDegrees(1.75))
   ): Command {
     println("doing traj generation here")
 
@@ -134,13 +133,13 @@ class GridAlign(
           robot.drive,
           path,
           poseTol = tolerance,
-          timeout = Double.MAX_VALUE
+          timeout = 4.0
         ),
         ParallelCommandGroup(
           WaitCommand(waitTimeForArm),
           ArmFollower(robot.arm) { armTraj }
         )
-      ).until(scoreCondition),
+      ),
       ConditionalCommand(
         SequentialCommandGroup(
           ArmSweep(

@@ -32,8 +32,24 @@ function displayActive(index) {
 }
 
 function sendActive(index) {
-  if (index !== active) {
-    client.addSample(nodeDashboardToRobotTopic, index);
+  Array.from(document.getElementsByClassName("fullactive")).forEach((element) => {
+      element.classList.remove("fullactive");
+    });
+
+  if (active == index) {
+      active = null;
+      Array.from(document.getElementsByClassName("active")).forEach((element) => {
+                    element.classList.remove("active");
+                  });
+      document.getElementsByTagName("td")[index].classList.add("fullactive")
+      client.addSample(nodeDashboardToRobotTopic, index);
+      return;
+    } else if (index !== null) {
+    active = index;
+    Array.from(document.getElementsByClassName("active")).forEach((element) => {
+              element.classList.remove("active");
+            });
+    document.getElementsByTagName("td")[index].classList.add("active")
   }
 }
 
@@ -51,12 +67,8 @@ function displayTime(time, isAuto) {
   element.className = "time";
   if (isAuto) {
     element.classList.add("auto");
-  } else if (time > 30 || time == 0) {
-    element.classList.add("teleop-1");
-  } else if (time > 15) {
-    element.classList.add("teleop-2");
   } else {
-    element.classList.add("teleop-3");
+    element.classList.add("teleop");
   }
   let secondsString = (time % 60).toString();
   if (secondsString.length == 1) {
@@ -134,7 +146,7 @@ window.addEventListener("load", () => {
   });
 
   // Add node touch listeners
-  [("touchstart", "touchmove")].forEach((eventString) => {
+  [("touchend")].forEach((eventString) => {
     document.body.addEventListener(eventString, (event) => {
       if (event.touches.length > 0) {
         let x = event.touches[0].clientX;
@@ -156,18 +168,5 @@ window.addEventListener("load", () => {
     });
   });
 
-  // Add cone orientation listeners
-  const coneOrientationDiv =
-    document.getElementsByClassName("cone-orientation")[0];
-  coneOrientationDiv.addEventListener("click", () => {
-    toggleTipped();
-  });
-  coneOrientationDiv.addEventListener("contextmenu", (event) => {
-    event.preventDefault();
-    toggleTipped();
-  });
-  coneOrientationDiv.addEventListener("touchstart", () => {
-    event.preventDefault();
-    toggleTipped();
-  });
+
 });
