@@ -89,12 +89,6 @@ class ObjectiveTracker(
     prevObjective.nodeLevel = objective.nodeLevel
   }
 
-  enum class NodeLevel {
-    HYBRID,
-    MID,
-    HIGH
-  }
-
   companion object {
     fun createObjTracker(robot: Robot): ObjectiveTracker {
       return ObjectiveTracker(
