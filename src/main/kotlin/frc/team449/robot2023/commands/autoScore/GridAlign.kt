@@ -125,7 +125,7 @@ class GridAlign(
 
     val armTraj = robot.arm.chooseTraj(levelsToArm[level]!!)
 
-    val waitTimeForArm = if (path.totalTimeSeconds > armTraj!!.totalTime + 1.25) path.totalTimeSeconds - armTraj.totalTime - 1.25 else 0.0
+    val waitTimeForArm = if (path.totalTimeSeconds > (armTraj?.totalTime ?: 0.0) + 1.25) path.totalTimeSeconds - (armTraj?.totalTime ?: 0.0) - 1.25 else 0.0
 
     return SequentialCommandGroup(
       ParallelCommandGroup(
@@ -142,17 +142,19 @@ class GridAlign(
       ),
       ConditionalCommand(
         SequentialCommandGroup(
-          ArmSweep(
-            robot.arm,
-            { 1.0 },
-            Rotation2d.fromDegrees(15.0)
+          ParallelRaceGroup(
+            WaitCommand(0.35),
+            ArmSweep(
+              robot.arm,
+              { 1.0 },
+              Rotation2d.fromDegrees(15.0)
+            )
           ),
-          WaitCommand(0.25),
           InstantCommand(robot.endEffector::pistonRev)
         ),
         InstantCommand(robot.endEffector::autoReverse)
       ) { isConeNode },
       InstantCommand(robot.endEffector::stop)
-    ).until(endCondition)
+    )
   }
 }
