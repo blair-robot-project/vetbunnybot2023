@@ -1,14 +1,16 @@
 package frc.team449.robot2023.commands.driveAlign
 
-import edu.wpi.first.math.controller.ProfiledPIDController
+import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.trajectory.TrapezoidProfile
+import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj2.command.CommandBase
-import frc.team449.control.holonomic.HolonomicDrive
+import frc.team449.control.holonomic.SwerveDrive
 import frc.team449.robot2023.constants.RobotConstants
 import frc.team449.robot2023.constants.auto.AutoConstants
+import kotlin.math.PI
 
 /**
  * @param drive The holonomic drive you want to align with
@@ -19,25 +21,34 @@ import frc.team449.robot2023.constants.auto.AutoConstants
  * @param tolerance The allowed tolerance from the targetPose
  */
 class ProfiledPoseAlign(
-  private val drive: HolonomicDrive,
+  private val drive: SwerveDrive,
   private val targetPose: Pose2d,
-  private val xPID: ProfiledPIDController = ProfiledPIDController(
+  xSpeed: Double,
+  ySpeed: Double,
+  private val xPID: PIDController = PIDController(
     AutoConstants.DEFAULT_X_KP,
     0.0,
     0.0,
-    TrapezoidProfile.Constraints(4.0, 3.0)
   ),
-  private val yPID: ProfiledPIDController = ProfiledPIDController(
+  private val yPID: PIDController = PIDController(
     AutoConstants.DEFAULT_Y_KP,
     0.0,
     0.0,
-    TrapezoidProfile.Constraints(4.0, 3.0)
   ),
-  private val headingPID: ProfiledPIDController = ProfiledPIDController(
+  private val headingPID: PIDController = PIDController(
     AutoConstants.DEFAULT_ROTATION_KP,
     0.0,
     0.0,
-    TrapezoidProfile.Constraints(RobotConstants.MAX_ROT_SPEED, RobotConstants.RATE_LIMIT)
+  ),
+  private val xProfile: TrapezoidProfile = TrapezoidProfile(
+    TrapezoidProfile.Constraints(RobotConstants.MAX_LINEAR_SPEED - 1.25, 2.25),
+    TrapezoidProfile.State(targetPose.x, 0.0),
+    TrapezoidProfile.State(drive.pose.x, xSpeed)
+  ),
+  private val yProfile: TrapezoidProfile = TrapezoidProfile(
+    TrapezoidProfile.Constraints(RobotConstants.MAX_LINEAR_SPEED - 1.25, 2.25),
+    TrapezoidProfile.State(targetPose.y, 0.0),
+    TrapezoidProfile.State(drive.pose.y, ySpeed)
   ),
   private val tolerance: Pose2d = Pose2d(0.05, 0.05, Rotation2d(0.05))
 ) : CommandBase() {
@@ -45,42 +56,48 @@ class ProfiledPoseAlign(
     addRequirements(drive)
   }
 
+  val timer = Timer()
+
   override fun initialize() {
-    headingPID.enableContinuousInput(-Math.PI, Math.PI)
+    headingPID.enableContinuousInput(-PI, PI)
 
     // Set tolerances from the given pose tolerance
     xPID.setTolerance(tolerance.x)
     yPID.setTolerance(tolerance.y)
     headingPID.setTolerance(tolerance.rotation.radians)
 
-    // Set the goals for all the PID controller to the target pose
-    xPID.setGoal(targetPose.x)
-    yPID.setGoal(targetPose.y)
-    headingPID.setGoal(targetPose.rotation.radians)
+    headingPID.setpoint = targetPose.rotation.radians
+
+    timer.restart()
+  }
+
+  fun getTime(): Double {
+    return maxOf(xProfile.totalTime(), yProfile.totalTime(), 0.5)
   }
 
   override fun execute() {
     // Calculate the feedback for X, Y, and theta using their respective controllers
-    val xFeedback = xPID.calculate(drive.pose.x)
-    val yFeedback = yPID.calculate(drive.pose.y)
+
+    val xProfCalc = xProfile.calculate(timer.get())
+    val yProfCalc = yProfile.calculate(timer.get())
+
+    val xFeedback = xPID.calculate(drive.pose.x, xProfCalc.position)
+    val yFeedback = yPID.calculate(drive.pose.y, yProfCalc.position)
     val headingFeedback = headingPID.calculate(drive.heading.radians)
 
     drive.set(
       ChassisSpeeds.fromFieldRelativeSpeeds(
-        xFeedback,
-        yFeedback,
+        xFeedback + xProfCalc.velocity,
+        yFeedback + yProfCalc.velocity,
         headingFeedback,
         drive.heading
       )
     )
-    println(xFeedback)
-    println(yFeedback)
-    println(headingFeedback)
-    println(xPID.goal)
   }
 
   override fun isFinished(): Boolean {
-    return xPID.atGoal() && yPID.atGoal() && headingPID.atGoal()
+    return xPID.atSetpoint() && yPID.atSetpoint() && headingPID.atSetpoint() &&
+      xProfile.isFinished(timer.get()) && yProfile.isFinished(timer.get())
   }
 
   override fun end(interrupted: Boolean) {

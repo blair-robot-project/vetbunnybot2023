@@ -25,7 +25,7 @@ object RobotConstants {
   const val MAX_ACCEL = 14.75 // m/s/s
   val INITIAL_POSE = Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0))
 
-  const val DOUBLE_ALIGN_ACCEL = 4.5
+  const val DOUBLE_ALIGN_ACCEL = 2.25
 
   /** PID controller for Orthogonal turning */
   val ORTHOGONAL_CONTROLLER = ProfiledPIDController(
@@ -43,6 +43,6 @@ object RobotConstants {
   val IR_CHANNEL = 15
 
   // Robot dimensions (INCLUDING BUMPERS)
-  val ROBOT_WIDTH = Units.inchesToMeters(27.0 + 3.25)
-  val ROBOT_LENGTH = Units.inchesToMeters(30.0 + 3.25)
+  val ROBOT_WIDTH = Units.inchesToMeters(27.0 + 3.25 * 2)
+  val ROBOT_LENGTH = Units.inchesToMeters(30.0 + 3.25 * 2)
 }

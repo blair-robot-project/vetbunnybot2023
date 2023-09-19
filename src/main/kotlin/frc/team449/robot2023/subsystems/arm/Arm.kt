@@ -58,9 +58,9 @@ open class Arm(
   @get:Log.ToString
   open val state: ArmState
     get() = ArmState(
-      Rotation2d(MathUtil.inputModulus(firstJointEncoder.position, -PI, PI)),
+      Rotation2d(MathUtil.inputModulus(firstJoint.position, -PI, PI)),
       Rotation2d(MathUtil.inputModulus(secondJointEncoder.position, -PI, PI)),
-      firstJointEncoder.velocity,
+      firstJoint.velocity,
       secondJointEncoder.velocity
     )
 
@@ -147,6 +147,10 @@ open class Arm(
     if (startPoint == ArmConstants.CUBE && endpoint == ArmConstants.CONE) return ArmPaths.cubeCone
     if (startPoint == ArmConstants.HIGH && endpoint == ArmConstants.MID) return ArmPaths.highMid
     if (startPoint == ArmConstants.MID && endpoint == ArmConstants.HIGH) return ArmPaths.midHigh
+    if (startPoint == ArmConstants.LOW && endpoint == ArmConstants.HIGH) return ArmPaths.lowHigh
+    if (startPoint == ArmConstants.LOW && endpoint == ArmConstants.MID) return ArmPaths.lowMid
+    if (startPoint == ArmConstants.HIGH && endpoint == ArmConstants.LOW) return ArmPaths.highLow
+    if (startPoint == ArmConstants.MID && endpoint == ArmConstants.LOW) return ArmPaths.midLow
 
     return if (startPoint == ArmConstants.BACK) {
       when (endpoint) {
@@ -291,7 +295,7 @@ open class Arm(
   }
 
   override fun initSendable(builder: SendableBuilder) {
-    builder.addDoubleProperty("First Joint Degrees", { Rotation2d.fromRadians(firstJointEncoder.position).degrees }, null)
+    builder.addDoubleProperty("First Joint Degrees", { Rotation2d.fromRadians(firstJoint.position).degrees }, null)
     builder.addDoubleProperty("Second Joint Degrees", { Rotation2d.fromRadians(secondJointEncoder.position).degrees }, null)
   }
 }

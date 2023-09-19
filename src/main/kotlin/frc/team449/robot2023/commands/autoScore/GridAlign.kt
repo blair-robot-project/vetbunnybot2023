@@ -1,25 +1,21 @@
 package frc.team449.robot2023.commands.autoScore
 
-import com.pathplanner.lib.PathConstraints
-import com.pathplanner.lib.PathPlanner
-import com.pathplanner.lib.PathPoint
 import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj2.command.*
-import frc.team449.control.auto.HolonomicFollower
+import frc.team449.control.DriveCommand
 import frc.team449.robot2023.commands.arm.ArmSweep
+import frc.team449.robot2023.commands.driveAlign.ProfiledPoseAlign
 import frc.team449.robot2023.constants.RobotConstants
 import frc.team449.robot2023.constants.field.FieldConstants
 import frc.team449.robot2023.constants.subsystem.ArmConstants
 import frc.team449.robot2023.subsystems.arm.control.ArmFollower
 import frc.team449.robot2023.subsystems.arm.control.ArmState
-import java.util.function.BooleanSupplier
 import kotlin.math.PI
 import kotlin.math.abs
-import kotlin.math.hypot
 
 class GridAlign(
   private val robot: frc.team449.robot2023.Robot
@@ -38,25 +34,38 @@ class GridAlign(
 
   private val levelsToOffsets: Map<Levels, Double> = mapOf(
     Levels.LOW to 0.0,
-    Levels.MID to abs(robot.arm.kinematics.toCartesian(ArmConstants.MID).x - 0.035) -
+    Levels.MID to abs(robot.arm.kinematics.toCartesian(ArmConstants.MID).x + ArmConstants.PIECE_TO_WHEEL) -
       ArmConstants.backToArmBase - FieldConstants.midNodeFromEdge,
-    Levels.HIGH to abs(robot.arm.kinematics.toCartesian(ArmConstants.HIGH).x - 0.035) -
+    Levels.HIGH to abs(robot.arm.kinematics.toCartesian(ArmConstants.HIGH).x + ArmConstants.PIECE_TO_WHEEL) -
       ArmConstants.backToArmBase - FieldConstants.highNodeFromEdge
   )
+
+  private fun inArmTolerance(current: ArmState, goal: ArmState, tolerance: ArmState): Boolean {
+    val error1 = current.theta.radians - goal.theta.radians
+    val error2 = current.beta.radians - goal.beta.radians
+
+    val there = abs(error1) < abs(tolerance.theta.radians) &&
+      abs(error2) < abs(tolerance.beta.radians) &&
+      abs(current.thetaVel) < abs(tolerance.thetaVel) &&
+      abs(current.betaVel) < abs(tolerance.betaVel)
+
+    println(there)
+
+    return there
+  }
 
   fun autoScore(
     target: FieldConstants.TargetPosition,
     isRed: Boolean,
-    endCondition: BooleanSupplier,
     level: Levels,
     isConeNode: Boolean,
-    tolerance: Pose2d = Pose2d(0.075, 0.075, Rotation2d.fromDegrees(1.75))
+    tolerance: Pose2d = Pose2d(0.065, 0.065, Rotation2d.fromDegrees(1.25)),
+    armTolerance: ArmState = ArmState(Rotation2d.fromDegrees(3.0), Rotation2d.fromDegrees(3.0), 0.2, 0.2)
   ): Command {
     println("doing traj generation here")
 
     val alliancePoint: Translation2d
     val endHeading: Rotation2d
-    val endRotation: Rotation2d
     val xSpeedMin: Double
     val xSpeedMax: Double
     val ySpeedMin: Double
@@ -76,7 +85,6 @@ class GridAlign(
     if (!isRed) {
       alliancePoint = Translation2d(point.x, point.y)
       endHeading = Rotation2d()
-      endRotation = Rotation2d(PI)
       xSpeedMin = -RobotConstants.MAX_LINEAR_SPEED
       xSpeedMax = 0.0
       if (robot.drive.pose.y < alliancePoint.y) {
@@ -89,7 +97,6 @@ class GridAlign(
     } else {
       alliancePoint = Translation2d(FieldConstants.fieldLength - point.x, point.y)
       endHeading = Rotation2d(PI)
-      endRotation = Rotation2d()
       xSpeedMin = 0.0
       xSpeedMax = RobotConstants.MAX_LINEAR_SPEED
       if (robot.drive.pose.y < alliancePoint.y) {
@@ -101,40 +108,30 @@ class GridAlign(
       }
     }
 
-    val path = PathPlanner.generatePath(
-      PathConstraints(RobotConstants.MAX_LINEAR_SPEED, RobotConstants.DOUBLE_ALIGN_ACCEL),
-      PathPoint(
-        robot.drive.pose.translation,
-        alliancePoint.minus(robot.drive.pose.translation).angle,
-        robot.drive.pose.rotation,
-        hypot(
-          MathUtil.clamp(
-            fieldRelSpeeds.vxMetersPerSecond,
-            xSpeedMin,
-            xSpeedMax
-          ),
-          MathUtil.clamp(
-            fieldRelSpeeds.vyMetersPerSecond,
-            ySpeedMin,
-            ySpeedMax
-          )
-        )
-      ),
-      PathPoint(alliancePoint, endRotation, endHeading)
-    )
-
     val armTraj = robot.arm.chooseTraj(levelsToArm[level]!!)
 
-    val waitTimeForArm = if (path.totalTimeSeconds > (armTraj?.totalTime ?: 0.0) + 1.25) path.totalTimeSeconds - (armTraj?.totalTime ?: 0.0) - 1.25 else 0.0
+    val profiledPath = ProfiledPoseAlign(
+      robot.drive,
+      Pose2d(alliancePoint, endHeading),
+      MathUtil.clamp(
+        fieldRelSpeeds.vxMetersPerSecond,
+        xSpeedMin,
+        xSpeedMax
+      ),
+      MathUtil.clamp(
+        fieldRelSpeeds.vyMetersPerSecond,
+        ySpeedMin,
+        ySpeedMax
+      ),
+      tolerance = tolerance
+    )
+
+    val waitTimeForArm = if (profiledPath.getTime() > (armTraj?.totalTime ?: 0.0) + 1.0)
+      profiledPath.getTime() - (armTraj?.totalTime ?: 0.0) - 1.75 else 0.0
 
     return SequentialCommandGroup(
       ParallelCommandGroup(
-        HolonomicFollower(
-          robot.drive,
-          path,
-          poseTol = tolerance,
-          timeout = 4.0
-        ),
+        profiledPath,
         ParallelCommandGroup(
           WaitCommand(waitTimeForArm),
           ArmFollower(robot.arm) { armTraj }
@@ -143,18 +140,25 @@ class GridAlign(
       ConditionalCommand(
         SequentialCommandGroup(
           ParallelRaceGroup(
-            WaitCommand(0.35),
+            WaitCommand(0.5),
             ArmSweep(
               robot.arm,
               { 1.0 },
-              Rotation2d.fromDegrees(15.0)
+              Rotation2d.fromDegrees(10.0)
             )
           ),
           InstantCommand(robot.endEffector::pistonRev)
         ),
         InstantCommand(robot.endEffector::autoReverse)
       ) { isConeNode },
-      InstantCommand(robot.endEffector::stop)
+      InstantCommand(robot.endEffector::stop),
+      ParallelRaceGroup(
+        SequentialCommandGroup(
+          WaitCommand(0.35),
+          ArmFollower(robot.arm) { robot.arm.chooseTraj(ArmConstants.BACK) }
+        ),
+        DriveCommand(robot.drive, robot.oi)
+      )
     )
   }
 }

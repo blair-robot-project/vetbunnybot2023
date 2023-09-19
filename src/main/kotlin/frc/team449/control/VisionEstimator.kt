@@ -82,6 +82,10 @@ class VisionEstimator(
       return lowestAmbiguityStrategy(result)
     }
     for (target: PhotonTrackedTarget in result.getTargets()) {
+      if (target.detectedCorners.size < 4) {
+        continue
+      }
+
       visCorners.addAll(target.detectedCorners)
       val tagPoseOpt = tagLayout.getTagPose(target.fiducialId)
       if (tagPoseOpt.isEmpty) {
@@ -132,6 +136,10 @@ class VisionEstimator(
       if (targetPoseAmbiguity != -1.0 && targetPoseAmbiguity < lowestAmbiguityScore) {
         lowestAmbiguityScore = targetPoseAmbiguity
         lowestAmbiguityTarget = target
+      }
+
+      if (target.detectedCorners.size < 4) {
+        return Optional.empty()
       }
     }
 

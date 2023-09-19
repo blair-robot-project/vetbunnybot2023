@@ -107,7 +107,10 @@ class OrthogonalHolonomicOI(
     /** Based on which button was pressed, give in the setpoint to the PID controller. */
     if (aButton.asBoolean) {
       atGoal = false
-      controller.goal = TrapezoidProfile.State(MathUtil.angleModulus(0.0 + allianceCompensation.invoke()), 0.0)
+      val desAngleA = MathUtil.angleModulus(0.0 + allianceCompensation.invoke())
+      if (abs(desAngleA - drive.heading.radians) > 0.075) {
+        controller.goal = TrapezoidProfile.State(desAngleA, 0.0)
+      }
     }
 //    else if (bButton.asBoolean) {
 //      atGoal = false
@@ -115,7 +118,12 @@ class OrthogonalHolonomicOI(
 //    }
     else if (yButton.asBoolean) {
       atGoal = false
-      controller.goal = TrapezoidProfile.State(MathUtil.angleModulus(PI + allianceCompensation.invoke()), 0.0)
+      val desAngleY = MathUtil.angleModulus(PI + allianceCompensation.invoke())
+      if (abs(desAngleY - drive.heading.radians) > 0.075) {
+        println("here")
+        println(desAngleY)
+        controller.goal = TrapezoidProfile.State(desAngleY, 0.0)
+      }
     }
 //    else if (xButton.asBoolean) {
 //      atGoal = false

@@ -79,7 +79,6 @@ class ObjectiveTracker(
       alignGen.autoScore(
         rows[objective.nodeRow],
         DriverStation.getAlliance().equals(Alliance.Red),
-        { false },
         objective.nodeLevel,
         objective.isConeNode,
       ).schedule()

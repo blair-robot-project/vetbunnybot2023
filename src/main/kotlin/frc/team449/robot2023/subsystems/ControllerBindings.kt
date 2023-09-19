@@ -12,8 +12,6 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton
 import edu.wpi.first.wpilibj2.command.button.Trigger
 import frc.team449.robot2023.Robot
 import frc.team449.robot2023.commands.arm.ArmSweep
-import frc.team449.robot2023.commands.autoBalance.AutoBalance
-import frc.team449.robot2023.commands.driveAlign.DoubleAlign
 import frc.team449.robot2023.constants.RobotConstants
 import frc.team449.robot2023.constants.subsystem.ArmConstants
 import frc.team449.robot2023.subsystems.arm.control.ArmFollower
@@ -224,21 +222,21 @@ class ControllerBindings(
         .withInterruptBehavior(kCancelIncoming)
     )
 
-    JoystickButton(driveController, XboxController.Button.kBack.value).onTrue(
-      AutoBalance.create(robot.drive)
-    )
+//    JoystickButton(driveController, XboxController.Button.kBack.value).onTrue(
+//      AutoBalance.create(robot.drive)
+//    )
 
     JoystickButton(driveController, XboxController.Button.kStart.value).onTrue(
       InstantCommand({ robot.drive.heading = Rotation2d(0.0) })
     )
 
-    JoystickButton(driveController, XboxController.Button.kB.value).onTrue(
-      InstantCommand({ DoubleAlign().rightDoubleAlign(robot, driveController).schedule() })
-    )
-
-    JoystickButton(driveController, XboxController.Button.kX.value).onTrue(
-      InstantCommand({ DoubleAlign().leftDoubleAlign(robot, driveController).schedule() })
-    )
+//    JoystickButton(driveController, XboxController.Button.kB.value).onTrue(
+//      InstantCommand({ DoubleAlign().rightDoubleAlign(robot, driveController).schedule() })
+//    )
+//
+//    JoystickButton(driveController, XboxController.Button.kX.value).onTrue(
+//      InstantCommand({ DoubleAlign().leftDoubleAlign(robot, driveController).schedule() })
+//    )
   }
 
   override fun initSendable(builder: SendableBuilder) {

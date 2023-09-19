@@ -71,7 +71,6 @@ class RobotLoop : TimedRobot() {
       robot.arm::holdArm,
       robot.arm
     )
-
 //    robot.light.defaultCommand = BlairAnimation(robot.light)
   }
 
@@ -81,6 +80,8 @@ class RobotLoop : TimedRobot() {
     Logger.updateEntries()
 
     robot.field.robotPose = robot.drive.pose
+
+    robot.field.getObject("bumpers").pose = robot.drive.pose
   }
 
   override fun autonomousInit() {

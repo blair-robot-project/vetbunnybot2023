@@ -7,6 +7,8 @@ import frc.team449.robot2023.subsystems.arm.control.ArmState
 
 object ArmConstants {
 
+  const val PIECE_TO_WHEEL = -0.075
+
   // Motor CAN ID
   const val FIRST_MOTOR_ID1 = 5
   const val FIRST_MOTOR_ID2 = 6
