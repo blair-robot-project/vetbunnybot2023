@@ -108,12 +108,16 @@ class VisionEstimator(
       val cameraMatrix = cameraMatrixOpt.get()
       val distCoeffs = distCoeffsOpt.get()
       val pnpResults = estimateCamPosePNP(cameraMatrix, distCoeffs, visCorners, knownVisTags)
-      val best = Pose3d()
-        .plus(pnpResults.best) // field-to-camera
-        .plus(robotToCam.inverse()) // field-to-robot
-      Optional.of(
-        EstimatedRobotPose(best, result.timestampSeconds, result.getTargets())
-      )
+      if (pnpResults != null) {
+        val best = Pose3d()
+          .plus(pnpResults.best) // field-to-camera
+          .plus(robotToCam.inverse()) // field-to-robot
+        Optional.of(
+          EstimatedRobotPose(best, result.timestampSeconds, result.getTargets())
+        )
+      } else {
+        Optional.empty()
+      }
     } else {
       Optional.empty()
     }
@@ -189,7 +193,7 @@ class VisionEstimator(
     distCoeffs: Matrix<N5, N1>,
     corners: List<TargetCorner>,
     knownTags: List<AprilTag>
-  ): PNPResults {
+  ): PNPResults? {
     // single-tag pnp
     return if (corners.size == 4) {
       val camToTag = OpenCVHelp.solvePNP_SQUARE(
@@ -237,17 +241,23 @@ class VisionEstimator(
         camToTag.bestReprojErr,
         camToTag.altReprojErr
       )
-    } else {
+    } else if (corners.size % 4 == 0) {
       val objectTrls = java.util.ArrayList<Translation3d>()
       for (tag in knownTags) objectTrls.addAll(VisionEstimation.kTagModel.getFieldVertices(tag.pose))
-      val camToOrigin = OpenCVHelp.solvePNP_SQPNP(cameraMatrix, distCoeffs, objectTrls, corners)
-      PNPResults(
-        camToOrigin.best.inverse(),
-        camToOrigin.alt.inverse(),
-        camToOrigin.ambiguity,
-        camToOrigin.bestReprojErr,
-        camToOrigin.altReprojErr
-      )
+      if (objectTrls.size == corners.size) {
+        val camToOrigin = OpenCVHelp.solvePNP_SQPNP(cameraMatrix, distCoeffs, objectTrls, corners)
+        PNPResults(
+          camToOrigin.best.inverse(),
+          camToOrigin.alt.inverse(),
+          camToOrigin.ambiguity,
+          camToOrigin.bestReprojErr,
+          camToOrigin.altReprojErr
+        )
+      } else {
+        null
+      }
+    } else {
+      null
     }
   }
 }

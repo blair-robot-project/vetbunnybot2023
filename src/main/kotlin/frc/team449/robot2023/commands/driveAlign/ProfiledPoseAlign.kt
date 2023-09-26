@@ -11,6 +11,7 @@ import frc.team449.control.holonomic.SwerveDrive
 import frc.team449.robot2023.constants.RobotConstants
 import frc.team449.robot2023.constants.auto.AutoConstants
 import kotlin.math.PI
+import kotlin.math.hypot
 
 /**
  * @param drive The holonomic drive you want to align with
@@ -50,7 +51,9 @@ class ProfiledPoseAlign(
     TrapezoidProfile.State(targetPose.y, 0.0),
     TrapezoidProfile.State(drive.pose.y, ySpeed)
   ),
-  private val tolerance: Pose2d = Pose2d(0.05, 0.05, Rotation2d(0.05))
+  private val tolerance: Pose2d = Pose2d(0.05, 0.05, Rotation2d(0.05)),
+  private val speedTol: Double = 0.05,
+  private val speedTolRot: Double = 0.05
 ) : CommandBase() {
   init {
     addRequirements(drive)
@@ -76,10 +79,12 @@ class ProfiledPoseAlign(
   }
 
   override fun execute() {
+    val currTime = timer.get()
+
     // Calculate the feedback for X, Y, and theta using their respective controllers
 
-    val xProfCalc = xProfile.calculate(timer.get())
-    val yProfCalc = yProfile.calculate(timer.get())
+    val xProfCalc = xProfile.calculate(currTime)
+    val yProfCalc = yProfile.calculate(currTime)
 
     val xFeedback = xPID.calculate(drive.pose.x, xProfCalc.position)
     val yFeedback = yPID.calculate(drive.pose.y, yProfCalc.position)
@@ -96,8 +101,13 @@ class ProfiledPoseAlign(
   }
 
   override fun isFinished(): Boolean {
+    val currTime = timer.get()
+
     return xPID.atSetpoint() && yPID.atSetpoint() && headingPID.atSetpoint() &&
-      xProfile.isFinished(timer.get()) && yProfile.isFinished(timer.get())
+      xProfile.isFinished(currTime) && yProfile.isFinished(currTime) &&
+      hypot(drive.currentSpeeds.vxMetersPerSecond,
+        drive.currentSpeeds.vyMetersPerSecond) < speedTol &&
+      drive.currentSpeeds.omegaRadiansPerSecond < speedTolRot
   }
 
   override fun end(interrupted: Boolean) {
