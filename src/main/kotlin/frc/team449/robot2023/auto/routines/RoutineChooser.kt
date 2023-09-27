@@ -56,7 +56,7 @@ class RoutineChooser(private val robot: Robot) : SendableChooser<String>() {
     )
 
     this.addOption(
-      "Choreo 2 Piece Bal",
+      "Choreo 3 Piece",
       if (isRed) {
         when (position) {
           PositionChooser.Positions.POSITION1 -> {

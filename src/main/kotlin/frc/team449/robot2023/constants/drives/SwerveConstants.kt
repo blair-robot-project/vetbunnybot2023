@@ -52,8 +52,8 @@ object SwerveConstants {
   const val DRIVE_CURRENT_LIM = 50
   const val STEERING_CURRENT_LIM = 50
 
-  /** Wheelbase = wheel-to-wheel distance from the side of the robot */
-  /** Trackwidth = wheel-to-wheel distance from the front/back of the robot */
+  /** Wheelbase = wheel-to-wheel distance looking from the side of the robot */
+  /** Trackwidth = wheel-to-wheel distance looking from the front of the robot */
   val WHEELBASE = Units.inchesToMeters(30.0) // ex. FL to BL
   val TRACKWIDTH = Units.inchesToMeters(27.00) // ex. BL to BR
 }
