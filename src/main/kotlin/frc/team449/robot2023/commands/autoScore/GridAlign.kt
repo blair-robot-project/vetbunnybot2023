@@ -41,27 +41,12 @@ class GridAlign(
       ArmConstants.backToArmBase - FieldConstants.highNodeFromEdge
   )
 
-  private fun inArmTolerance(current: ArmState, goal: ArmState, tolerance: ArmState): Boolean {
-    val error1 = current.theta.radians - goal.theta.radians
-    val error2 = current.beta.radians - goal.beta.radians
-
-    val there = abs(error1) < abs(tolerance.theta.radians) &&
-      abs(error2) < abs(tolerance.beta.radians) &&
-      abs(current.thetaVel) < abs(tolerance.thetaVel) &&
-      abs(current.betaVel) < abs(tolerance.betaVel)
-
-    println(there)
-
-    return there
-  }
-
   fun autoScore(
     target: FieldConstants.TargetPosition,
     isRed: Boolean,
     level: Levels,
     isConeNode: Boolean,
     tolerance: Pose2d = Pose2d(0.065, 0.065, Rotation2d.fromDegrees(1.25)),
-    armTolerance: ArmState = ArmState(Rotation2d.fromDegrees(3.0), Rotation2d.fromDegrees(3.0), 0.2, 0.2)
   ): Command {
     println("doing traj generation here")
 

@@ -97,7 +97,7 @@ class VisionEstimator(
     val hasCalibData = cameraMatrixOpt.isPresent && distCoeffsOpt.isPresent
 
     // multi-target solvePNP
-    return if (hasCalibData && visCorners.size == knownVisTags.size * 4 || knownVisTags.isNotEmpty()) {
+    return if (hasCalibData && visCorners.size == knownVisTags.size * 4 && knownVisTags.isNotEmpty()) {
       val cameraMatrix = cameraMatrixOpt.get()
       val distCoeffs = distCoeffsOpt.get()
       val pnpResults = estimateCamPosePNP(cameraMatrix, distCoeffs, visCorners, knownVisTags)

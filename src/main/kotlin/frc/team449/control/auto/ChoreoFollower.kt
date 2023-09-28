@@ -24,8 +24,6 @@ class ChoreoFollower(
 
   private val timer = Timer()
 
-  private val seenEventKeys = mutableListOf<Double>()
-
   init {
     addRequirements(drivetrain)
 
