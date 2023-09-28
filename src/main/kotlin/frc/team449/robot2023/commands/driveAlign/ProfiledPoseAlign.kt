@@ -28,17 +28,17 @@ class ProfiledPoseAlign(
   private val xPID: PIDController = PIDController(
     AutoConstants.DEFAULT_X_KP,
     0.0,
-    0.0,
+    0.0
   ),
   private val yPID: PIDController = PIDController(
     AutoConstants.DEFAULT_Y_KP,
     0.0,
-    0.0,
+    0.0
   ),
   private val headingPID: PIDController = PIDController(
     AutoConstants.DEFAULT_ROTATION_KP,
     0.0,
-    0.0,
+    0.0
   ),
   private val xProfile: TrapezoidProfile = TrapezoidProfile(
     TrapezoidProfile.Constraints(RobotConstants.MAX_LINEAR_SPEED - 1.25, 2.25),

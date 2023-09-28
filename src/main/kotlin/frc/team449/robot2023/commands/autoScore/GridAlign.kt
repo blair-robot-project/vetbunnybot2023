@@ -126,8 +126,11 @@ class GridAlign(
       tolerance = tolerance
     )
 
-    val waitTimeForArm = if (profiledPath.getTime() > (armTraj?.totalTime ?: 0.0) + 1.0)
-      profiledPath.getTime() - (armTraj?.totalTime ?: 0.0) - 1.75 else 0.0
+    val waitTimeForArm = if (profiledPath.getTime() > (armTraj?.totalTime ?: 0.0) + 1.0) {
+      profiledPath.getTime() - (armTraj?.totalTime ?: 0.0) - 1.75
+    } else {
+      0.0
+    }
 
     return SequentialCommandGroup(
       ParallelCommandGroup(
