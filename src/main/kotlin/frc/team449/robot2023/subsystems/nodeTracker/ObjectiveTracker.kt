@@ -14,7 +14,6 @@ import frc.team449.robot2023.Robot
 import frc.team449.robot2023.commands.autoScore.GridAlign
 import frc.team449.robot2023.constants.field.FieldConstants
 
-
 class ObjectiveTracker(
   selectorIO: NodeSelectorIO,
   robot: Robot
@@ -26,11 +25,13 @@ class ObjectiveTracker(
 
   class Objective(
     var nodeRow: Int = 0,
-    var nodeLevel: GridAlign.Levels = GridAlign.Levels.LOW,
+    var nodeLevel: GridAlign.Levels = GridAlign.Levels.LOW
   ) {
     val isConeNode: Boolean
-      get() = (nodeLevel != GridAlign.Levels.LOW
-        && (nodeRow == 0 || nodeRow == 2 || nodeRow == 3 || nodeRow == 5 || nodeRow == 6 || nodeRow == 8))
+      get() = (
+        nodeLevel != GridAlign.Levels.LOW &&
+          (nodeRow == 0 || nodeRow == 2 || nodeRow == 3 || nodeRow == 5 || nodeRow == 6 || nodeRow == 8)
+        )
   }
 
   private val alignGen = GridAlign(robot)
@@ -43,7 +44,7 @@ class ObjectiveTracker(
     FieldConstants.TargetPosition.Position6,
     FieldConstants.TargetPosition.Position7,
     FieldConstants.TargetPosition.Position8,
-    FieldConstants.TargetPosition.Position9,
+    FieldConstants.TargetPosition.Position9
   )
 
   init {
@@ -75,12 +76,13 @@ class ObjectiveTracker(
 
     if (objective.nodeRow != prevObjective.nodeRow ||
       objective.nodeLevel != prevObjective.nodeLevel &&
-      !DriverStation.isAutonomous()) {
+      !DriverStation.isAutonomous()
+    ) {
       alignGen.autoScore(
         rows[objective.nodeRow],
         DriverStation.getAlliance().equals(Alliance.Red),
         objective.nodeLevel,
-        objective.isConeNode,
+        objective.isConeNode
       ).schedule()
     }
 

@@ -11,8 +11,7 @@ import java.nio.file.Paths
 import kotlin.math.ceil
 import kotlin.math.max
 
-
-class NodeSelectorIOServer: NodeSelectorIO {
+class NodeSelectorIOServer : NodeSelectorIO {
 
   private val table = NetworkTableInstance.getDefault().getTable("nodeselector")
   private val nodePublisher = table.getIntegerTopic("node_robot_to_dashboard").publish()
