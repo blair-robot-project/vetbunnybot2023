@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.team449.control.DriveCommand
 import frc.team449.robot2023.Robot
-import frc.team449.robot2023.auto.Paths
 import frc.team449.robot2023.auto.PositionChooser
 import frc.team449.robot2023.auto.routines.RoutineChooser
 import frc.team449.robot2023.commands.ArmCalibration
@@ -27,9 +26,10 @@ class RobotLoop : TimedRobot() {
   private val robot = Robot()
   private val positionChooser: PositionChooser = PositionChooser()
   private val routineChooser: RoutineChooser = RoutineChooser(robot)
+
   private var autoCommand: Command? = null
   private var routineMap = hashMapOf<String, Command>()
-  private val controllerBinder = ControllerBindings(robot.driveController, robot.mechanismController, robot)
+  private val controllerBinder = ControllerBindings(robot.driveController, robot.mechController, robot)
 
   override fun robotInit() {
     // Yes this should be a print statement, it's useful to know that robotInit started.
@@ -56,7 +56,6 @@ class RobotLoop : TimedRobot() {
     ArmCalibration(robot.arm).ignoringDisable(true).schedule()
 
     Logger.configureLoggingAndConfig(robot, false)
-    Logger.configureLoggingAndConfig(Paths, false)
     SmartDashboard.putData("Field", robot.field)
     SmartDashboard.putData("Position Chooser", positionChooser)
     SmartDashboard.putData("Routine Chooser", routineChooser)
@@ -93,6 +92,7 @@ class RobotLoop : TimedRobot() {
     RobotConstants.ALLIANCE_COLOR = DriverStation.getAlliance()
 
     routineChooser.updateOptions(positionChooser.selected, RobotConstants.ALLIANCE_COLOR == DriverStation.Alliance.Red)
+
 
     /** Every time auto starts, we update the chosen auto command */
     this.autoCommand = routineMap[routineChooser.selected]

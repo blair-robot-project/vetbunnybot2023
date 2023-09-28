@@ -57,14 +57,8 @@ class VisionEstimator(
     // Remember the timestamp of the current result used
     poseCacheTimestampSeconds = cameraResult.timestampSeconds
 
-    var isFieldTarget = true
-
-    for (tag in cameraResult.targets) {
-      if (tagLayout.getTagPose(tag.fiducialId).isEmpty) isFieldTarget = false
-    }
-
     // If no targets seen, trivial case -- return empty result
-    return if (!cameraResult.hasTargets() && !isFieldTarget) {
+    return if (!cameraResult.hasTargets()) {
       Optional.empty()
     } else {
       multiTagPNPStrategy(cameraResult)
@@ -77,16 +71,12 @@ class VisionEstimator(
     val knownVisTags = ArrayList<AprilTag>()
     val fieldToCams = ArrayList<Pose3d>()
     val fieldToCamsAlt = ArrayList<Pose3d>()
+    val usedTargets = ArrayList<PhotonTrackedTarget>()
     if (result.getTargets().size < 2) {
       // Run fallback strategy instead
       return lowestAmbiguityStrategy(result)
     }
     for (target: PhotonTrackedTarget in result.getTargets()) {
-      if (target.detectedCorners.size < 4) {
-        continue
-      }
-
-      visCorners.addAll(target.detectedCorners)
       val tagPoseOpt = tagLayout.getTagPose(target.fiducialId)
       if (tagPoseOpt.isEmpty) {
         reportFiducialPoseError(target.fiducialId)
@@ -94,6 +84,9 @@ class VisionEstimator(
       }
       val tagPose = tagPoseOpt.get()
 
+      usedTargets.add(target)
+
+      visCorners.addAll(target.detectedCorners)
       // actual layout poses of visible tags -- not exposed, so have to recreate
       knownVisTags.add(AprilTag(target.fiducialId, tagPose))
       fieldToCams.add(tagPose.transformBy(target.bestCameraToTarget.inverse()))
@@ -108,16 +101,12 @@ class VisionEstimator(
       val cameraMatrix = cameraMatrixOpt.get()
       val distCoeffs = distCoeffsOpt.get()
       val pnpResults = estimateCamPosePNP(cameraMatrix, distCoeffs, visCorners, knownVisTags)
-      if (pnpResults != null) {
-        val best = Pose3d()
-          .plus(pnpResults.best) // field-to-camera
-          .plus(robotToCam.inverse()) // field-to-robot
-        Optional.of(
-          EstimatedRobotPose(best, result.timestampSeconds, result.getTargets())
-        )
-      } else {
-        Optional.empty()
-      }
+      val best = Pose3d()
+        .plus(pnpResults.best) // field-to-camera
+        .plus(robotToCam.inverse()) // field-to-robot
+      Optional.of(
+        EstimatedRobotPose(best, result.timestampSeconds, usedTargets)
+      )
     } else {
       Optional.empty()
     }
@@ -140,10 +129,6 @@ class VisionEstimator(
       if (targetPoseAmbiguity != -1.0 && targetPoseAmbiguity < lowestAmbiguityScore) {
         lowestAmbiguityScore = targetPoseAmbiguity
         lowestAmbiguityTarget = target
-      }
-
-      if (target.detectedCorners.size < 4) {
-        return Optional.empty()
       }
     }
 
@@ -173,7 +158,7 @@ class VisionEstimator(
           .transformBy(cameraToTarget.inverse())
           .transformBy(robotToCam.inverse()),
         result.timestampSeconds,
-        result.getTargets()
+        mutableListOf(lowestAmbiguityTarget)
       )
     )
   }
@@ -193,7 +178,7 @@ class VisionEstimator(
     distCoeffs: Matrix<N5, N1>,
     corners: List<TargetCorner>,
     knownTags: List<AprilTag>
-  ): PNPResults? {
+  ): PNPResults {
     // single-tag pnp
     return if (corners.size == 4) {
       val camToTag = OpenCVHelp.solvePNP_SQUARE(
@@ -241,23 +226,17 @@ class VisionEstimator(
         camToTag.bestReprojErr,
         camToTag.altReprojErr
       )
-    } else if (corners.size % 4 == 0) {
+    } else {
       val objectTrls = java.util.ArrayList<Translation3d>()
       for (tag in knownTags) objectTrls.addAll(VisionEstimation.kTagModel.getFieldVertices(tag.pose))
-      if (objectTrls.size == corners.size) {
-        val camToOrigin = OpenCVHelp.solvePNP_SQPNP(cameraMatrix, distCoeffs, objectTrls, corners)
-        PNPResults(
-          camToOrigin.best.inverse(),
-          camToOrigin.alt.inverse(),
-          camToOrigin.ambiguity,
-          camToOrigin.bestReprojErr,
-          camToOrigin.altReprojErr
-        )
-      } else {
-        null
-      }
-    } else {
-      null
+      val camToOrigin = OpenCVHelp.solvePNP_SQPNP(cameraMatrix, distCoeffs, objectTrls, corners)
+      PNPResults(
+        camToOrigin.best.inverse(),
+        camToOrigin.alt.inverse(),
+        camToOrigin.ambiguity,
+        camToOrigin.bestReprojErr,
+        camToOrigin.altReprojErr
+      )
     }
   }
 }

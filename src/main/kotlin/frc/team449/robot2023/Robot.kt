@@ -20,9 +20,7 @@ class Robot : RobotBase() {
 
   val driveController = XboxController(0)
 
-  val mechanismController = XboxController(1)
-
-  val scoringController = XboxController(2)
+  val mechController = XboxController(1)
 
   val ahrs = AHRS(SerialPort.Port.kMXP)
 

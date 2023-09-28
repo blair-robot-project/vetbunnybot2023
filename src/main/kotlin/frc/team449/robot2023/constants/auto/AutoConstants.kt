@@ -7,7 +7,7 @@ object AutoConstants {
   /** PID gains */
   const val DEFAULT_X_KP = 1.9
   const val DEFAULT_Y_KP = 1.9
-  const val DEFAULT_ROTATION_KP = 1.4
+  const val DEFAULT_ROTATION_KP = 2.0
 
   const val ORBIT_KP = 2 * PI
   val RED_WALL_DOUBLE = Translation2d(0.75, 6.13)

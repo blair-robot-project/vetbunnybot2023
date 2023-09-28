@@ -7,9 +7,10 @@ import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj2.command.*
 import frc.team449.control.DriveCommand
-import frc.team449.robot2023.commands.arm.ArmSweep
+import frc.team449.robot2023.auto.AutoUtil
 import frc.team449.robot2023.commands.driveAlign.ProfiledPoseAlign
 import frc.team449.robot2023.constants.RobotConstants
+import frc.team449.robot2023.constants.auto.AutoConstants
 import frc.team449.robot2023.constants.field.FieldConstants
 import frc.team449.robot2023.constants.subsystem.ArmConstants
 import frc.team449.robot2023.subsystems.arm.control.ArmFollower
@@ -137,18 +138,11 @@ class GridAlign(
         )
       ),
       ConditionalCommand(
+        AutoUtil.dropCone(robot),
         SequentialCommandGroup(
-          ParallelRaceGroup(
-            WaitCommand(0.5),
-            ArmSweep(
-              robot.arm,
-              { 1.0 },
-              Rotation2d.fromDegrees(10.0)
-            )
-          ),
-          InstantCommand(robot.endEffector::pistonRev)
-        ),
-        InstantCommand(robot.endEffector::autoReverse)
+          WaitCommand(AutoConstants.CUBE_DROP_WAIT_BEFORE),
+          InstantCommand(robot.endEffector::autoReverse)
+        )
       ) { isConeNode },
       InstantCommand(robot.endEffector::stop),
       ParallelRaceGroup(
