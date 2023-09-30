@@ -177,7 +177,9 @@ class ControllerBindings(
 
     JoystickButton(mechanismController, XboxController.Button.kX.value).onTrue(
       ArmFollower(robot.arm) { robot.arm.chooseTraj(ArmConstants.BACK) }
-        .withInterruptBehavior(kCancelIncoming)
+        .withInterruptBehavior(kCancelIncoming).andThen(
+          robot.endEffector::pistonOn
+        )
     )
 
     JoystickButton(mechanismController, XboxController.Button.kY.value).onTrue(
