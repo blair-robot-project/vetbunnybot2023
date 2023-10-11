@@ -2,7 +2,7 @@ package frc.team449
 
 import edu.wpi.first.wpilibj.PowerDistribution
 import edu.wpi.first.wpilibj.smartdashboard.Field2d
-import frc.team449.control.OI
+import edu.wpi.first.wpilibj2.command.Command
 import frc.team449.control.holonomic.HolonomicDrive
 
 abstract class RobotBase {
@@ -13,5 +13,5 @@ abstract class RobotBase {
 
   abstract val drive: HolonomicDrive?
 
-  abstract val oi: OI
+  abstract val oi: Command
 }

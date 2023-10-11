@@ -1,5 +1,6 @@
 package frc.team449.robot2023.subsystems.groundIntake
 
+import edu.wpi.first.util.sendable.SendableBuilder
 import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.PneumaticsModuleType
 import edu.wpi.first.wpilibj2.command.Command
@@ -59,6 +60,8 @@ class GroundIntake(
 
   fun retract(): Command {
     return this.runOnce {
+      topMotor.setVoltage(0.0)
+      bottomMotor.setVoltage(0.0)
       piston.set(DoubleSolenoid.Value.kReverse)
       retracted = true
     }
@@ -70,9 +73,16 @@ class GroundIntake(
       .andThen(outtake())
   }
 
-  fun stop() {
-    topMotor.stopMotor()
-    bottomMotor.stopMotor()
+  fun stop(): Command {
+    return this.runOnce {
+      topMotor.setVoltage(0.0)
+      bottomMotor.setVoltage(0.0)
+    }
+  }
+
+  override fun initSendable(builder: SendableBuilder) {
+    builder.addDoubleProperty("piston", { if (piston.get() == DoubleSolenoid.Value.kForward) 1.0 else 0.0 }, null)
+    builder.addDoubleProperty("top motor voltage", { topMotor.lastVoltage }, null)
   }
 
   companion object {

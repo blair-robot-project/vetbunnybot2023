@@ -15,6 +15,7 @@ import frc.team449.robot2023.commands.arm.ArmSweep
 import frc.team449.robot2023.constants.RobotConstants
 import frc.team449.robot2023.constants.subsystem.ArmConstants
 import frc.team449.robot2023.subsystems.arm.control.ArmFollower
+import frc.team449.robot2023.subsystems.arm.control.ArmState
 import kotlin.math.PI
 import kotlin.math.abs
 
@@ -89,34 +90,34 @@ class ControllerBindings(
       )
     )
 
-//    Trigger { driveController.rightTriggerAxis > 0.8 }.onTrue(
-//      ConditionalCommand(
-//        SequentialCommandGroup(
-//          ArmFollower(robot.arm) { robot.arm.chooseTraj(ArmConstants.CUBE) }
-//            .withInterruptBehavior(kCancelIncoming),
-//          WaitUntilCommand {
-//            robot.arm.distanceBetweenStates(robot.arm.state, ArmConstants.CUBE) <= 0.0175 &&
-//              robot.arm.state.betaVel <= 0.025 &&
-//              robot.arm.state.thetaVel <= 0.025
-//          },
-//          robot.groundIntake.deploy(),
-//          robot.groundIntake.teleopCube()
-//        ).alongWith(
-//          RepeatCommand(InstantCommand(robot.arm::holdArm))
-//        ),
-//        SequentialCommandGroup(
-//          robot.groundIntake.deploy(),
-//          robot.groundIntake.intakeCone()
-//        )
-//      ) { robot.endEffector.chooserPiston.get() == DoubleSolenoid.Value.kReverse }
-//    ).onFalse(
-//      SequentialCommandGroup(
-//        robot.groundIntake.retract(),
-//        robot.groundIntake.runOnce(robot.groundIntake::stop),
-//        ArmFollower(robot.arm) { robot.arm.chooseTraj(ArmConstants.STOW) }
-//          .withInterruptBehavior(kCancelIncoming)
-//      )
-//    )
+    Trigger { driveController.leftTriggerAxis > 0.8 }.onTrue(
+      ConditionalCommand(
+        SequentialCommandGroup(
+          ArmFollower(robot.arm) { robot.arm.chooseTraj(ArmConstants.CUBE) }
+            .withInterruptBehavior(kCancelIncoming),
+          WaitUntilCommand {
+            robot.arm.distanceBetweenStates(robot.arm.state, ArmConstants.CUBE) <= 0.0175 &&
+              robot.arm.state.betaVel <= 0.025 &&
+              robot.arm.state.thetaVel <= 0.025
+          },
+          robot.groundIntake.deploy(),
+          robot.groundIntake.teleopCube()
+        ).alongWith(
+          RepeatCommand(InstantCommand(robot.arm::holdArm))
+        ),
+        SequentialCommandGroup(
+          robot.groundIntake.deploy(),
+          robot.groundIntake.intakeCone()
+        )
+      ) { robot.endEffector.chooserPiston.get() == DoubleSolenoid.Value.kReverse }
+    ).onFalse(
+      SequentialCommandGroup(
+        robot.groundIntake.retract(),
+        robot.groundIntake.runOnce(robot.groundIntake::stop),
+        ArmFollower(robot.arm) { robot.arm.chooseTraj(ArmConstants.STOW) }
+          .withInterruptBehavior(kCancelIncoming)
+      )
+    )
 
     JoystickButton(driveController, XboxController.Button.kLeftBumper.value).onTrue(
       robot.endEffector.runOnce(robot.endEffector::intakeReverse).andThen(
@@ -205,10 +206,16 @@ class ControllerBindings(
 //    )
 
     Trigger { abs(mechanismController.leftY) > 0.3 || abs(mechanismController.rightY) > 0.3 }.onTrue(
-      RepeatCommand(
-        InstantCommand(
-          {
-            val newState = robot.arm.desiredState.copy()
+      ParallelRaceGroup(
+        WaitUntilCommand { abs(mechanismController.leftY) <= 0.3 && abs(mechanismController.rightY) <= 0.3 },
+        RepeatCommand(
+          robot.arm.runOnce {
+            val newState = ArmState(
+              Rotation2d(robot.arm.desiredState.theta.radians),
+              Rotation2d(robot.arm.desiredState.beta.radians),
+              0.0,
+              0.0
+            )
             newState.beta =
               Rotation2d(newState.beta.radians - MathUtil.applyDeadband(mechanismController.leftY, .3) * .005)
             newState.theta =
@@ -216,14 +223,17 @@ class ControllerBindings(
             robot.arm.moveToState(newState)
           }
         )
-      ).until { abs(mechanismController.leftY) <= 0.3 && abs(mechanismController.rightY) <= 0.3 }
+      )
     )
 
     JoystickButton(mechanismController, XboxController.Button.kA.value).onTrue(
-      ArmFollower(robot.arm) { robot.arm.chooseTraj(ArmConstants.DOUBLE) }
+      SequentialCommandGroup(
+        ArmFollower(robot.arm) { robot.arm.chooseTraj(ArmConstants.DOUBLE) }
+          .withInterruptBehavior(kCancelIncoming),
+        ArmFollower(robot.arm) { robot.arm.chooseTraj(ArmConstants.DOUBLE) }
         .andThen(InstantCommand(robot.endEffector::intake))
         .andThen(InstantCommand(robot.endEffector::pistonOn))
-        .withInterruptBehavior(kCancelIncoming)
+      )
     ).onFalse(
       ArmFollower(robot.arm) { robot.arm.chooseTraj(ArmConstants.BACK) }
         .withInterruptBehavior(kCancelIncoming)

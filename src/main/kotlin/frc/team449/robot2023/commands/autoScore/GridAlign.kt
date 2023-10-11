@@ -6,7 +6,6 @@ import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj2.command.*
-import frc.team449.control.DriveCommand
 import frc.team449.robot2023.auto.AutoUtil
 import frc.team449.robot2023.commands.driveAlign.ProfiledPoseAlign
 import frc.team449.robot2023.constants.RobotConstants
@@ -130,13 +129,6 @@ class GridAlign(
         )
       ) { isConeNode },
       InstantCommand(robot.endEffector::stop),
-      ParallelRaceGroup(
-        SequentialCommandGroup(
-          WaitCommand(0.35),
-          ArmFollower(robot.arm) { robot.arm.chooseTraj(ArmConstants.BACK) }
-        ),
-        DriveCommand(robot.drive, robot.oi)
-      )
     )
   }
 }

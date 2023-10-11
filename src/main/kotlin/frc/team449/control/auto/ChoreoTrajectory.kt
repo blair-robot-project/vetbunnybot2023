@@ -67,6 +67,7 @@ class ChoreoTrajectory(
       document.forEach { (name, pathData) ->
         name as String
         pathData as JSONObject
+        println(name)
         val trajectory = pathData["trajectory"] as JSONArray
 
         val info = parse(trajectory)

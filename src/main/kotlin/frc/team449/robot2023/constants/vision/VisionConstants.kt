@@ -42,11 +42,11 @@ VisionConstants {
 
   /** List of cameras that we want to use */
   val ESTIMATORS: List<VisionEstimator> = listOf(
-    VisionEstimator(
-      TAG_LAYOUT,
-      "Spinel",
-      robotToCamera
-    )
+//    VisionEstimator(
+//      TAG_LAYOUT,
+//      "Spinel",
+//      robotToCamera
+//    )
   )
 
   val ENCODER_TRUST = MatBuilder(Nat.N3(), Nat.N1()).fill(.075, .075, .025)

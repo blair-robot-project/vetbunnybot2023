@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.wpilibj.Encoder
 import frc.team449.robot2023.subsystems.arm.control.ArmState
+import kotlin.math.PI
 
 object ArmConstants {
 
@@ -19,10 +20,11 @@ object ArmConstants {
   const val SECOND_ENCODER_CHAN = 0
   const val FIRST_ENCODER_OFFSET = (0.25 + 0.101364) + (0.25 - 0.254440) + (0.25 - 0.243684) + (0.25 - 0.251001) + (0.104702 - 0.103164) +
     (0.104702 - 0.096773) + (0.104702 - 0.110550) + (0.104702 - 0.105399) + (0.104702 - 0.109143) + (0.104702 - 0.106454) +
-    (0.104702 - 0.104911) + (0.104702 - 0.095459) + (0.104702 - 0.107754)
+    (0.104702 - 0.104911) + (0.104702 - 0.095459) + (0.104702 - 0.107754) + (0.104702 - 0.66 / (2 * PI)) + (0.104702 - 0.682198 / (2 * PI))
   const val SECOND_ENCODER_OFFSET = -0.4292740 + 0.010235 + 0.005832 + (0.442945 - 0.449004) + (0.442945 - 0.445615) +
     (0.442945 - 0.425262) + (0.442945 - 0.459368) + (0.442945 - 0.445663) + (0.442945 - 0.443166) + (0.442945 - 0.445957) +
-    (0.442945 - 0.440851) + (0.442945 - 0.432587)
+    (0.442945 - 0.440851) + (0.442945 - 0.432587) + (0.442945 - 2.53 / (2 * PI)) - (7.48 / 360.0) + (0.442945 - 2.828152 / (2 * PI))
+
   val FIRST_JOINT_QUAD_ENCODER = Encoder(4, 5)
   val SECOND_JOINT_QUAD_ENCODER = Encoder(1, 2)
 
@@ -123,5 +125,10 @@ object ArmConstants {
     Rotation2d.fromDegrees(100.77)
   )
 
-  val STATES = listOf(SINGLE, DOUBLE, STOW, CONE, CUBE, MID, HIGH, BACK, LOW)
+  val THROW = ArmState(
+    Rotation2d.fromDegrees(80.0),
+    Rotation2d.fromDegrees(-80.0)
+  )
+
+  val STATES = listOf(SINGLE, DOUBLE, STOW, CONE, CUBE, MID, HIGH, BACK, LOW, THROW)
 }

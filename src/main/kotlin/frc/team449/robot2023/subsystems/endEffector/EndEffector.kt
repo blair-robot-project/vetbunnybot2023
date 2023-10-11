@@ -37,6 +37,10 @@ class EndEffector(
     intakeMotor.setVoltage(EndEffectorConstants.HOLD_VOLTAGE)
   }
 
+  fun throwCube() {
+    intakeMotor.setVoltage(-12.0)
+  }
+
   fun strongHoldIntake() {
     intakeMotor.setVoltage(9.0)
   }
@@ -59,8 +63,8 @@ class EndEffector(
 
   override fun initSendable(builder: SendableBuilder) {
     builder.addBooleanProperty("sensor", { sensor.get() }, null)
-    builder.addStringProperty("piston", { chooserPiston.get().toString() }, null)
-    builder.addStringProperty("motor", { intakeMotor.lastVoltage.toString() }, null)
+    builder.addDoubleProperty("piston", { if (chooserPiston.get() == DoubleSolenoid.Value.kForward) 1.0 else 0.0 }, null)
+    builder.addDoubleProperty("motor", { intakeMotor.lastVoltage }, null)
   }
 
   companion object {

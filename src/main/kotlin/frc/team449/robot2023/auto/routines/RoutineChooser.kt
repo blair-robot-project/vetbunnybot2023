@@ -12,7 +12,9 @@ class RoutineChooser(private val robot: Robot) : SendableChooser<String>() {
     return hashMapOf(
       "DropCone" to DropCone(robot).createCommand(robot),
       "RedFarThreePiece" to ThreePiece(robot, true).createCommand(robot),
-      "BlueFarThreePiece" to ThreePiece(robot, false).createCommand(robot)
+      "BlueFarThreePiece" to ThreePiece(robot, false).createCommand(robot),
+      "BlueThrowThreePiece" to WallThreePieceThrow(robot, false).createCommand(robot),
+      "RedThrowThreePiece" to WallThreePieceThrow(robot, true).createCommand(robot)
     )
   }
 
@@ -33,7 +35,14 @@ class RoutineChooser(private val robot: Robot) : SendableChooser<String>() {
       }
     )
 
-
+    this.addOption(
+      "Wall Three Piece Throw",
+      if (isRed) {
+        "RedThrowThreePiece"
+      } else {
+        "BlueThrowThreePiece"
+      }
+    )
 
     // TODO: CREATE OPTIONS
   }

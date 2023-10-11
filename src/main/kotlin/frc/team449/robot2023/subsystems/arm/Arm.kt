@@ -151,6 +151,8 @@ open class Arm(
     if (startPoint == ArmConstants.LOW && endpoint == ArmConstants.MID) return ArmPaths.lowMid
     if (startPoint == ArmConstants.HIGH && endpoint == ArmConstants.LOW) return ArmPaths.highLow
     if (startPoint == ArmConstants.MID && endpoint == ArmConstants.LOW) return ArmPaths.midLow
+    if (startPoint == ArmConstants.CUBE && endpoint == ArmConstants.THROW) return ArmPaths.cubeThrow
+    if (startPoint == ArmConstants.THROW && endpoint == ArmConstants.CUBE) return ArmPaths.throwCube
 
     return if (startPoint == ArmConstants.BACK) {
       when (endpoint) {
@@ -209,6 +211,8 @@ open class Arm(
       }
     } else {
       when (startPoint) {
+        ArmConstants.THROW ->
+          ArmPaths.throwBack
         ArmConstants.SINGLE ->
           ArmPaths.singleBack
         ArmConstants.DOUBLE ->

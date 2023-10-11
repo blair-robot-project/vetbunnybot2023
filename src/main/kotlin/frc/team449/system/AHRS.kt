@@ -1,5 +1,6 @@
 package frc.team449.system
 
+import edu.wpi.first.math.filter.LinearFilter
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.wpilibj.SerialPort
 import edu.wpi.first.wpilibj.Timer
@@ -18,7 +19,9 @@ class AHRS(
   var prevTime = Double.NaN
 
   @Log
-  var lastAngular = Double.NaN
+  var angularVel = Double.NaN
+
+  private val filter = LinearFilter.movingAverage(5)
 
   /** The current reading of the gyro with the offset included */
   @get:Log.ToString
@@ -52,8 +55,9 @@ class AHRS(
     }
     this.prevTime = currTime
     this.prevPos = currPos
-    lastAngular = vel
-    return vel
+    angularVel = filter.calculate(vel)
+
+    return angularVel
   }
 
   constructor(

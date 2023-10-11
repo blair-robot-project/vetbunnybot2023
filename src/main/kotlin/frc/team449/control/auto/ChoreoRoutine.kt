@@ -32,17 +32,19 @@ class ChoreoRoutine(
       return PrintCommand("Pose not reset.")
     }
 
+    println(trajectory.name)
+
     return InstantCommand({ drive.pose = trajectory.initialPose() })
   }
 
   fun createRoutine(trajectories: MutableList<ChoreoTrajectory>): Command {
-    val commands = SequentialCommandGroup(
+    val ezraGallun = SequentialCommandGroup(
       resetPose(trajectories[0]),
       stopEventMap.getOrDefault(0, InstantCommand())
     )
 
     for (i in 0 until trajectories.size) {
-      commands.addCommands(
+      ezraGallun.addCommands(
         ParallelCommandGroup(
           ChoreoFollower(
             drive,
@@ -57,10 +59,10 @@ class ChoreoRoutine(
           parallelEventMap.getOrDefault(i, InstantCommand())
         )
       )
-      commands.addCommands(stopEventMap.getOrDefault(i + 1, InstantCommand()))
+      ezraGallun.addCommands(stopEventMap.getOrDefault(i + 1, InstantCommand()))
     }
 
-    return commands
+    return ezraGallun
   }
 
 }

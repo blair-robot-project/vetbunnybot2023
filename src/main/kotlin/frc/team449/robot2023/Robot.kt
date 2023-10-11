@@ -5,8 +5,8 @@ import edu.wpi.first.wpilibj.RobotBase.isReal
 import edu.wpi.first.wpilibj.SerialPort
 import edu.wpi.first.wpilibj.XboxController
 import frc.team449.RobotBase
-import frc.team449.control.holonomic.OrthogonalHolonomicOI.Companion.createOrthogonalHolonomicOI
 import frc.team449.control.holonomic.SwerveDrive
+import frc.team449.control.holonomic.SwerveOrthogonalCommand
 import frc.team449.robot2023.constants.RobotConstants
 import frc.team449.robot2023.subsystems.arm.Arm.Companion.createArm
 import frc.team449.robot2023.subsystems.arm.ArmSim.Companion.createArmSim
@@ -36,7 +36,7 @@ class Robot : RobotBase() {
   override val drive = SwerveDrive.createSwerve(ahrs, field)
 
   @Log(name = "Joystick Input")
-  override val oi = createOrthogonalHolonomicOI(drive, driveController)
+  override val oi = SwerveOrthogonalCommand(drive, driveController)
 
   @Log(name = "Double Joint Arm")
   val arm = if (isReal()) createArm() else createArmSim()
@@ -44,6 +44,7 @@ class Robot : RobotBase() {
   @Log(name = "End Effector")
   val endEffector = createEndEffector()
 
+  @Log(name = "Ground Intake")
   val groundIntake = createGroundIntake()
 
   val tracker = createObjTracker(this)

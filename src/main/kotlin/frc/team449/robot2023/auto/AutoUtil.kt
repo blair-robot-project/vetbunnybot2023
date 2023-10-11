@@ -87,7 +87,8 @@ object AutoUtil {
     return SequentialCommandGroup(
       WaitCommand(AutoConstants.CUBE_DROP_WAIT_BEFORE),
       InstantCommand(robot.endEffector::autoReverse),
-      WaitCommand(AutoConstants.CUBE_DROP_WAIT_AFTER)
+      WaitCommand(AutoConstants.CUBE_DROP_WAIT_AFTER),
+      InstantCommand(robot.endEffector::stop)
     )
   }
 

@@ -1,9 +1,8 @@
 package frc.team449.robot2023.constants
 
-import edu.wpi.first.math.controller.ProfiledPIDController
+import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
-import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.wpilibj.DriverStation
 import frc.team449.robot2023.constants.drives.SwerveConstants
@@ -15,9 +14,9 @@ object RobotConstants {
   const val PDH_CAN = 49
 
   /** Controller Configurations */
-  const val RATE_LIMIT = 3.5 * PI
-  const val TRANSLATION_DEADBAND = .125
-  const val ROTATION_DEADBAND = .125
+  const val RATE_LIMIT = 4.25 * PI
+  const val TRANSLATION_DEADBAND = .15
+  const val ROTATION_DEADBAND = .15
 
   /** Drive configuration */
   const val MAX_LINEAR_SPEED = SwerveConstants.MAX_ATTAINABLE_MK4I_SPEED // m/s
@@ -28,15 +27,13 @@ object RobotConstants {
   const val DOUBLE_ALIGN_ACCEL = 2.25
 
   /** PID controller for Orthogonal turning */
-  val ORTHOGONAL_CONTROLLER = ProfiledPIDController(
-    2.25,
+  val ORTHOGONAL_CONTROLLER = PIDController(
+    3.0,
     0.0,
     0.0,
-    TrapezoidProfile.Constraints(
-      MAX_ROT_SPEED,
-      RATE_LIMIT
-    )
   )
+
+  const val ALIGN_ROT_SPEED = 3 * PI / 2
 
   var ALLIANCE_COLOR: DriverStation.Alliance = DriverStation.getAlliance()
 
