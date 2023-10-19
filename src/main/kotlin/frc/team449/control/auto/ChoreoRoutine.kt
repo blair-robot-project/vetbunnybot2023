@@ -19,7 +19,7 @@ class ChoreoRoutine(
   private val poseTol: Pose2d = Pose2d(0.05, 0.05, Rotation2d(0.05)),
   private val resetPosition: Boolean = false,
   private val resetPositionTolerance: Pose2d = Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0)),
-  private val timeout: Double = 0.65
+  private val timeout: Double = 0.35
 ) {
 
   private fun resetPose(trajectory: ChoreoTrajectory): Command {

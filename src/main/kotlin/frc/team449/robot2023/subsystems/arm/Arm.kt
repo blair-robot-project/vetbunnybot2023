@@ -194,6 +194,8 @@ open class Arm(
       }
     } else if (endpoint == ArmConstants.STOW) {
       when (startPoint) {
+        ArmConstants.AUTOMID ->
+          ArmPaths.autoMidStow
         ArmConstants.SINGLE ->
           ArmPaths.singleStow
         ArmConstants.DOUBLE ->
@@ -211,6 +213,8 @@ open class Arm(
       }
     } else {
       when (startPoint) {
+        ArmConstants.AUTOMID ->
+          ArmPaths.autoMidBack
         ArmConstants.THROW ->
           ArmPaths.throwBack
         ArmConstants.SINGLE ->

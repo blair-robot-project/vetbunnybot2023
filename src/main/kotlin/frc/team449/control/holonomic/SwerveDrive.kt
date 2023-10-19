@@ -13,7 +13,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics
 import edu.wpi.first.math.kinematics.SwerveModulePosition
 import edu.wpi.first.math.kinematics.SwerveModuleState
 import edu.wpi.first.wpilibj.RobotBase.isReal
-import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.control.VisionEstimator
@@ -25,6 +24,7 @@ import frc.team449.system.encoder.AbsoluteEncoder
 import frc.team449.system.encoder.NEOEncoder
 import frc.team449.system.motor.createSparkMax
 import io.github.oblarg.oblog.annotations.Log
+import kotlin.math.hypot
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -65,13 +65,31 @@ open class SwerveDrive(
     VisionConstants.VISION_TRUST
   )
 
-  private var lastTime = Timer.getFPGATimestamp()
-
   @Log.ToString(name = "Desired Speeds")
   var desiredSpeeds: ChassisSpeeds = ChassisSpeeds()
 
+  @Log.ToString(name = "Max Speed")
+  var maxSpeed: Double = 0.0
+
   override fun set(desiredSpeeds: ChassisSpeeds) {
     this.desiredSpeeds = desiredSpeeds
+
+    // Converts the desired [ChassisSpeeds] into an array of [SwerveModuleState].
+    val desiredModuleStates =
+      this.kinematics.toSwerveModuleStates(this.desiredSpeeds)
+
+    // Scale down module speed if a module is going faster than the max speed, and prevent early desaturation.
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+      desiredModuleStates,
+      SwerveConstants.MAX_ATTAINABLE_MK4I_SPEED
+    )
+
+    for (i in this.modules.indices) {
+      this.modules[i].state = desiredModuleStates[i]
+    }
+
+    for (module in modules)
+      module.update()
   }
 
   /** The measured pitch of the robot from the gyro sensor. */
@@ -94,14 +112,7 @@ open class SwerveDrive(
       )
     }
 
-  /** Stops the robot's drive. */
-  override fun stop() {
-    this.set(ChassisSpeeds(0.0, 0.0, 0.0))
-  }
-
   override fun periodic() {
-    val currTime = Timer.getFPGATimestamp()
-
     // Updates the robot's currentSpeeds.
     currentSpeeds = kinematics.toChassisSpeeds(
       modules[0].state,
@@ -110,22 +121,8 @@ open class SwerveDrive(
       modules[3].state
     )
 
-    // Converts the desired [ChassisSpeeds] into an array of [SwerveModuleState].
-    val desiredModuleStates =
-      this.kinematics.toSwerveModuleStates(this.desiredSpeeds)
-
-    // Scale down module speed if a module is going faster than the max speed, and prevent early desaturation.
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-      desiredModuleStates,
-      SwerveConstants.MAX_ATTAINABLE_MK4I_SPEED
-    )
-
-    for (i in this.modules.indices) {
-      this.modules[i].state = desiredModuleStates[i]
-    }
-
-    for (module in modules)
-      module.update()
+    val transVel = hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond)
+    if (transVel > maxSpeed) maxSpeed = transVel
 
     if (cameras.isNotEmpty()) localize()
 
@@ -137,9 +134,13 @@ open class SwerveDrive(
 
     // Sets the robot's pose and individual module rotations on the SmartDashboard [Field2d] widget.
     setRobotPose()
-
-    this.lastTime = currTime
   }
+
+  /** Stops the robot's drive. */
+  override fun stop() {
+    this.set(ChassisSpeeds(0.0, 0.0, 0.0))
+  }
+
 
   /** @return An array of [SwerveModulePosition] for each module, containing distance and angle. */
   private fun getPositions(): Array<SwerveModulePosition> {

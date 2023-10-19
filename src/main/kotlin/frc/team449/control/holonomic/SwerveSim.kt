@@ -22,6 +22,8 @@ class SwerveSim(
     heading = heading.plus(Rotation2d(super.desiredSpeeds.omegaRadiansPerSecond * (currTime - lastTime)))
     this.lastTime = currTime
 
+    set(super.desiredSpeeds)
+
     super.periodic()
   }
 }

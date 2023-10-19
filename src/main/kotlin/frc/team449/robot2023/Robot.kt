@@ -36,7 +36,7 @@ class Robot : RobotBase() {
   override val drive = SwerveDrive.createSwerve(ahrs, field)
 
   @Log(name = "Joystick Input")
-  override val oi = SwerveOrthogonalCommand(drive, driveController)
+  override val driveCommand = SwerveOrthogonalCommand(drive, driveController)
 
   @Log(name = "Double Joint Arm")
   val arm = if (isReal()) createArm() else createArmSim()

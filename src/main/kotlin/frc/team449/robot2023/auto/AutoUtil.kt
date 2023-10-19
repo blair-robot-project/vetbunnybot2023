@@ -100,7 +100,9 @@ object AutoUtil {
 
   fun stowDropCone(robot: Robot): Command {
     return InstantCommand(robot.endEffector::holdIntake).andThen(
-      ArmFollower(robot.arm) { ArmPaths.stowHigh }.andThen(dropCone(robot))
+      ArmFollower(robot.arm) { ArmPaths.stowAutoHigh }
+        .andThen(WaitCommand(AutoConstants.CONE_WAIT))
+        .andThen(InstantCommand(robot.endEffector::pistonRev))
     )
   }
 
@@ -110,7 +112,7 @@ object AutoUtil {
       robot.groundIntake.intakeCube(),
       InstantCommand(robot.endEffector::intake),
       InstantCommand(robot.endEffector::pistonRev),
-      ArmFollower(robot.arm) { ArmPaths.highCube }
+      ArmFollower(robot.arm) { ArmPaths.autoHighCube }
     )
   }
 
@@ -136,7 +138,7 @@ object AutoUtil {
   fun retractAndHigh(robot: Robot): Command {
     return SequentialCommandGroup(
       retractGroundIntake(robot),
-      ArmFollower(robot.arm) { ArmPaths.cubeHigh },
+      ArmFollower(robot.arm) { ArmPaths.cubeAutoHigh }
     )
   }
 

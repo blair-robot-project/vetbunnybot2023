@@ -1,6 +1,7 @@
 package frc.team449.robot2023.auto.routines
 
 import edu.wpi.first.wpilibj2.command.InstantCommand
+import edu.wpi.first.wpilibj2.command.PrintCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.team449.control.auto.ChoreoRoutine
@@ -21,16 +22,18 @@ class WallThreePieceThrow(
     stopEventMap = hashMapOf(
       0 to AutoUtil.stowDropCone(robot),
       2 to SequentialCommandGroup(
-        WaitCommand(1.0),
+        WaitCommand(0.75),
         InstantCommand(robot.endEffector::throwCube),
         WaitCommand(0.25),
         InstantCommand(robot.endEffector::stop),
       ),
       4 to SequentialCommandGroup(
-        WaitCommand(1.0),
+        WaitCommand(0.75),
         InstantCommand(robot.endEffector::throwCube),
         WaitCommand(0.25),
         InstantCommand(robot.endEffector::stop),
+        InstantCommand(robot.endEffector::pistonOn),
+        PrintCommand("easy dubs (bump three piece fully finished)")
       )
     ),
     parallelEventMap = hashMapOf(

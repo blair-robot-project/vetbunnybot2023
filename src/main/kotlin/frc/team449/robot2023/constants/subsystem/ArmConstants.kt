@@ -23,7 +23,8 @@ object ArmConstants {
     (0.104702 - 0.104911) + (0.104702 - 0.095459) + (0.104702 - 0.107754) + (0.104702 - 0.66 / (2 * PI)) + (0.104702 - 0.682198 / (2 * PI))
   const val SECOND_ENCODER_OFFSET = -0.4292740 + 0.010235 + 0.005832 + (0.442945 - 0.449004) + (0.442945 - 0.445615) +
     (0.442945 - 0.425262) + (0.442945 - 0.459368) + (0.442945 - 0.445663) + (0.442945 - 0.443166) + (0.442945 - 0.445957) +
-    (0.442945 - 0.440851) + (0.442945 - 0.432587) + (0.442945 - 2.53 / (2 * PI)) - (7.48 / 360.0) + (0.442945 - 2.828152 / (2 * PI))
+    (0.442945 - 0.440851) + (0.442945 - 0.432587) + (0.442945 - 2.53 / (2 * PI)) - (7.48 / 360.0) + (0.442945 - 2.828152 / (2 * PI)) -
+    (137.78 / 360.0)
 
   val FIRST_JOINT_QUAD_ENCODER = Encoder(4, 5)
   val SECOND_JOINT_QUAD_ENCODER = Encoder(1, 2)
@@ -73,7 +74,7 @@ object ArmConstants {
 
   // Current limits of the motors
   const val FIRST_JOINT_CURR_LIM = 40
-  const val SECOND_JOINT_CURR_LIM = 40
+  const val SECOND_JOINT_CURR_LIM = 60
 
   val backToArmBase = Units.inchesToMeters(8.0)
 
@@ -130,5 +131,15 @@ object ArmConstants {
     Rotation2d.fromDegrees(-80.0)
   )
 
-  val STATES = listOf(SINGLE, DOUBLE, STOW, CONE, CUBE, MID, HIGH, BACK, LOW, THROW)
+  val AUTOMID = ArmState(
+    Rotation2d.fromDegrees(80.0),
+    Rotation2d.fromDegrees(110.0)
+  )
+
+  val AUTOHIGH = ArmState(
+    Rotation2d.fromDegrees(135.00),
+    Rotation2d.fromDegrees(17.5)
+  )
+
+  val STATES = listOf(SINGLE, DOUBLE, STOW, CONE, CUBE, MID, HIGH, BACK, LOW, THROW, AUTOMID, AUTOHIGH)
 }

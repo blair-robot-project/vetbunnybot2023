@@ -175,7 +175,7 @@ class SwerveModuleSim(
 
   override fun update() {
     val currTime = Timer.getFPGATimestamp()
-    driveEncoder.position = driveEncoder.position + driveEncoder.velocity * (currTime - prevTime)
+    driveEncoder.position += driveEncoder.velocity * (currTime - prevTime)
     prevTime = currTime
   }
 }

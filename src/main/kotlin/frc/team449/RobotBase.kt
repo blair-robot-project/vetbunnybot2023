@@ -13,5 +13,5 @@ abstract class RobotBase {
 
   abstract val drive: HolonomicDrive?
 
-  abstract val oi: Command
+  abstract val driveCommand: Command
 }

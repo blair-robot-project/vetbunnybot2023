@@ -44,6 +44,8 @@ class SwerveOrthogonalCommand(
 
   private val rotCtrl = RobotConstants.ORTHOGONAL_CONTROLLER
 
+  private var skewConstant = 0.5
+
   init {
     addRequirements(drive)
     rotCtrl.enableContinuousInput(-PI, PI)
@@ -129,7 +131,7 @@ class SwerveOrthogonalCommand(
       /** Quick fix for the velocity skewing towards the direction of rotation
        * by rotating it with offset proportional to how much we are rotating
        **/
-      vel.rotateBy(Rotation2d(-rotScaled * dt))
+      vel.rotateBy(Rotation2d(-rotScaled * dt * skewConstant))
       drive.set(
         ChassisSpeeds.fromFieldRelativeSpeeds(
           vel.x * directionCompensation.invoke(),
@@ -160,6 +162,7 @@ class SwerveOrthogonalCommand(
     builder.addDoubleProperty("magAcc", { magAcc }, null)
     builder.addDoubleProperty("magAccClamped", { magAccClamped }, null)
     builder.addStringProperty("speeds", { drive.desiredSpeeds.toString() }, null)
+    builder.addDoubleProperty("skew constant", { skewConstant }, { k: Double -> skewConstant = k })
   }
 
 }

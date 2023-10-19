@@ -106,7 +106,7 @@ class RobotLoop : TimedRobot() {
       CommandScheduler.getInstance().cancel(autoCommand)
     }
 
-    robot.drive.defaultCommand = robot.oi
+    robot.drive.defaultCommand = robot.driveCommand
   }
 
   override fun teleopPeriodic() {

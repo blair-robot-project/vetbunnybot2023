@@ -81,7 +81,23 @@ object ArmPaths {
   val throwCube = ArmTrajectory("throwCube.json")
   val throwBack = ArmTrajectory("throwBack.json")
 
+  val autoHighCube = ArmTrajectory("autoHighCube.json")
+  val autoMidCube = ArmTrajectory("autoMidCube.json")
+  val cubeAutoHigh = ArmTrajectory("cubeAutoHigh.json")
+  val cubeAutoMid = ArmTrajectory("cubeAutoMid.json")
+  val stowAutoHigh = ArmTrajectory("stowAutoHigh.json")
+
+  val autoMidBack = ArmTrajectory("autoMidBack.json")
+  val autoMidStow = ArmTrajectory("autoMidStow.json")
+
   val trajectories = listOf(
+    stowAutoHigh,
+    autoMidBack,
+    autoMidStow,
+    autoHighCube,
+    autoMidCube,
+    cubeAutoHigh,
+    cubeAutoMid,
     throwCube,
     cubeThrow,
     throwBack,

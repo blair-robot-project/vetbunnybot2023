@@ -1,5 +1,6 @@
 package frc.team449.robot2023.commands.autoBalance
 
+import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj2.command.CommandBase
@@ -27,7 +28,11 @@ class AutoBalance(
   override fun execute() {
     drive.set(
       ChassisSpeeds(
-        controller.calculate(drive.roll.radians) * speedMetersPerSecond,
+        MathUtil.clamp(
+          controller.calculate(drive.roll.radians),
+          -speedMetersPerSecond,
+          speedMetersPerSecond
+        ),
         0.0,
         0.0
       )
@@ -43,9 +48,9 @@ class AutoBalance(
   }
 
   companion object {
-    fun create(drive: SwerveDrive): AutoBalance {
+    fun genCmd(drive: SwerveDrive): AutoBalance {
       return AutoBalance(
-        PIDController(AutoConstants.AUTO_BAL_KP, 0.0, AutoConstants.AUTO_BAL_KD),
+        PIDController(AutoConstants.AUTO_BAL_KP, 0.0, 0.0),
         drive,
         AutoConstants.ADJUST_SPEED
       )
