@@ -85,19 +85,20 @@ class ControllerBindings(
     )
 
     Trigger { driveController.leftTriggerAxis > 0.8 }.onTrue(
-      SequentialCommandGroup(
-        robot.endEffector.runOnce { robot.endEffector.pistonRev() },
-        ArmFollower(robot.arm) { robot.arm.chooseTraj(ArmConstants.CUBE) }
-          .withInterruptBehavior(kCancelIncoming),
-        WaitUntilCommand {
-          robot.arm.distanceBetweenStates(robot.arm.state, ArmConstants.CUBE) <= 0.025 &&
-            robot.arm.state.betaVel <= 0.025 &&
-            robot.arm.state.thetaVel <= 0.025
-        },
-        robot.groundIntake.deploy(),
-        robot.groundIntake.teleopCube()
-      ).alongWith(
-        RepeatCommand(InstantCommand(robot.arm::holdArm))
+      InstantCommand(robot.endEffector::pistonRev).andThen(
+        SequentialCommandGroup(
+          ArmFollower(robot.arm) { robot.arm.chooseTraj(ArmConstants.CUBE) }
+            .withInterruptBehavior(kCancelIncoming),
+          WaitUntilCommand {
+            robot.arm.distanceBetweenStates(robot.arm.state, ArmConstants.CUBE) <= 0.0175 &&
+              robot.arm.state.betaVel <= 0.025 &&
+              robot.arm.state.thetaVel <= 0.025
+          },
+          robot.groundIntake.deploy(),
+          robot.groundIntake.teleopCube()
+        ).alongWith(
+          RepeatCommand(InstantCommand(robot.arm::holdArm))
+        )
       )
     ).onFalse(
       SequentialCommandGroup(

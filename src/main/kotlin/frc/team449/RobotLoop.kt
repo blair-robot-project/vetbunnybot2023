@@ -9,12 +9,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.InstantCommand
+import frc.team449.control.VisionEstimator
 import frc.team449.robot2023.Robot
 import frc.team449.robot2023.auto.PositionChooser
 import frc.team449.robot2023.auto.routines.RoutineChooser
 import frc.team449.robot2023.commands.ArmCalibration
 import frc.team449.robot2023.constants.RobotConstants
 import frc.team449.robot2023.constants.subsystem.ArmConstants
+import frc.team449.robot2023.constants.vision.VisionConstants
 import frc.team449.robot2023.subsystems.ControllerBindings
 import frc.team449.robot2023.subsystems.arm.ArmPaths
 import io.github.oblarg.oblog.Logger
@@ -65,6 +67,23 @@ class RobotLoop : TimedRobot() {
 
     controllerBinder.bindButtons()
 
+    if (VisionConstants.ESTIMATORS.isEmpty()) {
+      VisionConstants.ESTIMATORS.add(
+        VisionEstimator(
+          VisionConstants.TAG_LAYOUT,
+          "Spinel",
+          VisionConstants.robotToCamera
+        )
+      )
+    } else {
+      VisionConstants.ESTIMATORS[0] =
+        VisionEstimator(
+          VisionConstants.TAG_LAYOUT,
+          "Spinel",
+          VisionConstants.robotToCamera
+        )
+    }
+
     robot.arm.defaultCommand = InstantCommand(
       robot.arm::holdArm,
       robot.arm
@@ -101,6 +120,8 @@ class RobotLoop : TimedRobot() {
   override fun autonomousPeriodic() {}
 
   override fun teleopInit() {
+    VisionConstants.ESTIMATORS.clear()
+
     robot.arm.controller.reset()
     if (autoCommand != null) {
       CommandScheduler.getInstance().cancel(autoCommand)
@@ -114,6 +135,23 @@ class RobotLoop : TimedRobot() {
 
   override fun disabledInit() {
     robot.drive.stop()
+
+    if (VisionConstants.ESTIMATORS.isEmpty()) {
+      VisionConstants.ESTIMATORS.add(
+        VisionEstimator(
+          VisionConstants.TAG_LAYOUT,
+          "Spinel",
+          VisionConstants.robotToCamera
+        )
+      )
+    } else {
+      VisionConstants.ESTIMATORS[0] =
+        VisionEstimator(
+          VisionConstants.TAG_LAYOUT,
+          "Spinel",
+          VisionConstants.robotToCamera
+        )
+    }
   }
 
   override fun disabledPeriodic() {

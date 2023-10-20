@@ -42,11 +42,11 @@ class ThreePiece(
         InstantCommand(robot.endEffector::intake),
         InstantCommand(robot.endEffector::pistonRev),
         ArmFollower(robot.arm) { ArmPaths.autoHighCube },
-        WaitCommand(7.71 - 5.715
-          - AutoConstants.CUBE_DROP_WAIT_AFTER - ArmPaths.highCube.totalTime),
+        WaitCommand(7.50 - 5.715
+          - AutoConstants.CUBE_DROP_WAIT_AFTER - ArmPaths.autoHighCube.totalTime),
         robot.groundIntake.deploy(),
         robot.groundIntake.intakeCube(),
-        WaitCommand(9.60 - 7.71),
+        WaitCommand(9.60 - 7.50),
         AutoUtil.retractGroundIntake(robot),
         ArmFollower(robot.arm) { ArmPaths.cubeAutoMid },
         AutoUtil.dropCube(robot)

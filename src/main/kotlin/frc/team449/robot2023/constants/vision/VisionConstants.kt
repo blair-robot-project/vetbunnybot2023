@@ -25,12 +25,12 @@ VisionConstants {
   )
 
   /** WPILib's AprilTagFieldLayout for the 2023 Charged Up Game */
-  private val TAG_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(
+  val TAG_LAYOUT: AprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(
     AprilTagFields.k2023ChargedUp.m_resourceFile
   )
 
   /** Robot to Camera distance */
-  private val robotToCamera = Transform3d(
+  val robotToCamera = Transform3d(
     Translation3d(Units.inchesToMeters(-10.25), Units.inchesToMeters(-6.0), Units.inchesToMeters(13.35)),
     Rotation3d(0.0, Units.degreesToRadians(12.0), Units.degreesToRadians(180.0))
   )
@@ -41,12 +41,12 @@ VisionConstants {
   var MAX_DISTANCE_MULTI_TAG = 4.5
 
   /** List of cameras that we want to use */
-  val ESTIMATORS: List<VisionEstimator> = listOf(
-//    VisionEstimator(
-//      TAG_LAYOUT,
-//      "Spinel",
-//      robotToCamera
-//    )
+  val ESTIMATORS: ArrayList<VisionEstimator> = arrayListOf(
+    VisionEstimator(
+      TAG_LAYOUT,
+      "Spinel",
+      robotToCamera
+    )
   )
 
   val ENCODER_TRUST = MatBuilder(Nat.N3(), Nat.N1()).fill(.075, .075, .025)

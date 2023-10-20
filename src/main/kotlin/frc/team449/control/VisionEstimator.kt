@@ -97,19 +97,21 @@ class VisionEstimator(
     val hasCalibData = cameraMatrixOpt.isPresent && distCoeffsOpt.isPresent
 
     // multi-target solvePNP
-    return if (hasCalibData && visCorners.size == knownVisTags.size * 4 && knownVisTags.isNotEmpty()) {
+    if (hasCalibData && visCorners.size == knownVisTags.size * 4 && knownVisTags.isNotEmpty()) {
       val cameraMatrix = cameraMatrixOpt.get()
       val distCoeffs = distCoeffsOpt.get()
       val pnpResults = estimateCamPosePNP(cameraMatrix, distCoeffs, visCorners, knownVisTags)
-      val best = Pose3d()
-        .plus(pnpResults.best) // field-to-camera
-        .plus(robotToCam.inverse()) // field-to-robot
-      Optional.of(
-        EstimatedRobotPose(best, result.timestampSeconds, usedTargets)
-      )
-    } else {
-      Optional.empty()
+      if (pnpResults != null) {
+        val best = Pose3d()
+          .plus(pnpResults.best) // field-to-camera
+          .plus(robotToCam.inverse()) // field-to-robot
+        return Optional.of(
+          EstimatedRobotPose(best, result.timestampSeconds, usedTargets)
+        )
+      }
     }
+
+    return Optional.empty()
   }
 
   /**
@@ -178,7 +180,11 @@ class VisionEstimator(
     distCoeffs: Matrix<N5, N1>,
     corners: List<TargetCorner>,
     knownTags: List<AprilTag>
-  ): PNPResults {
+  ): PNPResults? {
+    if (corners.size != knownTags.size * 4 || knownTags.isEmpty()) {
+      return null
+    }
+
     // single-tag pnp
     return if (corners.size == 4) {
       val camToTag = OpenCVHelp.solvePNP_SQUARE(
