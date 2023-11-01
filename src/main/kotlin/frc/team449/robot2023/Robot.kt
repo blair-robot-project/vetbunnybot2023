@@ -12,7 +12,6 @@ import frc.team449.robot2023.subsystems.arm.Arm.Companion.createArm
 import frc.team449.robot2023.subsystems.arm.ArmSim.Companion.createArmSim
 import frc.team449.robot2023.subsystems.endEffector.EndEffector.Companion.createEndEffector
 import frc.team449.robot2023.subsystems.groundIntake.GroundIntake.Companion.createGroundIntake
-import frc.team449.robot2023.subsystems.nodeTracker.ObjectiveTracker.Companion.createObjTracker
 import frc.team449.system.AHRS
 import io.github.oblarg.oblog.annotations.Log
 
@@ -47,7 +46,7 @@ class Robot : RobotBase() {
   @Log(name = "Ground Intake")
   val groundIntake = createGroundIntake()
 
-  val tracker = createObjTracker(this)
+//  val tracker = createObjTracker(this)
 
 //  val light = Light.createLight()
 //

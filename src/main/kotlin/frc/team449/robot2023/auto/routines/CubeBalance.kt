@@ -18,12 +18,13 @@ class CubeBalance(
   override val routine = ChoreoRoutine(
     drive = robot.drive,
     stopEventMap = hashMapOf(
-      0 to AutoUtil.stowDropCone(robot),
+      0 to AutoUtil.stowDropCube(robot),
       1 to AutoBalance.genCmd(robot.drive)
     ),
     parallelEventMap = hashMapOf(
       0 to SequentialCommandGroup(
         ArmFollower(robot.arm) { ArmPaths.highStow },
+
         InstantCommand(robot.endEffector::stop),
         InstantCommand(robot.endEffector::pistonOn)
       )

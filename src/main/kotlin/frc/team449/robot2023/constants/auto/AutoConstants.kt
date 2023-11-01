@@ -14,7 +14,7 @@ object AutoConstants {
   val RED_FAR_DOUBLE = Translation2d(0.75, 7.465)
 
   /** Auto Balance PD Gains */
-  const val AUTO_BAL_KP = 2.75
+  const val AUTO_BAL_KP = 25.0
   const val ADJUST_SPEED = 1.5 // m/s
   const val MAX_ROT_VEL = 20.0 // deg/s
 

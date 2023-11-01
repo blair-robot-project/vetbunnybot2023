@@ -47,7 +47,6 @@ class GridAlign(
     isConeNode: Boolean,
     tolerance: Pose2d = Pose2d(0.065, 0.065, Rotation2d.fromDegrees(1.25)),
   ): Command {
-    println("doing traj generation here")
 
     val alliancePoint: Translation2d
     val endHeading: Rotation2d

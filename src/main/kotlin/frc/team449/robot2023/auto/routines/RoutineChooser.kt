@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj2.command.Command
 import frc.team449.robot2023.Robot
-import frc.team449.robot2023.auto.PositionChooser
 
 class RoutineChooser(private val robot: Robot) : SendableChooser<String>() {
 
@@ -18,15 +17,17 @@ class RoutineChooser(private val robot: Robot) : SendableChooser<String>() {
       "BlueTwoPieceBal" to TwoPieceBal(robot, false).createCommand(robot),
       "RedTwoPieceBal" to TwoPieceBal(robot, true).createCommand(robot),
       "BlueCubeBal" to CubeBalance(robot, false).createCommand(robot),
-      "RedCubeBal" to CubeBalance(robot, true).createCommand(robot)
+      "RedCubeBal" to CubeBalance(robot, true).createCommand(robot),
+      "BlueConeCubeBump" to TwoPieceBump(robot, false).createCommand(robot),
+      "RedConeCubeBump" to TwoPieceBump(robot, true).createCommand(robot)
     )
   }
 
   init {
-    updateOptions(PositionChooser.Positions.CENTER, DriverStation.getAlliance() == DriverStation.Alliance.Red)
+    updateOptions(DriverStation.getAlliance() == DriverStation.Alliance.Red)
   }
 
-  fun updateOptions(position: PositionChooser.Positions, isRed: Boolean) {
+  fun updateOptions(isRed: Boolean) {
     /** Add auto options here */
     this.setDefaultOption("Drop Cone", "DropCone")
 
@@ -54,6 +55,10 @@ class RoutineChooser(private val robot: Robot) : SendableChooser<String>() {
       else "BlueCubeBal"
     )
 
-    // TODO: CREATE OPTIONS
+    this.addOption(
+      "Bump Two Piece",
+      if (isRed) "RedConeCubeBump"
+      else "BlueConeCubeBump"
+    )
   }
 }

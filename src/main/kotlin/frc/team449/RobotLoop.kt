@@ -9,9 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.InstantCommand
-import frc.team449.control.VisionEstimator
 import frc.team449.robot2023.Robot
-import frc.team449.robot2023.auto.PositionChooser
 import frc.team449.robot2023.auto.routines.RoutineChooser
 import frc.team449.robot2023.commands.ArmCalibration
 import frc.team449.robot2023.constants.RobotConstants
@@ -25,7 +23,6 @@ import io.github.oblarg.oblog.Logger
 class RobotLoop : TimedRobot() {
 
   private val robot = Robot()
-  private val positionChooser: PositionChooser = PositionChooser()
   private val routineChooser: RoutineChooser = RoutineChooser(robot)
 
   private var autoCommand: Command? = null
@@ -58,7 +55,6 @@ class RobotLoop : TimedRobot() {
 
     Logger.configureLoggingAndConfig(robot, false)
     SmartDashboard.putData("Field", robot.field)
-    SmartDashboard.putData("Position Chooser", positionChooser)
     SmartDashboard.putData("Routine Chooser", routineChooser)
     SmartDashboard.putData("Command Scheduler", CommandScheduler.getInstance())
     SmartDashboard.putData("Arm Subsystem", robot.arm)
@@ -67,22 +63,6 @@ class RobotLoop : TimedRobot() {
 
     controllerBinder.bindButtons()
 
-    if (VisionConstants.ESTIMATORS.isEmpty()) {
-      VisionConstants.ESTIMATORS.add(
-        VisionEstimator(
-          VisionConstants.TAG_LAYOUT,
-          "Spinel",
-          VisionConstants.robotToCamera
-        )
-      )
-    } else {
-      VisionConstants.ESTIMATORS[0] =
-        VisionEstimator(
-          VisionConstants.TAG_LAYOUT,
-          "Spinel",
-          VisionConstants.robotToCamera
-        )
-    }
 
     robot.arm.defaultCommand = InstantCommand(
       robot.arm::holdArm,
@@ -94,7 +74,7 @@ class RobotLoop : TimedRobot() {
   override fun robotPeriodic() {
     CommandScheduler.getInstance().run()
 
-    Logger.updateEntries()
+//    Logger.updateEntries()
 
     robot.field.robotPose = robot.drive.pose
 
@@ -108,9 +88,6 @@ class RobotLoop : TimedRobot() {
 
     /** At the start of auto we poll the alliance color given by the FMS */
     RobotConstants.ALLIANCE_COLOR = DriverStation.getAlliance()
-
-    routineChooser.updateOptions(positionChooser.selected, RobotConstants.ALLIANCE_COLOR == DriverStation.Alliance.Red)
-
 
     /** Every time auto starts, we update the chosen auto command */
     this.autoCommand = routineMap[routineChooser.selected]
@@ -136,26 +113,28 @@ class RobotLoop : TimedRobot() {
   override fun disabledInit() {
     robot.drive.stop()
 
-    if (VisionConstants.ESTIMATORS.isEmpty()) {
-      VisionConstants.ESTIMATORS.add(
-        VisionEstimator(
-          VisionConstants.TAG_LAYOUT,
-          "Spinel",
-          VisionConstants.robotToCamera
-        )
-      )
-    } else {
-      VisionConstants.ESTIMATORS[0] =
-        VisionEstimator(
-          VisionConstants.TAG_LAYOUT,
-          "Spinel",
-          VisionConstants.robotToCamera
-        )
-    }
+//    if (VisionConstants.ESTIMATORS.isEmpty()) {
+//      VisionConstants.ESTIMATORS.add(
+//        VisionEstimator(
+//          VisionConstants.TAG_LAYOUT,
+//          "Spinel",
+//          VisionConstants.robotToCamera
+//        )
+//      )
+//    } else {
+//      VisionConstants.ESTIMATORS[0] =
+//        VisionEstimator(
+//          VisionConstants.TAG_LAYOUT,
+//          "Spinel",
+//          VisionConstants.robotToCamera
+//        )
+//    }
   }
 
   override fun disabledPeriodic() {
     robot.arm.controller.reset()
+
+    routineChooser.updateOptions(RobotConstants.ALLIANCE_COLOR == DriverStation.Alliance.Red)
   }
 
   override fun testInit() {

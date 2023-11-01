@@ -41,14 +41,8 @@ VisionConstants {
   var MAX_DISTANCE_MULTI_TAG = 4.5
 
   /** List of cameras that we want to use */
-  val ESTIMATORS: ArrayList<VisionEstimator> = arrayListOf(
-    VisionEstimator(
-      TAG_LAYOUT,
-      "Spinel",
-      robotToCamera
-    )
-  )
+  val ESTIMATORS: ArrayList<VisionEstimator> = arrayListOf()
 
   val ENCODER_TRUST = MatBuilder(Nat.N3(), Nat.N1()).fill(.075, .075, .025)
-  val VISION_TRUST = MatBuilder(Nat.N3(), Nat.N1()).fill(.035, .035, .75)
+  val VISION_TRUST = MatBuilder(Nat.N3(), Nat.N1()).fill(.0275, .0275, .75)
 }

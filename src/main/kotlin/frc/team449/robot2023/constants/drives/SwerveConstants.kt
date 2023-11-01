@@ -49,8 +49,8 @@ object SwerveConstants {
   const val DRIVE_UPR = 0.31818905832
   const val TURN_UPR = 2 * Math.PI
   const val MAX_ATTAINABLE_MK4I_SPEED = (12 - DRIVE_KS) / DRIVE_KV
-  const val DRIVE_CURRENT_LIM = 80
-  const val STEERING_CURRENT_LIM = 50
+  const val DRIVE_CURRENT_LIM = 55
+  const val STEERING_CURRENT_LIM = 40
 
   /** Wheelbase = wheel-to-wheel distance from front to back of the robot */
   /** Trackwidth = wheel-to-wheel distance from side to side of the robot */

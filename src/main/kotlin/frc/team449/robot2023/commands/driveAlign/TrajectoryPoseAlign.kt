@@ -47,8 +47,6 @@ class TrajectoryPoseAlign(
       PathPoint(targetPose.translation, Rotation2d(), targetPose.rotation)
     )
 
-    println(traj.states)
-
     // Return a command that follows the trajectory
     return HolonomicFollower(
       drive,

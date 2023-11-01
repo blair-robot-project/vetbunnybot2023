@@ -37,7 +37,6 @@ class DoubleAlign {
     robot: Robot,
     endCondition: BooleanSupplier
   ): Command {
-    println("doing traj generation here")
 
     val alliancePoint: Translation2d
     val endHeading: Rotation2d
