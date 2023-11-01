@@ -1,5 +1,5 @@
-# Framework 2023
-Developing our framework for next season!
+# Bunnybots 2023
+Our source code for our veteran-led Bunnybot for our 2023 Bunnybots Game: Hibernation Harvest!
 
 -----------------------------
 
