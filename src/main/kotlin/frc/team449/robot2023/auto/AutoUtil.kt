@@ -1,18 +1,10 @@
 package frc.team449.robot2023.auto
 
 import edu.wpi.first.math.MatBuilder
-import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.numbers.N2
 import edu.wpi.first.math.numbers.N3
-import edu.wpi.first.wpilibj2.command.*
 import frc.team449.control.auto.ChoreoTrajectory
-import frc.team449.robot2023.Robot
-import frc.team449.robot2023.constants.auto.AutoConstants
 import frc.team449.robot2023.constants.field.FieldConstants
-import frc.team449.robot2023.constants.subsystem.ArmConstants
-import frc.team449.robot2023.subsystems.arm.ArmPaths
-import frc.team449.robot2023.subsystems.arm.control.ArmFollower
-import frc.team449.robot2023.subsystems.arm.control.ArmState
 import kotlin.math.PI
 
 object AutoUtil {
@@ -62,98 +54,4 @@ object AutoUtil {
    * across different auto routines. For Charged UP, these methods were things such as
    * dropping a cone/cube, or getting in ground intake position, etc.
    */
-  fun dropCone(robot: Robot): Command {
-    return SequentialCommandGroup(
-      RepeatCommand(
-        InstantCommand(
-          {
-            val currState = robot.arm.desiredState.copy()
-            robot.arm.moveToState(
-              ArmState(
-                currState.theta,
-                currState.beta + Rotation2d.fromDegrees(AutoConstants.CONE_DROP_SWEEP_SPEED),
-                currState.thetaVel,
-                currState.betaVel
-              )
-            )
-          }
-        )
-      ).withTimeout(AutoConstants.CONE_DROP_SWEEP_TIME),
-      InstantCommand(robot.endEffector::pistonRev)
-    )
-  }
-
-  fun dropCube(robot: Robot): Command {
-    return SequentialCommandGroup(
-      WaitCommand(AutoConstants.CUBE_DROP_WAIT_BEFORE),
-      InstantCommand(robot.endEffector::autoReverse),
-      WaitCommand(AutoConstants.CUBE_DROP_WAIT_AFTER),
-      InstantCommand(robot.endEffector::stop)
-    )
-  }
-
-  fun stowDropCube(robot: Robot): Command {
-    return InstantCommand(robot.endEffector::holdIntake).andThen(
-      ArmFollower(robot.arm) { ArmPaths.stowHigh }.andThen(dropCube(robot))
-    )
-  }
-
-  fun stowDropCone(robot: Robot): Command {
-    return InstantCommand(robot.endEffector::holdIntake).andThen(
-      ArmFollower(robot.arm) { ArmPaths.stowAutoHigh }
-        .andThen(WaitCommand(AutoConstants.CONE_WAIT))
-        .andThen(InstantCommand(robot.endEffector::pistonRev))
-    )
-  }
-
-  fun deployCube(robot: Robot): Command {
-    return SequentialCommandGroup(
-      robot.groundIntake.deploy(),
-      robot.groundIntake.intakeCube(),
-      InstantCommand(robot.endEffector::intake),
-      InstantCommand(robot.endEffector::pistonRev),
-      ArmFollower(robot.arm) { ArmPaths.autoHighCube }
-    )
-  }
-
-  fun deployCone(robot: Robot): Command {
-    return SequentialCommandGroup(
-      InstantCommand(robot.endEffector::intake),
-      InstantCommand(robot.endEffector::pistonOn),
-      ArmFollower(robot.arm) { ArmPaths.highCone }
-    )
-  }
-
-  fun stowArm(robot: Robot): Command {
-    return ArmFollower(robot.arm) { ArmPaths.highStow }
-  }
-
-  fun retractAndStow(robot: Robot): Command {
-    return SequentialCommandGroup(
-      retractGroundIntake(robot),
-      ArmFollower(robot.arm) { robot.arm.chooseTraj(ArmConstants.STOW) }
-    )
-  }
-
-  fun retractAndHigh(robot: Robot): Command {
-    return SequentialCommandGroup(
-      retractGroundIntake(robot),
-      ArmFollower(robot.arm) { ArmPaths.cubeAutoHigh }
-    )
-  }
-
-  fun retractAndMid(robot: Robot): Command {
-    return SequentialCommandGroup(
-      retractGroundIntake(robot),
-      ArmFollower(robot.arm) { ArmPaths.cubeMid }
-    )
-  }
-
-  fun retractGroundIntake(robot: Robot): Command {
-    return SequentialCommandGroup(
-      InstantCommand(robot.endEffector::strongHoldIntake),
-      robot.groundIntake.retract(),
-      robot.groundIntake.runOnce(robot.groundIntake::stop)
-    )
-  }
 }
