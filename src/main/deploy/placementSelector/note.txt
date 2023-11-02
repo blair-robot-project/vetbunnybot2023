@@ -1,5 +1,0 @@
-This code was adapted from 6328's node selector in their 2023 robot code.
-
-Here is a copy of their license:
-
-https://github.com/Mechanical-Advantage/RobotCode2023/blob/main/LICENSE
