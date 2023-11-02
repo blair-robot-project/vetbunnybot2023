@@ -105,8 +105,10 @@ class ProfiledPoseAlign(
 
     return xPID.atSetpoint() && yPID.atSetpoint() && headingPID.atSetpoint() &&
       xProfile.isFinished(currTime) && yProfile.isFinished(currTime) &&
-      hypot(drive.currentSpeeds.vxMetersPerSecond,
-        drive.currentSpeeds.vyMetersPerSecond) < speedTol &&
+      hypot(
+        drive.currentSpeeds.vxMetersPerSecond,
+        drive.currentSpeeds.vyMetersPerSecond
+      ) < speedTol &&
       drive.currentSpeeds.omegaRadiansPerSecond < speedTolRot
   }
 

@@ -30,7 +30,7 @@ object RobotConstants {
   val ORTHOGONAL_CONTROLLER = PIDController(
     3.0,
     0.0,
-    0.0,
+    0.0
   )
 
   const val ALIGN_ROT_SPEED = 3 * PI / 2

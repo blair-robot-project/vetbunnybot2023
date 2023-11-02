@@ -103,8 +103,7 @@ class SwerveOrthogonalCommand(
         atGoal = false
         rotCtrl.setpoint = desAngleA
       }
-    }
-    else if (controller.yButtonPressed) {
+    } else if (controller.yButtonPressed) {
       val desAngleY = MathUtil.angleModulus(PI + allianceCompensation.invoke())
       if (abs(desAngleY - drive.heading.radians) > 0.075 && abs(desAngleY - drive.heading.radians) < 2 * PI - 0.075) {
         atGoal = false
@@ -115,7 +114,8 @@ class SwerveOrthogonalCommand(
     if (atGoal) {
       rotScaled = rotRamp.calculate(
         (if (abs(controller.rightX) < RobotConstants.ROTATION_DEADBAND) .0 else -controller.rightX) *
-        drive.maxRotSpeed)
+          drive.maxRotSpeed
+      )
     } else {
       rotScaled = MathUtil.clamp(
         rotCtrl.calculate(drive.heading.radians),
@@ -164,5 +164,4 @@ class SwerveOrthogonalCommand(
     builder.addStringProperty("speeds", { drive.desiredSpeeds.toString() }, null)
     builder.addDoubleProperty("skew constant", { skewConstant }, { k: Double -> skewConstant = k })
   }
-
 }
