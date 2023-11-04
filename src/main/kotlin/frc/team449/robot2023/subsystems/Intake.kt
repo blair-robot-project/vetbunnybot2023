@@ -16,11 +16,11 @@ class Intake(
   private val motor: WrappedMotor,
 ): SubsystemBase() {
   fun extend(): Command{
-    return InstantCommand({ piston.set(DoubleSolenoid.Value.kForward) })
+    return InstantCommand({ piston.set(DoubleSolenoid.Value.kReverse) })
   }
 
   fun retract(): Command{
-    return InstantCommand({ piston.set(DoubleSolenoid.Value.kReverse)})
+    return InstantCommand({ piston.set(DoubleSolenoid.Value.kForward)})
   }
 
   fun intake(): Command{
