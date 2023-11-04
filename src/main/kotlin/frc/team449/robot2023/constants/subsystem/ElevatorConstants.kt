@@ -15,13 +15,13 @@ object ElevatorConstants {
   const val MAX_VEL = 1.0
   const val MAX_ACC = 1.0
 
-  const val KP = 1.0
-  const val KI = 0.0
-  const val KD = 0.0
+  const val kP = 1.0
+  const val kI = 0.0
+  const val kD = 0.0
 
-  const val KS = 0.0
-  const val KV = 0.0
-  const val KA = 0.0
+  const val kS = 0.0
+  const val kV = 0.0
+  const val kA = 0.0
 
   const val EXTEND_DISTANCE = 1.0
 }

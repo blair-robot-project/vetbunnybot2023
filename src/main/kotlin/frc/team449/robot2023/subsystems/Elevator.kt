@@ -50,6 +50,12 @@ class Elevator(
     )
   }
 
+  fun stop(): Command{
+    return InstantCommand({
+      motor.stopMotor()
+    })
+  }
+
   override fun periodic() {}
 
   companion object {
@@ -69,9 +75,9 @@ class Elevator(
       )
 
       val controller = PIDController(
-        ElevatorConstants.KP,
-        ElevatorConstants.KI,
-        ElevatorConstants.KD
+        ElevatorConstants.kP,
+        ElevatorConstants.kI,
+        ElevatorConstants.kD
       )
       controller.setTolerance(
         ElevatorConstants.POS_TOL,
@@ -79,9 +85,9 @@ class Elevator(
       )
 
       val feedforward = SimpleMotorFeedforward(
-        ElevatorConstants.KS,
-        ElevatorConstants.KV,
-        ElevatorConstants.KA
+        ElevatorConstants.kS,
+        ElevatorConstants.kV,
+        ElevatorConstants.kA
       )
 
       val profile = TrapezoidProfile(
