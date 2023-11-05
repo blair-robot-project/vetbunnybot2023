@@ -1,11 +1,8 @@
 package frc.team449.robot2023.subsystems
 
-import edu.wpi.first.wpilibj.DoubleSolenoid
-import edu.wpi.first.wpilibj.PneumaticsModuleType
+import edu.wpi.first.util.sendable.SendableBuilder
 import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.InstantCommand
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.team449.robot2023.constants.subsystem.IntakeConstants
 import frc.team449.robot2023.constants.subsystem.ManipulatorConstants
 import frc.team449.system.encoder.NEOEncoder
 import frc.team449.system.motor.WrappedMotor
@@ -15,27 +12,29 @@ class Manipulator(
   private val motor: WrappedMotor
 ): SubsystemBase() {
   fun intake(): Command {
-    return InstantCommand({
+    return this.runOnce {
       motor.setVoltage(ManipulatorConstants.INTAKE_VOLTAGE)
-    })
+    }
   }
 
   fun outtake(): Command {
-    return InstantCommand({
+    return this.runOnce {
       motor.setVoltage(-ManipulatorConstants.INTAKE_VOLTAGE)
-    })
+    }
   }
 
   fun stop(): Command {
-    return InstantCommand({
+    return this.runOnce {
       motor.stopMotor()
-    })
+    }
   }
 
-  override fun periodic() {}
+  override fun initSendable(builder: SendableBuilder) {
+    builder.addDoubleProperty("Manipulator Motor Voltage", { motor.lastVoltage }, {})
+  }
 
   companion object{
-    fun createIntake(): Manipulator {
+    fun createManipulator(): Manipulator {
       return Manipulator(
         createSparkMax(
           "Manipulator Motor",

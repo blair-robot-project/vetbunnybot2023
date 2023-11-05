@@ -7,6 +7,9 @@ import frc.team449.RobotBase
 import frc.team449.control.holonomic.SwerveDrive
 import frc.team449.control.holonomic.SwerveOrthogonalCommand
 import frc.team449.robot2023.constants.RobotConstants
+import frc.team449.robot2023.subsystems.Intake.Companion.createIntake
+import frc.team449.robot2023.subsystems.Manipulator.Companion.createManipulator
+import frc.team449.robot2023.subsystems.elevator.Elevator.Companion.createElevator
 import frc.team449.system.AHRS
 import io.github.oblarg.oblog.annotations.Log
 
@@ -31,6 +34,13 @@ class Robot : RobotBase() {
 
   @Log(name = "Joystick Input")
   override val driveCommand = SwerveOrthogonalCommand(drive, driveController)
+
+  @Log(name = "Elevator")
+  val elevator = createElevator()
+
+  val intake = createIntake()
+
+  val manipulator = createManipulator()
 
 //  val light = Light.createLight()
 //

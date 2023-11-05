@@ -1,7 +1,8 @@
 package frc.team449.control
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State
-import kotlin.math.*
+import kotlin.math.exp
+import kotlin.math.pow
 
 class TrapezoidExponentialProfile(
   private val vMax: Double,

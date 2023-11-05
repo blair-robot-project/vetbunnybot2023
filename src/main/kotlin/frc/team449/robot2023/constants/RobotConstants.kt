@@ -24,7 +24,7 @@ object RobotConstants {
   const val MAX_ACCEL = 14.75 // m/s/s
   val INITIAL_POSE = Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0))
 
-  const val DOUBLE_ALIGN_ACCEL = 2.25
+  const val LOOP_TIME = 0.020
 
   /** PID controller for Orthogonal turning */
   val ORTHOGONAL_CONTROLLER = PIDController(
