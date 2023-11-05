@@ -14,7 +14,6 @@ import org.json.simple.parser.JSONParser
 import java.io.File
 import java.io.FileReader
 
-
 class ChoreoTrajectory(
   val name: String,
   val stateMap: InterpolatingMatrixTreeMap<Double, N2, N3>,
@@ -57,7 +56,7 @@ class ChoreoTrajectory(
 
   companion object {
     fun createTrajectory(
-      filename: String,
+      filename: String
     ): MutableList<ChoreoTrajectory> {
       val path = Filesystem.getDeployDirectory().absolutePath.plus("/choreo/$filename.json")
       val document = (JSONParser().parse(FileReader(File(path).absolutePath)) as JSONObject)["paths"] as HashMap<*, *>
@@ -82,12 +81,10 @@ class ChoreoTrajectory(
             info.second
           )
         )
-
       }
 
       return trajList
     }
-
 
     private fun parse(trajectory: JSONArray): Pair<InterpolatingMatrixTreeMap<Double, N2, N3>, ArrayList<Double>> {
       val stateMap = InterpolatingMatrixTreeMap<Double, N2, N3>()

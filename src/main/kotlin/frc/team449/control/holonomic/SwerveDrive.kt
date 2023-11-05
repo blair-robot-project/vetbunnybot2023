@@ -141,7 +141,6 @@ open class SwerveDrive(
     this.set(ChassisSpeeds(0.0, 0.0, 0.0))
   }
 
-
   /** @return An array of [SwerveModulePosition] for each module, containing distance and angle. */
   private fun getPositions(): Array<SwerveModulePosition> {
     return Array(modules.size) { i -> modules[i].position }

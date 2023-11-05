@@ -13,7 +13,7 @@ class DoNothing(
 
   override val routine =
     ChoreoRoutine(
-      drive = robot.drive,
+      drive = robot.drive
     )
 
   override val trajectory: MutableList<ChoreoTrajectory> = mutableListOf()
