@@ -11,14 +11,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.robot2023.constants.subsystem.ElevatorConstants
-import frc.team449.system.encoder.NEOEncoder
+import frc.team449.robot2023.constants.subsystem.ElevatorConstants.motor
 import frc.team449.system.motor.WrappedMotor
-import frc.team449.system.motor.createSparkMax
 
 open class Elevator(
   private val motor: WrappedMotor,
   protected val controller: ProfiledPIDController,
-  private val feedforward: ElevatorFeedforward
+  private var feedforward: ElevatorFeedforward
 ): SubsystemBase() {
 
   protected val mech: Mechanism2d = Mechanism2d(1.5, 2.0)
@@ -96,29 +95,14 @@ open class Elevator(
     builder.addDoubleProperty("Current Motor Vel", { currentState.second }, {})
     builder.addDoubleProperty("Desired Motor Pos", { desiredState.first }, {})
     builder.addDoubleProperty("Desired Motor Vel", { desiredState.second }, {})
-    builder.addDoubleProperty("kS", { ElevatorConstants.kS }, { value -> ElevatorConstants.kS = value })
-    builder.addDoubleProperty("kV", { ElevatorConstants.kV }, { value -> ElevatorConstants.kV = value })
-    builder.addDoubleProperty("kG", { ElevatorConstants.kG }, { value -> ElevatorConstants.kG = value })
-    builder.addDoubleProperty("kP", { ElevatorConstants.kP }, { value -> ElevatorConstants.kP = value })
+    builder.addDoubleProperty("kS", { ElevatorConstants.kS }, { value -> ElevatorConstants.kS = value; feedforward = ElevatorFeedforward(value, feedforward.kg, feedforward.kv) })
+    builder.addDoubleProperty("kV", { ElevatorConstants.kV }, { value -> ElevatorConstants.kV = value; feedforward = ElevatorFeedforward(feedforward.ks, feedforward.kg, value) })
+    builder.addDoubleProperty("kG", { ElevatorConstants.kG }, { value -> ElevatorConstants.kG = value; feedforward = ElevatorFeedforward(feedforward.ks, value, feedforward.kv) })
+    builder.addDoubleProperty("kP", { ElevatorConstants.kP }, { value -> ElevatorConstants.kP = value; controller.p = value })
   }
 
   companion object {
     fun createElevator(): Elevator {
-      val motor = createSparkMax(
-        "Elevator Motor",
-        ElevatorConstants.LEFT_ID,
-        NEOEncoder.creator(
-          ElevatorConstants.PULLEY_RADIUS,
-          ElevatorConstants.GEARING
-        ),
-        enableBrakeMode = true,
-        inverted = ElevatorConstants.LEFT_INVERTED,
-        currentLimit = ElevatorConstants.CURRENT_LIMIT,
-        slaveSparks = mapOf(
-          Pair(ElevatorConstants.RIGHT_ID, ElevatorConstants.RIGHT_INVERTED)
-        )
-      )
-
       val controller = ProfiledPIDController(
         ElevatorConstants.kP,
         ElevatorConstants.kI,

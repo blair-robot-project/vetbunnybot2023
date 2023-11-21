@@ -1,7 +1,6 @@
 package frc.team449.control.auto
 
 import edu.wpi.first.wpilibj2.command.Command
-import frc.team449.robot2023.Robot
 
 interface ChoreoRoutineStructure {
 
@@ -9,7 +8,7 @@ interface ChoreoRoutineStructure {
 
   val trajectory: MutableList<ChoreoTrajectory>
 
-  fun createCommand(robot: Robot): Command {
+  fun createCommand(): Command {
     return routine.createRoutine(trajectory)
   }
 }

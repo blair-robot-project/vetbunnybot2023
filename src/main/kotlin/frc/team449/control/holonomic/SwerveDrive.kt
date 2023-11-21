@@ -68,7 +68,7 @@ open class SwerveDrive(
   @Log.ToString(name = "Desired Speeds")
   var desiredSpeeds: ChassisSpeeds = ChassisSpeeds()
 
-  @Log.ToString(name = "Max Speed")
+  @Log.ToString(name = "Max Recorded Speed")
   var maxSpeed: Double = 0.0
 
   override fun set(desiredSpeeds: ChassisSpeeds) {

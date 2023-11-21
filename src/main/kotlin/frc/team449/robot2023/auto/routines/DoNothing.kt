@@ -18,7 +18,7 @@ class DoNothing(
 
   override val trajectory: MutableList<ChoreoTrajectory> = mutableListOf()
 
-  override fun createCommand(robot: Robot): Command {
+  override fun createCommand(): Command {
     return InstantCommand()
   }
 }

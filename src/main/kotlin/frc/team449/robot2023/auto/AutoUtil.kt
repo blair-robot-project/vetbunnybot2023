@@ -1,6 +1,7 @@
 package frc.team449.robot2023.auto
 
 import edu.wpi.first.math.MatBuilder
+import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.numbers.N2
 import edu.wpi.first.math.numbers.N3
 import frc.team449.control.auto.ChoreoTrajectory
@@ -36,8 +37,8 @@ object AutoUtil {
 
         val newMatrix = MatBuilder(N2.instance, N3.instance).fill(
           FieldConstants.fieldLength - currentMatrix[0, 0],
-          currentMatrix[0, 1],
-          PI - currentMatrix[0, 2],
+          FieldConstants.fieldWidth - currentMatrix[0, 1],
+          MathUtil.angleModulus(PI + currentMatrix[0, 2]),
           -currentMatrix[1, 0],
           currentMatrix[1, 1],
           -currentMatrix[1, 2]

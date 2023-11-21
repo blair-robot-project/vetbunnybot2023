@@ -9,7 +9,9 @@ class RoutineChooser(private val robot: Robot) : SendableChooser<String>() {
 
   fun routineMap(): HashMap<String, Command> {
     return hashMapOf(
-      "DoNothing" to DoNothing(robot).createCommand(robot)
+      "DoNothing" to DoNothing(robot).createCommand(),
+      "BlueOnePiecePick" to OnePiecePick(robot, false).createCommand(),
+      "RedOnePiecePick" to OnePiecePick(robot, true).createCommand()
     )
   }
 
@@ -20,5 +22,11 @@ class RoutineChooser(private val robot: Robot) : SendableChooser<String>() {
   fun updateOptions(isRed: Boolean) {
     /** Add auto options here */
     this.setDefaultOption("Do Nothing", "DoNothing")
+
+    this.addOption(
+      "One Piece and Pick",
+      if (isRed) "RedOnePiecePick"
+      else "BlueOnePiecePick"
+    )
   }
 }
