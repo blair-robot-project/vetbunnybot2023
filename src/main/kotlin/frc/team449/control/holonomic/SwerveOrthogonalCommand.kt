@@ -9,8 +9,9 @@ import edu.wpi.first.util.sendable.SendableBuilder
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.XboxController
-import edu.wpi.first.wpilibj2.command.CommandBase
+import edu.wpi.first.wpilibj2.command.Command
 import frc.team449.robot2023.constants.RobotConstants
+import kotlin.jvm.optionals.getOrNull
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.hypot
@@ -19,7 +20,7 @@ class SwerveOrthogonalCommand(
   private val drive: SwerveDrive,
   private val controller: XboxController,
   private val fieldOriented: () -> Boolean = { true }
-) : CommandBase() {
+) : Command() {
 
   private var prevX = 0.0
   private var prevY = 0.0
@@ -33,8 +34,8 @@ class SwerveOrthogonalCommand(
   private var magAccClamped = 0.0
 
   private var rotScaled = 0.0
-  private val allianceCompensation = { if (RobotConstants.ALLIANCE_COLOR == DriverStation.Alliance.Red) 0.0 else PI }
-  private val directionCompensation = { if (RobotConstants.ALLIANCE_COLOR == DriverStation.Alliance.Red) -1.0 else 1.0 }
+  private val allianceCompensation = { if (DriverStation.getAlliance().getOrNull() == DriverStation.Alliance.Red) 0.0 else PI }
+  private val directionCompensation = { if (DriverStation.getAlliance().getOrNull() == DriverStation.Alliance.Red) -1.0 else 1.0 }
 
   private var atGoal = true
 

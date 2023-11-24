@@ -4,7 +4,6 @@ import edu.wpi.first.math.filter.LinearFilter
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.wpilibj.SerialPort
 import edu.wpi.first.wpilibj.Timer
-import edu.wpi.first.wpilibj.interfaces.Gyro
 import edu.wpi.first.wpilibj.simulation.SimDeviceSim
 import frc.team449.util.simBooleanProp
 import frc.team449.util.simDoubleProp
@@ -13,7 +12,7 @@ import io.github.oblarg.oblog.annotations.Log
 
 class AHRS(
   private val navx: com.kauailabs.navx.frc.AHRS
-) : Gyro by navx, Loggable {
+) : Loggable {
 
   var prevPos = Double.NaN
   var prevTime = Double.NaN
@@ -69,8 +68,6 @@ class AHRS(
   fun calibrated(): Boolean {
     return navx.isMagnetometerCalibrated
   }
-
-  override fun getAngle() = heading.degrees
 
   /**
    * Used to set properties of an [AHRS] object during simulation. See

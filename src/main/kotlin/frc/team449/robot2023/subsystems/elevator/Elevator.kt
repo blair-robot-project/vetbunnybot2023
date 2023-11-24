@@ -52,8 +52,6 @@ open class Elevator(
 
       desiredState = Pair(controller.setpoint.position, controller.setpoint.velocity)
 
-      if (desiredState.first > 1.4) println("ggs we gottem")
-
       if (desiredState.first == controller.goal.position && desiredState.second == controller.goal.velocity)
         motor.setVoltage(controller.calculate(currentState.first) + ElevatorConstants.kS + ElevatorConstants.kG)
       else
@@ -95,6 +93,7 @@ open class Elevator(
     builder.addDoubleProperty("Current Motor Vel", { currentState.second }, {})
     builder.addDoubleProperty("Desired Motor Pos", { desiredState.first }, {})
     builder.addDoubleProperty("Desired Motor Vel", { desiredState.second }, {})
+    builder.addDoubleProperty("Last motor voltage", { motor.lastVoltage }, {})
     builder.addDoubleProperty("kS", { ElevatorConstants.kS }, { value -> ElevatorConstants.kS = value; feedforward = ElevatorFeedforward(value, feedforward.kg, feedforward.kv) })
     builder.addDoubleProperty("kV", { ElevatorConstants.kV }, { value -> ElevatorConstants.kV = value; feedforward = ElevatorFeedforward(feedforward.ks, feedforward.kg, value) })
     builder.addDoubleProperty("kG", { ElevatorConstants.kG }, { value -> ElevatorConstants.kG = value; feedforward = ElevatorFeedforward(feedforward.ks, value, feedforward.kv) })

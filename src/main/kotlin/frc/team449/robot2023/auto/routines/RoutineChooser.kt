@@ -1,6 +1,5 @@
 package frc.team449.robot2023.auto.routines
 
-import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser
 import edu.wpi.first.wpilibj2.command.Command
 import frc.team449.robot2023.Robot
@@ -16,7 +15,7 @@ class RoutineChooser(private val robot: Robot) : SendableChooser<String>() {
   }
 
   init {
-    updateOptions(DriverStation.getAlliance() == DriverStation.Alliance.Red)
+    updateOptions(true)
   }
 
   fun updateOptions(isRed: Boolean) {

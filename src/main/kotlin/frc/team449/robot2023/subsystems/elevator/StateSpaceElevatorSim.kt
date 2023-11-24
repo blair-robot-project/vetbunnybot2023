@@ -10,12 +10,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import frc.team449.robot2023.constants.RobotConstants
 import frc.team449.robot2023.constants.subsystem.ElevatorConstants
 import frc.team449.system.motor.WrappedMotor
+import java.util.function.Supplier
 
 class StateSpaceElevatorSim(
   private val motor: WrappedMotor,
   loop: LinearSystemLoop<N2, N1, N1>,
-  constraints: TrapezoidProfile.Constraints
-): StateSpaceElevator(motor, loop, constraints) {
+  constraint: TrapezoidProfile.Constraints
+): StateSpaceElevator(motor, loop, constraint) {
 
   private val elevatorSim = TiltedElevatorSim(
     DCMotor.getNEO(ElevatorConstants.NUM_MOTORS),
@@ -27,6 +28,9 @@ class StateSpaceElevatorSim(
     true,
     angle = ElevatorConstants.ANGLE
   )
+
+  override val positionSupplier =
+    Supplier { elevatorSim.positionMeters }
 
   var currentDraw = 0.0
 

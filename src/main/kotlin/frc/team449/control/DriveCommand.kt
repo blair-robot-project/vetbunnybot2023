@@ -1,7 +1,7 @@
 package frc.team449.control
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds
-import edu.wpi.first.wpilibj2.command.CommandBase
+import edu.wpi.first.wpilibj2.command.Command
 
 /**
  * Generic driving command that applies the OI output to the drivetrain.
@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase
 class DriveCommand(
   private val drive: DriveSubsystem,
   private val oi: OI
-) : CommandBase() {
+) : Command() {
 
   init {
     addRequirements(drive)

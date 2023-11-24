@@ -3,6 +3,7 @@ package frc.team449.robot2023.subsystems
 import edu.wpi.first.util.sendable.Sendable
 import edu.wpi.first.util.sendable.SendableBuilder
 import edu.wpi.first.wpilibj.XboxController
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.button.JoystickButton
 import frc.team449.robot2023.Robot
 
@@ -38,7 +39,10 @@ class ControllerBindings(
     )
 
     JoystickButton(mechanismController, XboxController.Button.kY.value).onTrue(
-      robot.elevator.tuneKS()
+      SequentialCommandGroup(
+        robot.elevator.showSummaryStats(),
+        robot.elevator.tuneKS()
+      )
     )
   }
 

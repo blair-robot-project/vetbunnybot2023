@@ -6,7 +6,7 @@ import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 import edu.wpi.first.wpilibj.Timer
-import edu.wpi.first.wpilibj2.command.CommandBase
+import edu.wpi.first.wpilibj2.command.Command
 import frc.team449.control.holonomic.SwerveDrive
 import frc.team449.robot2023.constants.RobotConstants
 import frc.team449.robot2023.constants.auto.AutoConstants
@@ -24,8 +24,8 @@ import kotlin.math.hypot
 class ProfiledPoseAlign(
   private val drive: SwerveDrive,
   private val targetPose: Pose2d,
-  xSpeed: Double,
-  ySpeed: Double,
+  private val xSpeed: Double,
+  private val ySpeed: Double,
   private val xPID: PIDController = PIDController(
     AutoConstants.DEFAULT_X_KP,
     0.0,
@@ -41,20 +41,12 @@ class ProfiledPoseAlign(
     0.0,
     0.0
   ),
-  private val xProfile: TrapezoidProfile = TrapezoidProfile(
-    TrapezoidProfile.Constraints(RobotConstants.MAX_LINEAR_SPEED - 1.25, 2.25),
-    TrapezoidProfile.State(targetPose.x, 0.0),
-    TrapezoidProfile.State(drive.pose.x, xSpeed)
-  ),
-  private val yProfile: TrapezoidProfile = TrapezoidProfile(
-    TrapezoidProfile.Constraints(RobotConstants.MAX_LINEAR_SPEED - 1.25, 2.25),
-    TrapezoidProfile.State(targetPose.y, 0.0),
-    TrapezoidProfile.State(drive.pose.y, ySpeed)
-  ),
+  private val xProfile: TrapezoidProfile = TrapezoidProfile(TrapezoidProfile.Constraints(RobotConstants.MAX_LINEAR_SPEED - 1.25, 2.25)),
+  private val yProfile: TrapezoidProfile = TrapezoidProfile(TrapezoidProfile.Constraints(RobotConstants.MAX_LINEAR_SPEED - 1.25, 2.25)),
   private val tolerance: Pose2d = Pose2d(0.05, 0.05, Rotation2d(0.05)),
   private val speedTol: Double = 0.05,
   private val speedTolRot: Double = 0.05
-) : CommandBase() {
+) : Command() {
   init {
     addRequirements(drive)
   }
@@ -83,8 +75,17 @@ class ProfiledPoseAlign(
 
     // Calculate the feedback for X, Y, and theta using their respective controllers
 
-    val xProfCalc = xProfile.calculate(currTime)
-    val yProfCalc = yProfile.calculate(currTime)
+    val xProfCalc = xProfile.calculate(
+      currTime,
+      TrapezoidProfile.State(targetPose.x, 0.0),
+      TrapezoidProfile.State(drive.pose.x, xSpeed)
+    )
+
+    val yProfCalc = yProfile.calculate(
+      currTime,
+      TrapezoidProfile.State(targetPose.y, 0.0),
+      TrapezoidProfile.State(drive.pose.y, ySpeed)
+    )
 
     val xFeedback = xPID.calculate(drive.pose.x, xProfCalc.position)
     val yFeedback = yPID.calculate(drive.pose.y, yProfCalc.position)

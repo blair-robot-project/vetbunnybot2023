@@ -1,24 +1,14 @@
 package frc.team449.control
 
-import edu.wpi.first.apriltag.AprilTag
 import edu.wpi.first.apriltag.AprilTagFieldLayout
-import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.geometry.*
-import edu.wpi.first.math.numbers.N1
-import edu.wpi.first.math.numbers.N3
-import edu.wpi.first.math.numbers.N5
 import edu.wpi.first.wpilibj.DriverStation
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import org.photonvision.EstimatedRobotPose
 import org.photonvision.PhotonCamera
 import org.photonvision.PhotonPoseEstimator
-import org.photonvision.estimation.OpenCVHelp
-import org.photonvision.estimation.PNPResults
-import org.photonvision.estimation.VisionEstimation
 import org.photonvision.targeting.PhotonPipelineResult
 import org.photonvision.targeting.PhotonTrackedTarget
-import org.photonvision.targeting.TargetCorner
-import java.util.Optional
+import java.util.*
 import kotlin.math.abs
 
 /**
@@ -29,7 +19,7 @@ class VisionEstimator(
   private val tagLayout: AprilTagFieldLayout,
   camName: String,
   private val robotToCam: Transform3d
-) : PhotonPoseEstimator(tagLayout, PoseStrategy.MULTI_TAG_PNP, PhotonCamera(camName), robotToCam) {
+) : PhotonPoseEstimator(tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, PhotonCamera(camName), robotToCam) {
 
   private val camera = PhotonCamera(camName)
   private val reportedErrors: HashSet<Int> = HashSet()
@@ -61,57 +51,30 @@ class VisionEstimator(
     return if (!cameraResult.hasTargets()) {
       Optional.empty()
     } else {
-      multiTagPNPStrategy(cameraResult)
+      multiTagOnCoprocStrategy(cameraResult)
     }
   }
 
-  private fun multiTagPNPStrategy(result: PhotonPipelineResult): Optional<EstimatedRobotPose> {
-    // Arrays we need declared up front
-    val visCorners = ArrayList<TargetCorner>()
-    val knownVisTags = ArrayList<AprilTag>()
-    val fieldToCams = ArrayList<Pose3d>()
-    val fieldToCamsAlt = ArrayList<Pose3d>()
-    val usedTargets = ArrayList<PhotonTrackedTarget>()
-    if (result.getTargets().size < 2) {
-      // Run fallback strategy instead
-      return lowestAmbiguityStrategy(result)
-    }
-    for (target: PhotonTrackedTarget in result.getTargets()) {
-      val tagPoseOpt = tagLayout.getTagPose(target.fiducialId)
-      if (tagPoseOpt.isEmpty) {
-        reportFiducialPoseError(target.fiducialId)
-        continue
-      }
-      val tagPose = tagPoseOpt.get()
-
-      usedTargets.add(target)
-
-      visCorners.addAll(target.detectedCorners)
-      // actual layout poses of visible tags -- not exposed, so have to recreate
-      knownVisTags.add(AprilTag(target.fiducialId, tagPose))
-      fieldToCams.add(tagPose.transformBy(target.bestCameraToTarget.inverse()))
-      fieldToCamsAlt.add(tagPose.transformBy(target.alternateCameraToTarget.inverse()))
-    }
-    val cameraMatrixOpt = camera.cameraMatrix
-    val distCoeffsOpt = camera.distCoeffs
-    val hasCalibData = cameraMatrixOpt.isPresent && distCoeffsOpt.isPresent
-
-    // multi-target solvePNP
-    if (hasCalibData && visCorners.size == knownVisTags.size * 4 && knownVisTags.isNotEmpty()) {
-      val cameraMatrix = cameraMatrixOpt.get()
-      val distCoeffs = distCoeffsOpt.get()
-      val pnpResults = estimateCamPosePNP(cameraMatrix, distCoeffs, visCorners, knownVisTags)
-      if (pnpResults != null) {
-        val best = Pose3d()
-          .plus(pnpResults.best) // field-to-camera
-          .plus(robotToCam.inverse()) // field-to-robot
-        return Optional.of(
-          EstimatedRobotPose(best, result.timestampSeconds, usedTargets)
+  private fun multiTagOnCoprocStrategy(
+    result: PhotonPipelineResult,
+  ): Optional<EstimatedRobotPose> {
+    return if (result.multiTagResult.estimatedPose.isPresent) {
+      val best_tf = result.multiTagResult.estimatedPose.best
+      val best = Pose3d()
+        .plus(best_tf) // field-to-camera
+        .relativeTo(fieldTags.origin)
+        .plus(robotToCam.inverse()) // field-to-robot
+      Optional.of(
+        EstimatedRobotPose(
+          best,
+          result.timestampSeconds,
+          result.getTargets(),
+          PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR
         )
-      }
+      )
+    } else {
+      lowestAmbiguityStrategy(result)
     }
-
-    return Optional.empty()
   }
 
   /**
@@ -160,7 +123,8 @@ class VisionEstimator(
           .transformBy(cameraToTarget.inverse())
           .transformBy(robotToCam.inverse()),
         result.timestampSeconds,
-        mutableListOf(lowestAmbiguityTarget)
+        mutableListOf(lowestAmbiguityTarget),
+        PoseStrategy.LOWEST_AMBIGUITY
       )
     )
   }
@@ -172,77 +136,6 @@ class VisionEstimator(
         false
       )
       reportedErrors.add(fiducialId)
-    }
-  }
-
-  private fun estimateCamPosePNP(
-    cameraMatrix: Matrix<N3, N3>,
-    distCoeffs: Matrix<N5, N1>,
-    corners: List<TargetCorner>,
-    knownTags: List<AprilTag>
-  ): PNPResults? {
-    if (corners.size != knownTags.size * 4 || knownTags.isEmpty()) {
-      return null
-    }
-
-    // single-tag pnp
-    return if (corners.size == 4) {
-      val camToTag = OpenCVHelp.solvePNP_SQUARE(
-        cameraMatrix,
-        distCoeffs,
-        VisionEstimation.kTagModel.getFieldVertices(knownTags[0].pose),
-        corners
-      )
-      val bestTagToCam = Transform3d(
-        camToTag.best.translation,
-        Rotation3d(
-          camToTag.best.x,
-          camToTag.best.y,
-          driveHeading!!.radians + robotToCam.rotation.z - knownTags[0].pose.rotation.z
-        )
-      ).inverse()
-      val altTagToCam = Transform3d(
-        camToTag.alt.translation,
-        Rotation3d(
-          camToTag.alt.x,
-          camToTag.alt.y,
-          driveHeading!!.radians + robotToCam.rotation.z - knownTags[0].pose.rotation.z
-        )
-      ).inverse()
-      val bestPose: Pose3d = knownTags[0].pose.transformBy(bestTagToCam)
-      var altPose = Pose3d()
-      if (camToTag.ambiguity != 0.0) altPose = knownTags[0].pose.transformBy(altTagToCam)
-      SmartDashboard.putNumberArray(
-        "multiTagBest_internal",
-        doubleArrayOf(
-          bestTagToCam.x,
-          bestTagToCam.y,
-          bestTagToCam.z,
-          bestTagToCam.rotation.quaternion.w,
-          bestTagToCam.rotation.quaternion.x,
-          bestTagToCam.rotation.quaternion.y,
-          bestTagToCam.rotation.quaternion.z
-        )
-      )
-      val o = Pose3d()
-      PNPResults(
-        Transform3d(o, bestPose),
-        Transform3d(o, altPose),
-        camToTag.ambiguity,
-        camToTag.bestReprojErr,
-        camToTag.altReprojErr
-      )
-    } else {
-      val objectTrls = java.util.ArrayList<Translation3d>()
-      for (tag in knownTags) objectTrls.addAll(VisionEstimation.kTagModel.getFieldVertices(tag.pose))
-      val camToOrigin = OpenCVHelp.solvePNP_SQPNP(cameraMatrix, distCoeffs, objectTrls, corners)
-      PNPResults(
-        camToOrigin.best.inverse(),
-        camToOrigin.alt.inverse(),
-        camToOrigin.ambiguity,
-        camToOrigin.bestReprojErr,
-        camToOrigin.altReprojErr
-      )
     }
   }
 }

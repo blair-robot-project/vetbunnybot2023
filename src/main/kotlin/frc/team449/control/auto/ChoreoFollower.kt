@@ -5,7 +5,7 @@ import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj.Timer
-import edu.wpi.first.wpilibj2.command.CommandBase
+import edu.wpi.first.wpilibj2.command.Command
 import frc.team449.control.holonomic.HolonomicDrive
 import frc.team449.robot2023.constants.auto.AutoConstants
 import kotlin.math.PI
@@ -19,7 +19,7 @@ class ChoreoFollower(
   poseTol: Pose2d = Pose2d(0.035, 0.035, Rotation2d(0.035)),
   private val timeout: Double = 0.65,
   private val resetPose: Boolean = false
-) : CommandBase() {
+) : Command() {
 
   private val timer = Timer()
 

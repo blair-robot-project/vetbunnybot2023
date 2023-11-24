@@ -4,7 +4,7 @@ import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.geometry.Translation2d
 import edu.wpi.first.math.kinematics.ChassisSpeeds
-import edu.wpi.first.wpilibj2.command.CommandBase
+import edu.wpi.first.wpilibj2.command.Command
 import frc.team449.control.DriveSubsystem
 import frc.team449.control.OI
 import frc.team449.robot2023.constants.RobotConstants
@@ -24,7 +24,7 @@ class OrbitAlign(
     0.0,
     0.0
   )
-) : CommandBase() {
+) : Command() {
 
   init {
     addRequirements(drive)

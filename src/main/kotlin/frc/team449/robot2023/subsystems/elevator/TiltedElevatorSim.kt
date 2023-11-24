@@ -20,7 +20,7 @@ class TiltedElevatorSim(
   private val simulateGravity: Boolean = true,
   noise: Matrix<N1, N1> = VecBuilder.fill(0.0015),
   private val angle: Double
-): ElevatorSim(gearbox, gearing, carriageMass, drumRadius, minHeight, maxHeight, simulateGravity, noise) {
+): ElevatorSim(gearbox, gearing, carriageMass, drumRadius, minHeight, maxHeight, simulateGravity, 0.0, noise) {
 
   override fun updateX(currentXhat: Matrix<N2?, N1>, u: Matrix<N1?, N1>, dtSeconds: Double): Matrix<N2?, N1> {
     // Calculate updated x-hat from Runge-Kutta.

@@ -53,7 +53,6 @@ object SparkUtil {
       is SparkMaxRelativeEncoder -> {
         encoder.positionConversionFactor = unitPerRotation * gearing
         encoder.velocityConversionFactor = unitPerRotation * gearing / 60
-        encoder.setInverted(encInverted)
       }
       is SparkMaxAlternateEncoder -> {
         encoder.positionConversionFactor = unitPerRotation * gearing

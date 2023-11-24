@@ -1,11 +1,11 @@
 package frc.team449.robot2023.commands.light
 
-import edu.wpi.first.wpilibj2.command.CommandBase
+import edu.wpi.first.wpilibj2.command.Command
 import frc.team449.robot2023.subsystems.light.Light
 
 class Rainbow(
   private val led: Light
-) : CommandBase() {
+) : Command() {
 
   init {
     addRequirements(led)

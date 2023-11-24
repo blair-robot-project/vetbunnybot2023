@@ -4,7 +4,6 @@ import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.util.Units
-import edu.wpi.first.wpilibj.DriverStation
 import frc.team449.robot2023.constants.drives.SwerveConstants
 import kotlin.math.PI
 
@@ -34,8 +33,6 @@ object RobotConstants {
   )
 
   const val ALIGN_ROT_SPEED = 3 * PI / 2
-
-  var ALLIANCE_COLOR: DriverStation.Alliance = DriverStation.getAlliance()
 
   val IR_CHANNEL = 15
 

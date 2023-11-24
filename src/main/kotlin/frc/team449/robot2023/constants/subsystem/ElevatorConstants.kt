@@ -18,21 +18,21 @@ object ElevatorConstants {
 
   var kP = 3.0
   var kI = 0.0
-  var kD = 0.0
+  var kD = 1.0
 
   var kS = 0.0
-  var kV = 3.475
-  var kG = 1.269
-  var kSG = 1.30
+  var kV = 3.225
+  var kG = 1.445
+  var kSG = 1.445
 
   var MAX_VEL = (12 - kS) / kV
-  const val MAX_ACC = 0.5
+  const val MAX_ACC = 5.0
 
   const val HIGH_DISTANCE = 1.4
   const val LOW_DISTANCE = 0.25
   const val STOW_DISTANCE = 0.0
 
-  const val CURRENT_LIMIT = 40
+  const val CURRENT_LIMIT = 50
 
   // This is temporary, just so we can have two elevator subsystems to test out (internal smax and state space)
   val motor = createSparkMax(
@@ -63,9 +63,10 @@ object ElevatorConstants {
   /** State Space constants */
   val MODEL_POS_STDDEV = Units.inchesToMeters(3.0)
   val MODEL_VEL_STDDEV = Units.inchesToMeters(50.0)
-  val ENCODER_POS_STDDEV = 0.005
+  const val ENCODER_POS_STDDEV = 0.005
   val LQR_POS_TOL = Units.inchesToMeters(0.75)
   val LQR_VEL_TOL = Units.inchesToMeters(15.0)
-  val LQR_CONTROL_EFFORT_VOLTS = 10.0
-  val MAX_VOLTAGE = 12.0
+  const val LQR_CONTROL_EFFORT_VOLTS = 10.5
+  const val MAX_VOLTAGE = 10.5
+  const val DT = 0.005
 }
