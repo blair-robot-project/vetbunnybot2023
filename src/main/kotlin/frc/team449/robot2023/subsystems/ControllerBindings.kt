@@ -41,7 +41,7 @@ class ControllerBindings(
     JoystickButton(mechanismController, XboxController.Button.kY.value).onTrue(
       SequentialCommandGroup(
         robot.elevator.showSummaryStats(),
-        robot.elevator.tuneKS()
+        robot.elevator.tuneKG()
       )
     )
   }

@@ -9,7 +9,7 @@ import frc.team449.control.holonomic.SwerveOrthogonalCommand
 import frc.team449.robot2023.constants.RobotConstants
 import frc.team449.robot2023.subsystems.Intake.Companion.createIntake
 import frc.team449.robot2023.subsystems.Manipulator.Companion.createManipulator
-import frc.team449.robot2023.subsystems.elevator.StateSpaceElevator.Companion.createStateSpaceElevator
+import frc.team449.robot2023.subsystems.elevator.Elevator.Companion.createStateSpaceElevator
 import frc.team449.system.AHRS
 import io.github.oblarg.oblog.annotations.Log
 

@@ -2,6 +2,29 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/LiveWindow/Ungrouped/DigitalInput[6]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[7]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[8]": "Digital Input",
+      "/LiveWindow/Ungrouped/DigitalInput[9]": "Digital Input",
+      "/LiveWindow/Ungrouped/PIDController[10]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[11]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[12]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[13]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[14]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[15]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[16]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[17]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[18]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[4]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[5]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[6]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[7]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[8]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
+      "/LiveWindow/Ungrouped/navX-Sensor[1]": "Gyro",
       "/SmartDashboard/Command Scheduler": "Scheduler",
       "/SmartDashboard/Elevator Visual": "Mechanism2d",
       "/SmartDashboard/Field": "Field2d",
@@ -43,7 +66,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 262,
+          "height": 522,
           "series": [
             {
               "color": [
@@ -94,27 +117,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 243,
-          "series": [
-            {
-              "color": [
-                0.2980392277240753,
-                0.44705885648727417,
-                0.6901960968971252,
-                1.0
-              ],
-              "id": "NT:/Shuffleboard/Robot/Elevator/Simulated current Draw"
-            }
-          ]
-        },
-        {
-          "backgroundColor": [
-            0.0,
-            0.0,
-            0.0,
-            0.8500000238418579
-          ],
-          "height": 243,
+          "height": 514,
           "series": [
             {
               "color": [

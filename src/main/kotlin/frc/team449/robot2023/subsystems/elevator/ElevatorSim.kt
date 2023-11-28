@@ -1,22 +1,30 @@
 package frc.team449.robot2023.subsystems.elevator
 
-import edu.wpi.first.math.controller.ElevatorFeedforward
-import edu.wpi.first.math.controller.ProfiledPIDController
+import edu.wpi.first.math.numbers.N1
+import edu.wpi.first.math.numbers.N2
+import edu.wpi.first.math.system.LinearSystemLoop
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.util.sendable.SendableBuilder
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import frc.team449.robot2023.constants.RobotConstants
 import frc.team449.robot2023.constants.subsystem.ElevatorConstants
 import frc.team449.system.motor.WrappedMotor
+import java.util.function.Supplier
 
 class ElevatorSim(
   private val motor: WrappedMotor,
-  controller: ProfiledPIDController,
-  feedforward: ElevatorFeedforward
-): Elevator(motor, controller, feedforward) {
+  loop: LinearSystemLoop<N2, N1, N1>
+): Elevator(motor, loop) {
 
   private val elevatorSim = TiltedElevatorSim(
-    DCMotor.getNEO(ElevatorConstants.NUM_MOTORS),
+    DCMotor(
+      ElevatorConstants.NOMINAL_VOLTAGE,
+      ElevatorConstants.STALL_TORQUE,
+      ElevatorConstants.STALL_CURRENT,
+      ElevatorConstants.FREE_CURRENT,
+      ElevatorConstants.FREE_SPEED,
+      ElevatorConstants.NUM_MOTORS
+    ),
     ElevatorConstants.EFFECTIVE_GEARING,
     ElevatorConstants.CARRIAGE_MASS,
     ElevatorConstants.PULLEY_RADIUS,
@@ -26,16 +34,23 @@ class ElevatorSim(
     angle = ElevatorConstants.ANGLE
   )
 
+  override val positionSupplier =
+    Supplier { elevatorSim.positionMeters }
+
   var currentDraw = 0.0
 
   override fun periodic() {
     elevatorSim.setInputVoltage(motor.lastVoltage)
+
     elevatorSim.update(RobotConstants.LOOP_TIME)
 
     currentState = Pair(elevatorSim.positionMeters, elevatorSim.velocityMetersPerSecond)
+
     currentDraw = elevatorSim.currentDrawAmps
 
     elevatorVisual.length = ElevatorConstants.MIN_LENGTH + currentState.first
+    desiredElevatorVisual.length = ElevatorConstants.MIN_LENGTH + desiredState.first
+
     SmartDashboard.putData("Elevator Visual", mech)
   }
 
