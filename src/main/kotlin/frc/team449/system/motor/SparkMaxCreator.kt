@@ -16,80 +16,80 @@ import frc.team449.system.encoder.EncoderCreator
 
 // TODO: Test if disabling voltage compensation helps reduce brownouts
 fun createSparkMax(
-  name: String,
-  id: Int,
-  encCreator: EncoderCreator<CANSparkMax>,
-  enableBrakeMode: Boolean = true,
-  inverted: Boolean = false,
-  currentLimit: Int = 0,
-  enableVoltageComp: Boolean = false,
-  slaveSparks: Map<Int, Boolean> = mapOf(),
-  controlFrameRateMillis: Int = -1,
-  statusFrameRatesMillis: Map<CANSparkMaxLowLevel.PeriodicFrame, Int> = mapOf()
+    name: String,
+    id: Int,
+    encCreator: EncoderCreator<CANSparkMax>,
+    enableBrakeMode: Boolean = true,
+    inverted: Boolean = false,
+    currentLimit: Int = 0,
+    enableVoltageComp: Boolean = false,
+    slaveSparks: Map<Int, Boolean> = mapOf(),
+    controlFrameRateMillis: Int = -1,
+    statusFrameRatesMillis: Map<CANSparkMaxLowLevel.PeriodicFrame, Int> = mapOf()
 ): WrappedMotor {
-  val motor = CANSparkMax(
-    id,
-    CANSparkMaxLowLevel.MotorType.kBrushless
-  )
-  if (motor.lastError != REVLibError.kOk) {
-    println(
-      "Motor could not be constructed on port " +
-        id +
-        " due to error " +
-        motor.lastError
+    val motor = CANSparkMax(
+        id,
+        CANSparkMaxLowLevel.MotorType.kBrushless
     )
-  }
-
-  motor.restoreFactoryDefaults()
-
-  val enc = encCreator.create(name + "Enc", motor, inverted)
-
-  val brakeMode =
-    if (enableBrakeMode) {
-      CANSparkMax.IdleMode.kBrake
-    } else {
-      CANSparkMax.IdleMode.kCoast
+    if (motor.lastError != REVLibError.kOk) {
+        println(
+            "Motor could not be constructed on port " +
+                id +
+                " due to error " +
+                motor.lastError
+        )
     }
 
-  motor.inverted = inverted
-  // Set brake mode
-  motor.idleMode = brakeMode
+    motor.restoreFactoryDefaults()
 
-  // Set frame rates
-  if (controlFrameRateMillis >= 1) {
-    // Must be between 1 and 100 ms.
-    motor.setControlFramePeriodMs(controlFrameRateMillis)
-  }
+    val enc = encCreator.create(name + "Enc", motor, inverted)
 
-  for ((statusFrame, period) in statusFrameRatesMillis) {
-    motor.setPeriodicFramePeriod(statusFrame, period)
-  }
+    val brakeMode =
+        if (enableBrakeMode) {
+            CANSparkMax.IdleMode.kBrake
+        } else {
+            CANSparkMax.IdleMode.kCoast
+        }
 
-  // Set the current limit if it was given
-  if (currentLimit > 0) {
-    motor.setSmartCurrentLimit(currentLimit)
-  }
+    motor.inverted = inverted
+    // Set brake mode
+    motor.idleMode = brakeMode
 
-  if (enableVoltageComp) {
-    motor.enableVoltageCompensation(RobotController.getBatteryVoltage())
-  } else {
-    motor.disableVoltageCompensation()
-  }
+    // Set frame rates
+    if (controlFrameRateMillis >= 1) {
+        // Must be between 1 and 100 ms.
+        motor.setControlFramePeriodMs(controlFrameRateMillis)
+    }
 
-  for ((slavePort, slaveInverted) in slaveSparks) {
-    val slave = createFollowerSpark(slavePort)
-    slave.restoreFactoryDefaults()
-    slave.follow(motor, slaveInverted)
-    slave.idleMode = brakeMode
+    for ((statusFrame, period) in statusFrameRatesMillis) {
+        motor.setPeriodicFramePeriod(statusFrame, period)
+    }
+
+    // Set the current limit if it was given
     if (currentLimit > 0) {
-      slave.setSmartCurrentLimit(currentLimit)
+        motor.setSmartCurrentLimit(currentLimit)
     }
-    slave.burnFlash()
-  }
 
-  motor.burnFlash()
+    if (enableVoltageComp) {
+        motor.enableVoltageCompensation(RobotController.getBatteryVoltage())
+    } else {
+        motor.disableVoltageCompensation()
+    }
 
-  return WrappedMotor(name, motor, enc)
+    for ((slavePort, slaveInverted) in slaveSparks) {
+        val slave = createFollowerSpark(slavePort)
+        slave.restoreFactoryDefaults()
+        slave.follow(motor, slaveInverted)
+        slave.idleMode = brakeMode
+        if (currentLimit > 0) {
+            slave.setSmartCurrentLimit(currentLimit)
+        }
+        slave.burnFlash()
+    }
+
+    motor.burnFlash()
+
+    return WrappedMotor(name, motor, enc)
 }
 
 /**
@@ -98,30 +98,30 @@ fun createSparkMax(
  * @param port The follower's CAN ID
  */
 private fun createFollowerSpark(port: Int): CANSparkMax {
-  val follower = CANSparkMax(
-    port,
-    CANSparkMaxLowLevel.MotorType.kBrushless
-  )
+    val follower = CANSparkMax(
+        port,
+        CANSparkMaxLowLevel.MotorType.kBrushless
+    )
 
-  follower
-    .getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen)
-    .enableLimitSwitch(false)
-  follower
-    .getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen)
-    .enableLimitSwitch(false)
+    follower
+        .getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen)
+        .enableLimitSwitch(false)
+    follower
+        .getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen)
+        .enableLimitSwitch(false)
 
-  follower.setPeriodicFramePeriod(
-    CANSparkMaxLowLevel.PeriodicFrame.kStatus0,
-    100
-  )
-  follower.setPeriodicFramePeriod(
-    CANSparkMaxLowLevel.PeriodicFrame.kStatus1,
-    100
-  )
-  follower.setPeriodicFramePeriod(
-    CANSparkMaxLowLevel.PeriodicFrame.kStatus2,
-    100
-  )
+    follower.setPeriodicFramePeriod(
+        CANSparkMaxLowLevel.PeriodicFrame.kStatus0,
+        100
+    )
+    follower.setPeriodicFramePeriod(
+        CANSparkMaxLowLevel.PeriodicFrame.kStatus1,
+        100
+    )
+    follower.setPeriodicFramePeriod(
+        CANSparkMaxLowLevel.PeriodicFrame.kStatus2,
+        100
+    )
 
-  return follower
+    return follower
 }

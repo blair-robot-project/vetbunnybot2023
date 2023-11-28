@@ -16,7 +16,7 @@ class TrapezoidalExponentialProfile(
     private val tolerance: Double = 0.05,
     private val vMax: Double = 5.0,
     startingDistance: Double = 0.0,
-    private var finalDistance: Double,
+    private var finalDistance: Double
 ) {
     private val trueStartingDistance: Double = startingDistance
     private val trueFinalDistance: Double = finalDistance
@@ -279,5 +279,4 @@ class TrapezoidalExponentialProfile(
             }
         }
     }
-
 }

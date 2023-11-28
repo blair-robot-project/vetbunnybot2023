@@ -11,34 +11,34 @@ import io.github.oblarg.oblog.annotations.Log
  * @param name Name for logging
  */
 class WrappedMotor(
-  private val name: String,
-  private val motor: MotorController,
-  val encoder: Encoder
+    private val name: String,
+    private val motor: MotorController,
+    val encoder: Encoder
 ) : MotorController by motor, Loggable {
-  /**
-   * The last set voltage for this motor (through [setVoltage] or [set])
-   */
-  @Log
-  var lastVoltage = 0.0
-    private set
+    /**
+     * The last set voltage for this motor (through [setVoltage] or [set])
+     */
+    @Log
+    var lastVoltage = 0.0
+        private set
 
-  /** Position in meters or whatever unit you set */
-  val position: Double
-    get() = encoder.position
+    /** Position in meters or whatever unit you set */
+    val position: Double
+        get() = encoder.position
 
-  /** Velocity in meters per second or whatever unit you set */
-  val velocity: Double
-    get() = encoder.velocity
+    /** Velocity in meters per second or whatever unit you set */
+    val velocity: Double
+        get() = encoder.velocity
 
-  override fun setVoltage(volts: Double) {
-    motor.setVoltage(volts)
-    this.lastVoltage = volts
-  }
+    override fun setVoltage(volts: Double) {
+        motor.setVoltage(volts)
+        this.lastVoltage = volts
+    }
 
-  override fun set(output: Double) {
-    motor.set(output)
-    this.lastVoltage = output * RobotController.getBatteryVoltage()
-  }
+    override fun set(output: Double) {
+        motor.set(output)
+        this.lastVoltage = output * RobotController.getBatteryVoltage()
+    }
 
-  override fun configureLogName() = this.name
+    override fun configureLogName() = this.name
 }

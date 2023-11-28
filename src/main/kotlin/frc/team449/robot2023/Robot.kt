@@ -15,32 +15,32 @@ import io.github.oblarg.oblog.annotations.Log
 
 class Robot : RobotBase() {
 
-  val driveController = XboxController(0)
+    val driveController = XboxController(0)
 
-  val mechController = XboxController(1)
+    val mechController = XboxController(1)
 
-  val ahrs = AHRS(SerialPort.Port.kMXP)
+    val ahrs = AHRS(SerialPort.Port.kMXP)
 
-  // Instantiate/declare PDP and other stuff here
+    // Instantiate/declare PDP and other stuff here
 
-  @Log(name = "PDH Logs")
-  override val powerDistribution: PowerDistribution = PowerDistribution(
-    RobotConstants
-      .PDH_CAN,
-    PowerDistribution.ModuleType.kRev
-  )
+    @Log(name = "PDH Logs")
+    override val powerDistribution: PowerDistribution = PowerDistribution(
+        RobotConstants
+            .PDH_CAN,
+        PowerDistribution.ModuleType.kRev
+    )
 
-  override val drive = SwerveDrive.createSwerve(ahrs, field)
+    override val drive = SwerveDrive.createSwerve(ahrs, field)
 
-  @Log(name = "Joystick Input")
-  override val driveCommand = SwerveOrthogonalCommand(drive, driveController)
+    @Log(name = "Joystick Input")
+    override val driveCommand = SwerveOrthogonalCommand(drive, driveController)
 
-  @Log(name = "Elevator")
-  val elevator = createStateSpaceElevator()
+    @Log(name = "Elevator")
+    val elevator = createStateSpaceElevator()
 
-  val intake = createIntake()
+    val intake = createIntake()
 
-  val manipulator = createManipulator()
+    val manipulator = createManipulator()
 
 //  val light = Light.createLight()
 //

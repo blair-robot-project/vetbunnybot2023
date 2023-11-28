@@ -1,17 +1,17 @@
 package frc.team449.system.motor
 //
-//import com.ctre.phoenix.motorcontrol.*
-//import com.ctre.phoenix.motorcontrol.can.BaseTalon
-//import com.ctre.phoenix.motorcontrol.can.VictorSPX
-//import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod
-//import edu.wpi.first.wpilibj.motorcontrol.MotorController
-//import frc.team449.system.encoder.EncoderCreator
+// import com.ctre.phoenix.motorcontrol.*
+// import com.ctre.phoenix.motorcontrol.can.BaseTalon
+// import com.ctre.phoenix.motorcontrol.can.VictorSPX
+// import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod
+// import edu.wpi.first.wpilibj.motorcontrol.MotorController
+// import frc.team449.system.encoder.EncoderCreator
 //
-///** Wrap a TalonSRX or TalonFX in a WrappedMotor object
+// /** Wrap a TalonSRX or TalonFX in a WrappedMotor object
 // * @see configureSlaveTalon
 // * @see createSlaveVictor
 // */
-//fun <T> createTalon(
+// fun <T> createTalon(
 //  name: String,
 //  motor: T,
 //  encCreator: EncoderCreator<T>,
@@ -26,7 +26,7 @@ package frc.team449.system.motor
 //  controlFrameRatesMillis: Map<ControlFrame, Int> = mapOf(),
 //  statusFrameRatesMillis: Map<StatusFrameEnhanced, Int> = mapOf(),
 //  feedbackDevice: FeedbackDevice? = null
-//): WrappedMotor where T : MotorController, T : BaseTalon {
+// ): WrappedMotor where T : MotorController, T : BaseTalon {
 //  val enc = encCreator.create(name + "Enc", motor, inverted)
 //  motor.setInverted(inverted)
 //  // Set brake mode
@@ -106,15 +106,15 @@ package frc.team449.system.motor
 //  motor.configNominalOutputReverse(0.0, 0)
 //
 //  return WrappedMotor(name, motor, enc)
-//}
+// }
 //
-///** @param slaveTalon Takes a slave TalonSRX or TalonFX and configures it to act as a slave
+// /** @param slaveTalon Takes a slave TalonSRX or TalonFX and configures it to act as a slave
 // * @return The same Talon
 // */
-//fun configureSlaveTalon(
+// fun configureSlaveTalon(
 //  slaveTalon: BaseTalon,
 //  invertType: InvertType
-//): BaseTalon {
+// ): BaseTalon {
 //  // Turn off features we don't want a slave to have
 //  slaveTalon.setInverted(invertType)
 //  slaveTalon.configForwardLimitSwitchSource(
@@ -149,16 +149,16 @@ package frc.team449.system.motor
 //  slaveTalon.setStatusFramePeriod(StatusFrameEnhanced.Status_11_UartGadgeteer, 100, 0)
 //
 //  return slaveTalon
-//}
+// }
 //
-///**
+// /**
 // * Creates a VictorSPX that will follow some Talon
 // *
 // * @param port The CAN ID of this Victor SPX.
 // * @param invertType Whether to invert this relative to the master. Defaults to not inverting
 // * relative to master.
 // */
-//fun createSlaveVictor(port: Int, invertType: InvertType): VictorSPX {
+// fun createSlaveVictor(port: Int, invertType: InvertType): VictorSPX {
 //  val victorSPX = VictorSPX(port)
 //  victorSPX.setInverted(invertType)
 //  victorSPX.configPeakOutputForward(1.0, 0)
@@ -177,9 +177,9 @@ package frc.team449.system.motor
 //  victorSPX.setStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1, 100, 0)
 //
 //  return victorSPX
-//}
+// }
 //
-///**
+// /**
 // * Set this Talon to follow another CAN device.
 // *
 // * @param port The CAN ID of the device to follow.
@@ -188,13 +188,13 @@ package frc.team449.system.motor
 // * @param voltageCompSamples The number of voltage compensation samples to use, or null to not
 // * compensate voltage.
 // */
-//private fun setMasterForTalon(
+// private fun setMasterForTalon(
 //  slaveTalon: BaseTalon,
 //  port: Int,
 //  brakeMode: Boolean,
 //  currentLimit: Int,
 //  voltageCompSamples: Int?
-//) {
+// ) {
 //  // Brake mode doesn't automatically follow master
 //  slaveTalon.setNeutralMode(if (brakeMode) NeutralMode.Brake else NeutralMode.Coast)
 //
@@ -221,9 +221,9 @@ package frc.team449.system.motor
 //
 //  // Follow the leader
 //  slaveTalon[ControlMode.Follower] = port.toDouble()
-//}
+// }
 //
-///**
+// /**
 // * Set this Victor to follow another CAN device.
 // *
 // * @param toFollow The motor controller to follow.
@@ -231,12 +231,12 @@ package frc.team449.system.motor
 // * @param voltageCompSamples The number of voltage compensation samples to use, or null to not
 // * compensate voltage.
 // */
-//private fun setMasterForVictor(
+// private fun setMasterForVictor(
 //  victorSPX: VictorSPX,
 //  toFollow: IMotorController,
 //  brakeMode: Boolean,
 //  voltageCompSamples: Int?
-//) {
+// ) {
 //  // Brake mode doesn't automatically follow master
 //  victorSPX.setNeutralMode(if (brakeMode) NeutralMode.Brake else NeutralMode.Coast)
 //
@@ -251,4 +251,4 @@ package frc.team449.system.motor
 //
 //  // Follow the leader
 //  victorSPX.follow(toFollow)
-//}
+// }

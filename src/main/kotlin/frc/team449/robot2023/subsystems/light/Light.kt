@@ -12,30 +12,30 @@ import frc.team449.robot2023.constants.subsystem.LightConstants
  */
 
 class Light(
-  port: Int,
-  length: Int
+    port: Int,
+    length: Int
 ) : SubsystemBase() {
 
-  private val lightStrip = AddressableLED(port)
-  val buffer = AddressableLEDBuffer(length)
+    private val lightStrip = AddressableLED(port)
+    val buffer = AddressableLEDBuffer(length)
 
-  init {
-    lightStrip.setLength(buffer.length)
-    lightStrip.setData(buffer)
-    lightStrip.start()
-  }
-
-  override fun periodic() {
-    lightStrip.setData(buffer)
-  }
-
-  companion object {
-    /** Create an LED strip controller using [LightConstants]. */
-    fun createLight(): Light {
-      return Light(
-        LightConstants.LIGHT_PORT,
-        LightConstants.LIGHT_LENGTH
-      )
+    init {
+        lightStrip.setLength(buffer.length)
+        lightStrip.setData(buffer)
+        lightStrip.start()
     }
-  }
+
+    override fun periodic() {
+        lightStrip.setData(buffer)
+    }
+
+    companion object {
+        /** Create an LED strip controller using [LightConstants]. */
+        fun createLight(): Light {
+            return Light(
+                LightConstants.LIGHT_PORT,
+                LightConstants.LIGHT_LENGTH
+            )
+        }
+    }
 }

@@ -7,5 +7,5 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds
  */
 
 fun interface OI {
-  fun get(): ChassisSpeeds
+    fun get(): ChassisSpeeds
 }

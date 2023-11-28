@@ -9,16 +9,16 @@ import edu.wpi.first.wpilibj2.command.Command
  * @param oi The OI that feeds the inputted [ChassisSpeeds] to the [drive].
  */
 class DriveCommand(
-  private val drive: DriveSubsystem,
-  private val oi: OI
+    private val drive: DriveSubsystem,
+    private val oi: OI
 ) : Command() {
 
-  init {
-    addRequirements(drive)
-  }
+    init {
+        addRequirements(drive)
+    }
 
-  /** Take returned [ChassisSpeeds] from a joystick/[OI] and feed it to a [DriveSubsystem]. */
-  override fun execute() {
-    drive.set(oi.get())
-  }
+    /** Take returned [ChassisSpeeds] from a joystick/[OI] and feed it to a [DriveSubsystem]. */
+    override fun execute() {
+        drive.set(oi.get())
+    }
 }
