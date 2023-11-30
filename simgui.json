@@ -40,6 +40,11 @@
         "window": {
           "visible": true
         }
+      },
+      "/SmartDashboard/Routine Chooser": {
+        "window": {
+          "visible": true
+        }
       }
     }
   },
@@ -56,6 +61,9 @@
       }
     }
   },
+  "NetworkTables View": {
+    "visible": false
+  },
   "Plot": {
     "Plot <0>": {
       "plots": [
@@ -66,7 +74,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 522,
+          "height": 266,
           "series": [
             {
               "color": [
@@ -106,7 +114,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <1>": {
       "plots": [
@@ -117,7 +128,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 514,
+          "height": 303,
           "series": [
             {
               "color": [
@@ -130,7 +141,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     }
   }
 }
