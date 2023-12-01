@@ -9,17 +9,25 @@ import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.team449.robot2023.constants.subsystem.IntakeConstants
 import frc.team449.system.SparkUtil
+import monologue.Logged
+import monologue.Monologue
+import monologue.Monologue.LogNT
 
 class Intake(
     private val piston: DoubleSolenoid,
     private val motorID: Int
-) : SubsystemBase() {
+) : SubsystemBase(), Logged {
 
     private val motor = CANSparkMax(motorID, CANSparkMaxLowLevel.MotorType.kBrushless)
     private val encoder = motor.encoder
 
+    @LogNT
+    private var intakeExtended = false;
+
     // TODO: check gearing with mechanics
     init {
+        Monologue.setupLogging(this, "/Intake")
+
         SparkUtil.applySparkSettings(
             motor,
             inverted = IntakeConstants.INVERTED,
@@ -31,11 +39,11 @@ class Intake(
     }
 
     fun extend(): Command {
-        return this.runOnce { piston.set(DoubleSolenoid.Value.kForward) }
+        return this.runOnce { piston.set(DoubleSolenoid.Value.kForward); intakeExtended = true }
     }
 
     fun retract(): Command {
-        return this.runOnce { piston.set(DoubleSolenoid.Value.kReverse) }
+        return this.runOnce { piston.set(DoubleSolenoid.Value.kReverse); intakeExtended = false }
     }
 
     fun intake(): Command {

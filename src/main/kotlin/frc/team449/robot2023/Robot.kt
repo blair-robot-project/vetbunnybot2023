@@ -12,6 +12,9 @@ import frc.team449.robot2023.subsystems.Manipulator.Companion.createManipulator
 import frc.team449.robot2023.subsystems.elevator.Elevator.Companion.createStateSpaceElevator
 import frc.team449.system.AHRS
 import io.github.oblarg.oblog.annotations.Log
+import monologue.Logged
+import monologue.Monologue
+import monologue.Monologue.LogNT
 
 class Robot : RobotBase() {
 

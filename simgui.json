@@ -50,6 +50,9 @@
   },
   "NetworkTables": {
     "transitory": {
+      "Intake": {
+        "open": true
+      },
       "Shuffleboard": {
         "Robot": {
           "Elevator": {
@@ -61,8 +64,11 @@
       }
     }
   },
-  "NetworkTables View": {
-    "visible": false
+  "NetworkTables Info": {
+    "Server": {
+      "open": true
+    },
+    "visible": true
   },
   "Plot": {
     "Plot <0>": {

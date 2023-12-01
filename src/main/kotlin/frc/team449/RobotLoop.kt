@@ -12,6 +12,7 @@ import frc.team449.robot2023.auto.routines.RoutineChooser
 import frc.team449.robot2023.constants.vision.VisionConstants
 import frc.team449.robot2023.subsystems.ControllerBindings
 import io.github.oblarg.oblog.Logger
+import monologue.Monologue
 import kotlin.jvm.optionals.getOrNull
 
 /** The main class of the robot, constructs all the subsystems and initializes default commands. */
@@ -58,6 +59,8 @@ class RobotLoop : TimedRobot() {
         robot.field.robotPose = robot.drive.pose
 
         robot.field.getObject("bumpers").pose = robot.drive.pose
+
+        Monologue.update()
     }
 
     override fun autonomousInit() {
