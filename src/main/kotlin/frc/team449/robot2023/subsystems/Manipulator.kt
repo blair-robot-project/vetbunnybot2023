@@ -9,11 +9,13 @@ import frc.team449.robot2023.constants.subsystem.ManipulatorConstants
 import frc.team449.system.SparkUtil
 
 class Manipulator(
-  private val motorID: Int
+  motorID: Int
 ) : SubsystemBase() {
 
   private val motor = CANSparkMax(motorID, CANSparkMaxLowLevel.MotorType.kBrushless)
   private val encoder = motor.encoder
+
+  private var lastVoltage = 0.0
 
   init {
     SparkUtil.applySparkSettings(
@@ -28,23 +30,27 @@ class Manipulator(
   fun intake(): Command {
     return this.runOnce {
       motor.setVoltage(ManipulatorConstants.INTAKE_VOLTAGE)
+      lastVoltage = ManipulatorConstants.INTAKE_VOLTAGE
     }
   }
 
   fun outtake(): Command {
     return this.runOnce {
       motor.setVoltage(-ManipulatorConstants.INTAKE_VOLTAGE)
+      lastVoltage = -ManipulatorConstants.INTAKE_VOLTAGE
     }
   }
 
   fun stop(): Command {
     return this.runOnce {
       motor.stopMotor()
+      lastVoltage = 0.0
     }
   }
 
   override fun initSendable(builder: SendableBuilder) {
-    builder.addDoubleProperty("Intake Motor Velocity", { encoder.velocity }, {})
+    builder.publishConstString("1.0", "Motor Voltages")
+    builder.addDoubleProperty("1.1 Last Voltage", { lastVoltage }, null)
   }
 
   companion object {

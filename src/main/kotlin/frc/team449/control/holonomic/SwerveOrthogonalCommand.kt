@@ -151,16 +151,22 @@ class SwerveOrthogonalCommand(
   }
 
   override fun initSendable(builder: SendableBuilder) {
-    builder.addDoubleProperty("currX", { if (abs(controller.leftY) < RobotConstants.TRANSLATION_DEADBAND) .0 else -controller.leftY }, null)
-    builder.addDoubleProperty("currY", { if (abs(controller.leftX) < RobotConstants.TRANSLATION_DEADBAND) .0 else -controller.leftX }, null)
-    builder.addDoubleProperty("prevX", { prevX }, null)
-    builder.addDoubleProperty("prevY", { prevY }, null)
-    builder.addDoubleProperty("dx", { dx }, null)
-    builder.addDoubleProperty("dy", { dy }, null)
-    builder.addDoubleProperty("dt", { dt }, null)
-    builder.addDoubleProperty("magAcc", { magAcc }, null)
-    builder.addDoubleProperty("magAccClamped", { magAccClamped }, null)
-    builder.addStringProperty("speeds", { drive.desiredSpeeds.toString() }, null)
-    builder.addDoubleProperty("skew constant", { skewConstant }, { k: Double -> skewConstant = k })
+    builder.publishConstString("1.0", "Controller X and Y Values")
+    builder.addDoubleProperty("1.1 currX", { if (abs(controller.leftY) < RobotConstants.TRANSLATION_DEADBAND) .0 else -controller.leftY }, null)
+    builder.addDoubleProperty("1.2 currY", { if (abs(controller.leftX) < RobotConstants.TRANSLATION_DEADBAND) .0 else -controller.leftX }, null)
+    builder.addDoubleProperty("1.3 prevX", { prevX }, null)
+    builder.addDoubleProperty("1.4 prevY", { prevY }, null)
+
+    builder.publishConstString("2.0", "Delta X, Y, Time over one loop")
+    builder.addDoubleProperty("2.1 dx", { dx }, null)
+    builder.addDoubleProperty("2.2 dy", { dy }, null)
+    builder.addDoubleProperty("2.3 dt", { dt }, null)
+
+    builder.publishConstString("3.0", "Magnitude of Acceleration")
+    builder.addDoubleProperty("3.1 magAcc", { magAcc }, null)
+    builder.addDoubleProperty("3.2 magAccClamped", { magAccClamped }, null)
+
+    builder.publishConstString("4.0", "Turning Skew")
+    builder.addDoubleProperty("4.1 skew constant", { skewConstant }, { k: Double -> skewConstant = k })
   }
 }

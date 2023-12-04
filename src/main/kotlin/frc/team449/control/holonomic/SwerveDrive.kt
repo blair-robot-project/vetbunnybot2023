@@ -194,38 +194,47 @@ open class SwerveDrive(
   }
 
   override fun initSendable(builder: SendableBuilder) {
-    builder.addDoubleArrayProperty("1.0 Estimated Pose", { doubleArrayOf(pose.x, pose.y, pose.rotation.radians) }, null)
-    builder.addDoubleArrayProperty("1.1 Current Chassis Speeds", { doubleArrayOf(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, currentSpeeds.omegaRadiansPerSecond) }, null)
-    builder.addDoubleArrayProperty("1.2 Desired Chassis Speeds", { doubleArrayOf(desiredSpeeds.vxMetersPerSecond, desiredSpeeds.vyMetersPerSecond, desiredSpeeds.omegaRadiansPerSecond) }, null)
-    builder.addDoubleProperty("1.3 Max Recorded Speed", { maxSpeed }, null)
-    builder.addDoubleProperty("2.0 FL Steering Rotations", { modules[0].position.angle.rotations }, null)
-    builder.addDoubleProperty("2.1 FR Steering Rotations", { modules[1].position.angle.rotations }, null)
-    builder.addDoubleProperty("2.2 BL Steering Rotations", { modules[2].position.angle.rotations }, null)
-    builder.addDoubleProperty("2.3 BR Steering Rotations", { modules[3].position.angle.rotations }, null)
+    builder.publishConstString("1.0", "Poses and ChassisSpeeds")
+    builder.addDoubleArrayProperty("1.1 Estimated Pose", { doubleArrayOf(pose.x, pose.y, pose.rotation.radians) }, null)
+    builder.addDoubleArrayProperty("1.2 Current Chassis Speeds", { doubleArrayOf(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, currentSpeeds.omegaRadiansPerSecond) }, null)
+    builder.addDoubleArrayProperty("1.3 Desired Chassis Speeds", { doubleArrayOf(desiredSpeeds.vxMetersPerSecond, desiredSpeeds.vyMetersPerSecond, desiredSpeeds.omegaRadiansPerSecond) }, null)
+    builder.addDoubleProperty("1.4 Max Recorded Speed", { maxSpeed }, null)
+
+    builder.publishConstString("2.0", "Steering Rotations")
+    builder.addDoubleProperty("2.1 FL", { modules[0].position.angle.rotations }, null)
+    builder.addDoubleProperty("2.2 FR", { modules[1].position.angle.rotations }, null)
+    builder.addDoubleProperty("2.3 BL", { modules[2].position.angle.rotations }, null)
+    builder.addDoubleProperty("2.4 BR", { modules[3].position.angle.rotations }, null)
+
+    builder.publishConstString("3.0", "Module Driving Speeds (Standard Order, FL, FR, BL, BR)")
     builder.addDoubleArrayProperty(
-      "3.0 Module Desired Driving Speeds",
+      "3.1 Desired Speed",
       { DoubleArray(modules.size) { index -> modules[index].desiredSpeed } },
       null
     )
     builder.addDoubleArrayProperty(
-      "3.1 Module Driving Speeds",
+      "3.2 Current Speeds",
       { DoubleArray(modules.size) { index -> modules[index].state.speedMetersPerSecond } },
       null
     )
+
+    builder.publishConstString("4.0", "Last Module Voltages (Standard Order, FL, FR, BL, BR)")
     builder.addDoubleArrayProperty(
-      "4.0 Last Driving Voltages",
+      "4.1 Driving",
       { DoubleArray(modules.size) { index -> modules[index].lastDrivingVoltage() } },
       null
     )
     builder.addDoubleArrayProperty(
-      "4.1 Last Steering Voltages",
+      "4.2 Steering",
       { DoubleArray(modules.size) { index -> modules[index].lastSteeringVoltage() } },
       null
     )
-    builder.addDoubleProperty("5.0 AHRS Heading Degrees", { ahrs.heading.degrees }, null)
-    builder.addDoubleProperty("5.1 AHRS Pitch Degrees", { ahrs.pitch.degrees }, null)
-    builder.addDoubleProperty("5.2 AHRS Roll Degrees", { ahrs.roll.degrees }, null)
-    builder.addDoubleProperty("5.3 AHRS Angular X Vel", { ahrs.angularXVel() }, null)
+
+    builder.publishConstString("5.0", "AHRS Values")
+    builder.addDoubleProperty("5.1 Heading Degrees", { ahrs.heading.degrees }, null)
+    builder.addDoubleProperty("5.2 Pitch Degrees", { ahrs.pitch.degrees }, null)
+    builder.addDoubleProperty("5.3 Roll Degrees", { ahrs.roll.degrees }, null)
+    builder.addDoubleProperty("5.4 Angular X Vel", { ahrs.angularXVel() }, null)
   }
 
   companion object {

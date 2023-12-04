@@ -4,6 +4,7 @@ import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N2
 import edu.wpi.first.math.system.LinearSystemLoop
 import edu.wpi.first.math.system.plant.DCMotor
+import edu.wpi.first.math.util.Units
 import edu.wpi.first.util.sendable.SendableBuilder
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import frc.team449.robot2023.constants.RobotConstants
@@ -11,6 +12,8 @@ import frc.team449.robot2023.constants.subsystem.ElevatorConstants
 import frc.team449.robot2023.subsystems.Intake
 import frc.team449.system.motor.WrappedMotor
 import java.util.function.Supplier
+import kotlin.math.cos
+import kotlin.math.sin
 
 class ElevatorSim(
   private val motor: WrappedMotor,
@@ -58,6 +61,24 @@ class ElevatorSim(
 
   override fun initSendable(builder: SendableBuilder) {
     super.initSendable(builder)
-    builder.addDoubleProperty("Simulated current Draw", { currentDraw }, {})
+
+    builder.publishConstString("4.0", "Current")
+    builder.addDoubleProperty("4.1 Simulated current Draw", { currentDraw }, {})
+
+    builder.publishConstString("5.0", "Advantage Scope 3D Pos")
+    builder.addDoubleArrayProperty(
+      "5.1 3D Position",
+      {
+        doubleArrayOf(
+          0.045 + cos(Units.degreesToRadians(ElevatorConstants.ANGLE)) * currentState.first,
+          0.0,
+          0.09 + sin(Units.degreesToRadians(ElevatorConstants.ANGLE)) * currentState.first,
+          0.0,
+          0.0,
+          0.0,
+        )
+      },
+      null
+    )
   }
 }

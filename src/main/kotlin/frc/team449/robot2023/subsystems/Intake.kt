@@ -13,11 +13,13 @@ import frc.team449.system.SparkUtil
 
 class Intake(
   val piston: DoubleSolenoid,
-  private val motorID: Int
+  motorID: Int
 ) : SubsystemBase() {
 
   private val motor = CANSparkMax(motorID, CANSparkMaxLowLevel.MotorType.kBrushless)
   private val encoder = motor.encoder
+
+  private var lastVoltage = 0.0
 
   init {
     SparkUtil.applySparkSettings(
@@ -40,27 +42,35 @@ class Intake(
   fun intake(): Command {
     return this.runOnce {
       motor.setVoltage(IntakeConstants.INTAKE_VOLTAGE)
+      lastVoltage = IntakeConstants.INTAKE_VOLTAGE
     }
   }
 
   fun outtake(): Command {
     return this.runOnce {
       motor.setVoltage(-IntakeConstants.INTAKE_VOLTAGE)
+      lastVoltage = -IntakeConstants.INTAKE_VOLTAGE
     }
   }
 
   fun stop(): Command {
     return this.runOnce {
       motor.stopMotor()
+      lastVoltage = 0.0
     }
   }
 
   override fun initSendable(builder: SendableBuilder) {
-    builder.addStringProperty("Intake Piston Status", { piston.get().toString() }, {})
+    builder.publishConstString("1.0", "Piston")
+    builder.addStringProperty("Piston Status", { piston.get().toString() }, {})
+
+    builder.publishConstString("2.0", "Motor Voltages")
+    builder.addDoubleProperty("2.1 Last Voltage", { lastVoltage }, null)
 
     if (RobotBase.isSimulation()) {
+      builder.publishConstString("3.0", "Advantage Scope 3D Pos")
       builder.addDoubleArrayProperty(
-        "Intake 3D Position",
+        "3.1 Intake 3D Position",
         {
           if (piston.get() == DoubleSolenoid.Value.kForward) {
             doubleArrayOf(

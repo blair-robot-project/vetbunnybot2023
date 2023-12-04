@@ -9,7 +9,6 @@ import edu.wpi.first.math.numbers.N2
 import edu.wpi.first.math.system.LinearSystemLoop
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.system.plant.LinearSystemId
-import edu.wpi.first.math.util.Units
 import edu.wpi.first.util.sendable.SendableBuilder
 import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.RobotBase
@@ -219,29 +218,18 @@ open class Elevator(
   }
 
   override fun initSendable(builder: SendableBuilder) {
-    builder.addDoubleProperty("Last motor voltage", { motor.lastVoltage }, {})
-    builder.addDoubleProperty("Current Motor Pos", { currentState.first }, {})
-    builder.addDoubleProperty("Current Motor Vel", { currentState.second }, {})
-    builder.addDoubleProperty("Desired Motor Pos", { desiredState.first }, {})
-    builder.addDoubleProperty("Desired Motor Vel", { desiredState.second }, {})
-    builder.addDoubleProperty("kS", { ElevatorConstants.kS }, { value -> ElevatorConstants.kS = value })
-    builder.addDoubleProperty("kG", { ElevatorConstants.kG }, { value -> ElevatorConstants.kG = value })
-    if (RobotBase.isSimulation()) {
-      builder.addDoubleArrayProperty(
-        "3D Position",
-        {
-          doubleArrayOf(
-            0.045 + cos(Units.degreesToRadians(ElevatorConstants.ANGLE)) * currentState.first,
-            0.0,
-            0.09 + sin(Units.degreesToRadians(ElevatorConstants.ANGLE)) * currentState.first,
-            0.0,
-            0.0,
-            0.0,
-          )
-        },
-        null
-      )
-    }
+    builder.publishConstString("1.0", "Voltage")
+    builder.addDoubleProperty("1.1 Last voltage", { motor.lastVoltage }, {})
+
+    builder.publishConstString("2.0", "Position and Velocities")
+    builder.addDoubleProperty("2.1 Current Pos", { currentState.first }, {})
+    builder.addDoubleProperty("2.2 Current Vel", { currentState.second }, {})
+    builder.addDoubleProperty("2.3 Desired Pos", { desiredState.first }, {})
+    builder.addDoubleProperty("2.4 Desired Vel", { desiredState.second }, {})
+
+    builder.publishConstString("3.0", "Feedforward")
+    builder.addDoubleProperty("3.1 kS", { ElevatorConstants.kS }, { value -> ElevatorConstants.kS = value })
+    builder.addDoubleProperty("3.2 kG", { ElevatorConstants.kG }, { value -> ElevatorConstants.kG = value })
   }
 
   companion object {

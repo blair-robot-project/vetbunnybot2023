@@ -11,7 +11,6 @@ import frc.team449.robot2023.Robot
 import frc.team449.robot2023.auto.routines.RoutineChooser
 import frc.team449.robot2023.constants.vision.VisionConstants
 import frc.team449.robot2023.subsystems.ControllerBindings
-import io.github.oblarg.oblog.Logger
 import monologue.Logged
 import monologue.Monologue
 import kotlin.jvm.optionals.getOrNull
@@ -43,11 +42,10 @@ class RobotLoop : TimedRobot(), Logged {
     routineMap = routineChooser.routineMap()
     println("DONE Generating Auto Routines : ${Timer.getFPGATimestamp()}")
 
-    Logger.configureLoggingAndConfig(robot, false)
     SmartDashboard.putData("Field", robot.field)
     SmartDashboard.putData("Routine Chooser", routineChooser)
     SmartDashboard.putData("Command Scheduler", CommandScheduler.getInstance())
-    SmartDashboard.putBoolean("Enable Logging?", false)
+    SmartDashboard.putBoolean("Enable Logging?", true)
 
     controllerBinder.bindButtons()
 
