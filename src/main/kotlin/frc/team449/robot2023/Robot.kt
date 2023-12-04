@@ -11,39 +11,40 @@ import frc.team449.robot2023.subsystems.Intake.Companion.createIntake
 import frc.team449.robot2023.subsystems.Manipulator.Companion.createManipulator
 import frc.team449.robot2023.subsystems.elevator.Elevator.Companion.createStateSpaceElevator
 import frc.team449.system.AHRS
-import io.github.oblarg.oblog.annotations.Log
 import monologue.Logged
-import monologue.Monologue
-import monologue.Monologue.LogNT
+import monologue.Monologue.LogBoth
 
-class Robot : RobotBase() {
+class Robot : RobotBase(), Logged {
 
-    val driveController = XboxController(0)
+  val driveController = XboxController(0)
 
-    val mechController = XboxController(1)
+  val mechController = XboxController(1)
 
-    val ahrs = AHRS(SerialPort.Port.kMXP)
+  val ahrs = AHRS(SerialPort.Port.kMXP)
 
-    // Instantiate/declare PDP and other stuff here
+  // Instantiate/declare PDP and other stuff here
 
-    @Log(name = "PDH Logs")
-    override val powerDistribution: PowerDistribution = PowerDistribution(
-        RobotConstants
-            .PDH_CAN,
-        PowerDistribution.ModuleType.kRev
-    )
+  @LogBoth
+  override val powerDistribution: PowerDistribution = PowerDistribution(
+    RobotConstants
+      .PDH_CAN,
+    PowerDistribution.ModuleType.kRev
+  )
 
-    override val drive = SwerveDrive.createSwerve(ahrs, field)
+  @LogBoth
+  override val drive = SwerveDrive.createSwerve(ahrs, field)
 
-    @Log(name = "Joystick Input")
-    override val driveCommand = SwerveOrthogonalCommand(drive, driveController)
+  @LogBoth
+  override val driveCommand = SwerveOrthogonalCommand(drive, driveController)
 
-    @Log(name = "Elevator")
-    val elevator = createStateSpaceElevator()
+  @LogBoth
+  val intake = createIntake()
 
-    val intake = createIntake()
+  @LogBoth
+  val manipulator = createManipulator()
 
-    val manipulator = createManipulator()
+  @LogBoth
+  val elevator = createStateSpaceElevator(this)
 
 //  val light = Light.createLight()
 //

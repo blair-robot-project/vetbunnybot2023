@@ -9,50 +9,50 @@ import frc.team449.robot2023.constants.field.FieldConstants
 import kotlin.math.PI
 
 object AutoUtil {
-    fun transformForPos2(pathGroup: MutableList<ChoreoTrajectory>): MutableList<ChoreoTrajectory> {
-        for (index in 0 until pathGroup.size) {
-            for (time in pathGroup[index].objectiveTimestamps) {
-                val currentMatrix = pathGroup[index].stateMap.get(time)
+  fun transformForPos2(pathGroup: MutableList<ChoreoTrajectory>): MutableList<ChoreoTrajectory> {
+    for (index in 0 until pathGroup.size) {
+      for (time in pathGroup[index].objectiveTimestamps) {
+        val currentMatrix = pathGroup[index].stateMap.get(time)
 
-                val newMatrix = MatBuilder(N2.instance, N3.instance).fill(
-                    currentMatrix[0, 0],
-                    FieldConstants.fieldWidth - currentMatrix[0, 1],
-                    -currentMatrix[0, 2],
-                    currentMatrix[1, 0],
-                    -currentMatrix[1, 1],
-                    -currentMatrix[1, 2]
-                )
+        val newMatrix = MatBuilder(N2.instance, N3.instance).fill(
+          currentMatrix[0, 0],
+          FieldConstants.fieldWidth - currentMatrix[0, 1],
+          -currentMatrix[0, 2],
+          currentMatrix[1, 0],
+          -currentMatrix[1, 1],
+          -currentMatrix[1, 2]
+        )
 
-                pathGroup[index].stateMap.put(time, newMatrix)
-            }
-        }
-
-        return pathGroup
+        pathGroup[index].stateMap.put(time, newMatrix)
+      }
     }
 
-    fun transformForRed(pathGroup: MutableList<ChoreoTrajectory>): MutableList<ChoreoTrajectory> {
-        for (index in 0 until pathGroup.size) {
-            for (time in pathGroup[index].objectiveTimestamps) {
-                val currentMatrix = pathGroup[index].stateMap.get(time)
+    return pathGroup
+  }
 
-                val newMatrix = MatBuilder(N2.instance, N3.instance).fill(
-                    FieldConstants.fieldLength - currentMatrix[0, 0],
-                    FieldConstants.fieldWidth - currentMatrix[0, 1],
-                    MathUtil.angleModulus(PI + currentMatrix[0, 2]),
-                    -currentMatrix[1, 0],
-                    currentMatrix[1, 1],
-                    -currentMatrix[1, 2]
-                )
+  fun transformForRed(pathGroup: MutableList<ChoreoTrajectory>): MutableList<ChoreoTrajectory> {
+    for (index in 0 until pathGroup.size) {
+      for (time in pathGroup[index].objectiveTimestamps) {
+        val currentMatrix = pathGroup[index].stateMap.get(time)
 
-                pathGroup[index].stateMap.put(time, newMatrix)
-            }
-        }
+        val newMatrix = MatBuilder(N2.instance, N3.instance).fill(
+          FieldConstants.fieldLength - currentMatrix[0, 0],
+          FieldConstants.fieldWidth - currentMatrix[0, 1],
+          MathUtil.angleModulus(PI + currentMatrix[0, 2]),
+          -currentMatrix[1, 0],
+          currentMatrix[1, 1],
+          -currentMatrix[1, 2]
+        )
 
-        return pathGroup
+        pathGroup[index].stateMap.put(time, newMatrix)
+      }
     }
 
-    /** Add other methods that return commands that do groups of actions that are done
-     * across different auto routines. For Charged UP, these methods were things such as
-     * dropping a cone/cube, or getting in ground intake position, etc.
-     */
+    return pathGroup
+  }
+
+  /** Add other methods that return commands that do groups of actions that are done
+   * across different auto routines. For Charged UP, these methods were things such as
+   * dropping a cone/cube, or getting in ground intake position, etc.
+   */
 }

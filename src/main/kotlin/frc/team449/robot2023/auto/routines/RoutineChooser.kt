@@ -6,40 +6,40 @@ import frc.team449.robot2023.Robot
 
 class RoutineChooser(private val robot: Robot) : SendableChooser<String>() {
 
-    fun routineMap(): HashMap<String, Command> {
-        return hashMapOf(
-            "DoNothing" to DoNothing(robot).createCommand(),
-            "BlueOnePiecePick" to OnePiecePick(robot, false).createCommand(),
-            "RedOnePiecePick" to OnePiecePick(robot, true).createCommand(),
-            "BlueOnePieceDrop" to OnePieceDrop(robot, false).createCommand(),
-            "RedOnePieceDrop" to OnePieceDrop(robot, true).createCommand()
-        )
-    }
+  fun routineMap(): HashMap<String, Command> {
+    return hashMapOf(
+      "DoNothing" to DoNothing(robot).createCommand(),
+      "BlueOnePiecePick" to OnePiecePick(robot, false).createCommand(),
+      "RedOnePiecePick" to OnePiecePick(robot, true).createCommand(),
+      "BlueOnePieceDrop" to OnePieceDrop(robot, false).createCommand(),
+      "RedOnePieceDrop" to OnePieceDrop(robot, true).createCommand()
+    )
+  }
 
-    init {
-        updateOptions(true)
-    }
+  init {
+    updateOptions(true)
+  }
 
-    fun updateOptions(isRed: Boolean) {
-        /** Add auto options here */
-        this.setDefaultOption("Do Nothing", "DoNothing")
+  fun updateOptions(isRed: Boolean) {
+    /** Add auto options here */
+    this.setDefaultOption("Do Nothing", "DoNothing")
 
-        this.addOption(
-            "One Piece and Pick",
-            if (isRed) {
-                "RedOnePiecePick"
-            } else {
-                "BlueOnePiecePick"
-            }
-        )
+    this.addOption(
+      "One Piece and Pick",
+      if (isRed) {
+        "RedOnePiecePick"
+      } else {
+        "BlueOnePiecePick"
+      }
+    )
 
-        this.addOption(
-            "One Piece and Drop",
-            if (isRed) {
-                "RedOnePieceDrop"
-            } else {
-                "BlueOnePieceDrop"
-            }
-        )
-    }
+    this.addOption(
+      "One Piece and Drop",
+      if (isRed) {
+        "RedOnePieceDrop"
+      } else {
+        "BlueOnePieceDrop"
+      }
+    )
+  }
 }

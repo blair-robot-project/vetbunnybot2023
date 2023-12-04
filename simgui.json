@@ -15,7 +15,13 @@
       "/LiveWindow/Ungrouped/PIDController[16]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[17]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[18]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[19]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[1]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[20]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[21]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[22]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[23]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[24]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[4]": "PIDController",
@@ -25,18 +31,31 @@
       "/LiveWindow/Ungrouped/PIDController[8]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
       "/LiveWindow/Ungrouped/navX-Sensor[1]": "Gyro",
+      "/Monologuing/robot/elevator/mech": "Mechanism2d",
       "/SmartDashboard/Command Scheduler": "Scheduler",
       "/SmartDashboard/Elevator Visual": "Mechanism2d",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/Routine Chooser": "String Chooser"
     },
     "windows": {
+      "/SmartDashboard/Command Scheduler": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/Elevator Visual": {
         "window": {
           "visible": true
         }
       },
       "/SmartDashboard/Field": {
+        "bottom": 544,
+        "builtin": "2023 Charged Up",
+        "height": 8.013679504394531,
+        "left": 46,
+        "right": 1088,
+        "top": 36,
+        "width": 16.541748046875,
         "window": {
           "visible": true
         }
@@ -49,17 +68,52 @@
     }
   },
   "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    },
+    "Retained Values": {
+      "open": false
+    },
     "transitory": {
-      "Intake": {
-        "open": true
+      "Monologuing": {
+        "open": true,
+        "robot": {
+          "drive": {
+            "double[]##v_/Monologuing/robot/drive/Current Chassis Speeds": {
+              "open": true
+            },
+            "double[]##v_/Monologuing/robot/drive/Estimated Pose": {
+              "open": true
+            }
+          },
+          "elevator": {
+            "open": true
+          },
+          "intake": {
+            "open": true
+          },
+          "open": true
+        }
       },
       "Shuffleboard": {
-        "Robot": {
-          "Elevator": {
+        "SwerveSim": {
+          "BLModule": {
+            "BLDrive": {
+              "open": true
+            },
+            "BLTurn": {
+              "BLTurnEnc": {
+                "open": true
+              },
+              "open": true
+            },
             "open": true
           },
           "open": true
         },
+        "open": true
+      },
+      "SmartDashboard": {
         "open": true
       }
     }

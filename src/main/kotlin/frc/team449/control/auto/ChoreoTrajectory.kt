@@ -15,102 +15,102 @@ import java.io.File
 import java.io.FileReader
 
 class ChoreoTrajectory(
-    val name: String,
-    val stateMap: InterpolatingMatrixTreeMap<Double, N2, N3>,
-    val totalTime: Double,
-    val objectiveTimestamps: ArrayList<Double>
+  val name: String,
+  val stateMap: InterpolatingMatrixTreeMap<Double, N2, N3>,
+  val totalTime: Double,
+  val objectiveTimestamps: ArrayList<Double>
 ) {
 
-    fun initialPose(): Pose2d {
-        val initialState = stateMap.get(0.0)
+  fun initialPose(): Pose2d {
+    val initialState = stateMap.get(0.0)
 
-        return Pose2d(
-            initialState[0, 0],
-            initialState[0, 1],
-            Rotation2d(initialState[0, 2])
-        )
-    }
-
-    fun sample(t: Double): ChoreoState {
-        val timeSeconds = MathUtil.clamp(t, 0.0, totalTime)
-        val interpolatedMat = stateMap.get(timeSeconds)
-
-        return ChoreoState(
-            interpolatedMat[0, 0],
-            interpolatedMat[0, 1],
-            interpolatedMat[0, 2],
-            interpolatedMat[1, 0],
-            interpolatedMat[1, 1],
-            interpolatedMat[1, 2]
-        )
-    }
-
-    class ChoreoState(
-        val xPos: Double,
-        val yPos: Double,
-        val theta: Double,
-        val xVel: Double,
-        val yVel: Double,
-        val thetaVel: Double
+    return Pose2d(
+      initialState[0, 0],
+      initialState[0, 1],
+      Rotation2d(initialState[0, 2])
     )
+  }
 
-    companion object {
-        fun createTrajectory(
-            filename: String
-        ): MutableList<ChoreoTrajectory> {
-            val path = Filesystem.getDeployDirectory().absolutePath.plus("/choreo/$filename.json")
-            val document = (JSONParser().parse(FileReader(File(path).absolutePath)) as JSONObject)["paths"] as HashMap<*, *>
+  fun sample(t: Double): ChoreoState {
+    val timeSeconds = MathUtil.clamp(t, 0.0, totalTime)
+    val interpolatedMat = stateMap.get(timeSeconds)
 
-            val trajList = mutableListOf<ChoreoTrajectory>()
+    return ChoreoState(
+      interpolatedMat[0, 0],
+      interpolatedMat[0, 1],
+      interpolatedMat[0, 2],
+      interpolatedMat[1, 0],
+      interpolatedMat[1, 1],
+      interpolatedMat[1, 2]
+    )
+  }
 
-            document.forEach { (name, pathData) ->
-                name as String
-                pathData as JSONObject
-                val trajectory = pathData["trajectory"] as JSONArray
+  class ChoreoState(
+    val xPos: Double,
+    val yPos: Double,
+    val theta: Double,
+    val xVel: Double,
+    val yVel: Double,
+    val thetaVel: Double
+  )
 
-                val info = parse(trajectory)
+  companion object {
+    fun createTrajectory(
+      filename: String
+    ): MutableList<ChoreoTrajectory> {
+      val path = Filesystem.getDeployDirectory().absolutePath.plus("/choreo/$filename.json")
+      val document = (JSONParser().parse(FileReader(File(path).absolutePath)) as JSONObject)["paths"] as HashMap<*, *>
 
-                val last = trajectory.last() as JSONObject
-                val totalTime = last["timestamp"] as Double
+      val trajList = mutableListOf<ChoreoTrajectory>()
 
-                trajList.add(
-                    ChoreoTrajectory(
-                        filename + name,
-                        info.first,
-                        totalTime,
-                        info.second
-                    )
-                )
-            }
+      document.forEach { (name, pathData) ->
+        name as String
+        pathData as JSONObject
+        val trajectory = pathData["trajectory"] as JSONArray
 
-            return trajList
-        }
+        val info = parse(trajectory)
 
-        private fun parse(trajectory: JSONArray): Pair<InterpolatingMatrixTreeMap<Double, N2, N3>, ArrayList<Double>> {
-            val stateMap = InterpolatingMatrixTreeMap<Double, N2, N3>()
+        val last = trajectory.last() as JSONObject
+        val totalTime = last["timestamp"] as Double
 
-            val timestamps = arrayListOf<Double>()
+        trajList.add(
+          ChoreoTrajectory(
+            filename + name,
+            info.first,
+            totalTime,
+            info.second
+          )
+        )
+      }
 
-            trajectory.forEach { state ->
-                state as JSONObject
-                val stateTime = state["timestamp"].toString().toDouble()
-
-                timestamps.add(stateTime)
-
-                val builder = MatBuilder(N2.instance, N3.instance)
-                val matrix = builder.fill(
-                    state["x"].toString().toDouble(),
-                    state["y"].toString().toDouble(),
-                    state["heading"].toString().toDouble(),
-                    state["velocityX"].toString().toDouble(),
-                    state["velocityY"].toString().toDouble(),
-                    state["angularVelocity"].toString().toDouble()
-                )
-
-                stateMap.put(stateTime, matrix)
-            }
-
-            return stateMap to timestamps
-        }
+      return trajList
     }
+
+    private fun parse(trajectory: JSONArray): Pair<InterpolatingMatrixTreeMap<Double, N2, N3>, ArrayList<Double>> {
+      val stateMap = InterpolatingMatrixTreeMap<Double, N2, N3>()
+
+      val timestamps = arrayListOf<Double>()
+
+      trajectory.forEach { state ->
+        state as JSONObject
+        val stateTime = state["timestamp"].toString().toDouble()
+
+        timestamps.add(stateTime)
+
+        val builder = MatBuilder(N2.instance, N3.instance)
+        val matrix = builder.fill(
+          state["x"].toString().toDouble(),
+          state["y"].toString().toDouble(),
+          state["heading"].toString().toDouble(),
+          state["velocityX"].toString().toDouble(),
+          state["velocityY"].toString().toDouble(),
+          state["angularVelocity"].toString().toDouble()
+        )
+
+        stateMap.put(stateTime, matrix)
+      }
+
+      return stateMap to timestamps
+    }
+  }
 }

@@ -9,50 +9,49 @@ import frc.team449.robot2023.constants.subsystem.ManipulatorConstants
 import frc.team449.system.SparkUtil
 
 class Manipulator(
-    private val motorID: Int
+  private val motorID: Int
 ) : SubsystemBase() {
 
-    private val motor = CANSparkMax(motorID, CANSparkMaxLowLevel.MotorType.kBrushless)
-    private val encoder = motor.encoder
+  private val motor = CANSparkMax(motorID, CANSparkMaxLowLevel.MotorType.kBrushless)
+  private val encoder = motor.encoder
 
-    init {
-        SparkUtil.applySparkSettings(
-            motor,
-            inverted = ManipulatorConstants.INVERTED,
-            encoder = encoder,
-            unitPerRotation = ManipulatorConstants.UPR,
-            gearing = ManipulatorConstants.GEARING,
-            offset = Double.NaN
-        )
-    }
+  init {
+    SparkUtil.applySparkSettings(
+      motor,
+      inverted = ManipulatorConstants.INVERTED,
+      encoder = encoder,
+      unitPerRotation = 1.0,
+      gearing = 1.0
+    )
+  }
 
-    fun intake(): Command {
-        return this.runOnce {
-            motor.setVoltage(ManipulatorConstants.INTAKE_VOLTAGE)
-        }
+  fun intake(): Command {
+    return this.runOnce {
+      motor.setVoltage(ManipulatorConstants.INTAKE_VOLTAGE)
     }
+  }
 
-    fun outtake(): Command {
-        return this.runOnce {
-            motor.setVoltage(-ManipulatorConstants.INTAKE_VOLTAGE)
-        }
+  fun outtake(): Command {
+    return this.runOnce {
+      motor.setVoltage(-ManipulatorConstants.INTAKE_VOLTAGE)
     }
+  }
 
-    fun stop(): Command {
-        return this.runOnce {
-            motor.stopMotor()
-        }
+  fun stop(): Command {
+    return this.runOnce {
+      motor.stopMotor()
     }
+  }
 
-    override fun initSendable(builder: SendableBuilder) {
-        builder.addDoubleProperty("Intake Motor Velocity", { encoder.velocity }, {})
-    }
+  override fun initSendable(builder: SendableBuilder) {
+    builder.addDoubleProperty("Intake Motor Velocity", { encoder.velocity }, {})
+  }
 
-    companion object {
-        fun createManipulator(): Manipulator {
-            return Manipulator(
-                ManipulatorConstants.MOTOR_ID
-            )
-        }
+  companion object {
+    fun createManipulator(): Manipulator {
+      return Manipulator(
+        ManipulatorConstants.MOTOR_ID
+      )
     }
+  }
 }

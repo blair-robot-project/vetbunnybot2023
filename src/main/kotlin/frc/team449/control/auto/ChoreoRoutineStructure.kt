@@ -4,11 +4,11 @@ import edu.wpi.first.wpilibj2.command.Command
 
 interface ChoreoRoutineStructure {
 
-    val routine: ChoreoRoutine
+  val routine: ChoreoRoutine
 
-    val trajectory: MutableList<ChoreoTrajectory>
+  val trajectory: MutableList<ChoreoTrajectory>
 
-    fun createCommand(): Command {
-        return routine.createRoutine(trajectory)
-    }
+  fun createCommand(): Command {
+    return routine.createRoutine(trajectory)
+  }
 }

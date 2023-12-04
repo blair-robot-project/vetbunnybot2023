@@ -7,11 +7,11 @@ import frc.team449.control.holonomic.HolonomicDrive
 
 abstract class RobotBase {
 
-    val field = Field2d()
+  val field = Field2d()
 
-    abstract val powerDistribution: PowerDistribution
+  abstract val powerDistribution: PowerDistribution
 
-    abstract val drive: HolonomicDrive?
+  abstract val drive: HolonomicDrive?
 
-    abstract val driveCommand: Command
+  abstract val driveCommand: Command
 }

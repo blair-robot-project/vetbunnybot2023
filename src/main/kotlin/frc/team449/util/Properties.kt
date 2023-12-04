@@ -11,9 +11,9 @@ import kotlin.reflect.KProperty
  * @tparam F The type of the property that is delegated
  */
 fun <B, F> wrappedProp(backing: B, get: (B) -> F): ReadOnlyProperty<Any?, F> {
-    return object : ReadOnlyProperty<Any?, F> {
-        override operator fun getValue(thisRef: Any?, property: KProperty<*>) = get(backing)
-    }
+  return object : ReadOnlyProperty<Any?, F> {
+    override operator fun getValue(thisRef: Any?, property: KProperty<*>) = get(backing)
+  }
 }
 
 /** A property with a custom getter and setter but a backing field of a different type
@@ -23,11 +23,11 @@ fun <B, F> wrappedProp(backing: B, get: (B) -> F): ReadOnlyProperty<Any?, F> {
  * @see simBooleanProp
  */
 fun <B, F> wrappedProp(backing: B, get: (B) -> F, set: (B, F) -> Unit): ReadWriteProperty<Any?, F> {
-    return object : ReadWriteProperty<Any?, F> {
-        override operator fun getValue(thisRef: Any?, property: KProperty<*>) = get(backing)
+  return object : ReadWriteProperty<Any?, F> {
+    override operator fun getValue(thisRef: Any?, property: KProperty<*>) = get(backing)
 
-        override operator fun setValue(thisRef: Any?, property: KProperty<*>, value: F) = set(backing, value)
-    }
+    override operator fun setValue(thisRef: Any?, property: KProperty<*>, value: F) = set(backing, value)
+  }
 }
 
 /** A delegated property of type Double backed by a [SimDouble] */
