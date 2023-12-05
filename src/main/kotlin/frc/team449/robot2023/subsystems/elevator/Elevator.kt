@@ -1,5 +1,6 @@
 package frc.team449.robot2023.subsystems.elevator
 
+import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.Nat
 import edu.wpi.first.math.VecBuilder
 import edu.wpi.first.math.controller.LinearQuadraticRegulator
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.*
 import frc.team449.control.TrapezoidalExponentialProfile
 import frc.team449.robot2023.Robot
+import frc.team449.robot2023.constants.MotorConstants
 import frc.team449.robot2023.constants.subsystem.ElevatorConstants
 import frc.team449.robot2023.subsystems.Intake
 import frc.team449.system.motor.WrappedMotor
@@ -87,26 +89,20 @@ open class Elevator(
     )
   }
 
-  private fun isFinished(goal: Double, epsilon: Double = 1e-4): Boolean {
-    return if (abs(desiredState.first - goal) < epsilon) {
-      true
-    } else {
-      false
-    }
-  }
+  fun summaryStats(): Command {
+    return InstantCommand({
+      val summary = dtList.stream().mapToDouble { it * 1000 }.summaryStatistics()
 
-  private fun summaryStats() {
-    val summary = dtList.stream().mapToDouble { it * 1000 }.summaryStatistics()
+      var variance = 0.0
 
-    var variance = 0.0
+      for (num in dtList) {
+        variance += (num * 1000 - summary.average).pow(2)
+      }
 
-    for (num in dtList) {
-      variance += (num * 1000 - summary.average).pow(2)
-    }
+      variance /= dtList.size
 
-    variance /= dtList.size
-
-    println("Count: ${summary.count}, Average (ms): ${summary.average}, Min (ms): ${summary.min}, Max (ms): ${summary.max}, Std dev (ms) ${sqrt(variance)}")
+      println("Count: ${summary.count}, Average (ms): ${summary.average}, Min (ms): ${summary.min}, Max (ms): ${summary.max}, Std dev (ms) ${sqrt(variance)}")
+    })
   }
 
   private fun moveToPos(distance: Double): Command {
@@ -142,35 +138,34 @@ open class Elevator(
         ElevatorConstants.DT,
         this
       )
-        .until { isFinished(distance) }
-        .andThen(InstantCommand({ desiredState = Pair(distance, 0.0) }))
     )
   }
 
-  fun manualMovement(movement: DoubleSupplier, rate: Double = 0.0075): Command {
+  fun manualMovement(movement: DoubleSupplier, rate: Double = 0.5 / 200): Command {
     return NotifierCommand(
       {
-        var setpoint = currentState.first
-        if (movement.asDouble < 0 && currentState.first > ElevatorConstants.MIN_SAFE_POS + 0.1 ||
-          intake.piston.get() == DoubleSolenoid.Value.kForward ||
-          movement.asDouble > 0 && currentState.first > ElevatorConstants.MIN_SAFE_POS
-        ) {
-          setpoint += currentState.first + movement.asDouble * rate
+        desiredState = if (movement.asDouble < 0 && currentState.first > ElevatorConstants.MIN_SAFE_POS + 0.1
+          || intake.piston.get() == DoubleSolenoid.Value.kForward
+          || movement.asDouble > 0 && currentState.first > ElevatorConstants.MIN_SAFE_POS) {
+          Pair(
+            MathUtil.clamp(desiredState.first + movement.asDouble.pow(2) * rate * sign(movement.asDouble), 0.0, ElevatorConstants.HIGH_DISTANCE),
+            movement.asDouble.pow(2) * sign(movement.asDouble) * rate * 200)
+        } else {
+          Pair(desiredState.first, 0.0)
         }
 
-        loop.setNextR(setpoint, 0.0)
+        loop.setNextR(desiredState.first, desiredState.second)
         loop.correct(VecBuilder.fill(positionSupplier.get()))
         loop.predict(ElevatorConstants.DT)
 
         motor.setVoltage(
           loop.getU(0) + ElevatorConstants.kG + sign(desiredState.second) * ElevatorConstants.kS
         )
-
-        desiredState = Pair(setpoint, 0.0)
       },
       ElevatorConstants.DT,
       this
     )
+      .handleInterrupt { desiredState = Pair(desiredState.first, 0.0) }
   }
 
   fun high(): Command {
@@ -191,18 +186,12 @@ open class Elevator(
     return ConditionalCommand(
       moveToPos(ElevatorConstants.STOW_DISTANCE),
       InstantCommand()
-    ) {
-      currentState.first > ElevatorConstants.MIN_SAFE_POS && ElevatorConstants.STOW_DISTANCE > ElevatorConstants.MIN_SAFE_POS ||
-        intake.piston.get() == DoubleSolenoid.Value.kForward
-    }
+    ) { currentState.first > ElevatorConstants.MIN_SAFE_POS && ElevatorConstants.STOW_DISTANCE > ElevatorConstants.MIN_SAFE_POS
+      || intake.piston.get() == DoubleSolenoid.Value.kForward }
   }
 
   fun tuneKG(): Command {
     return this.run { motor.setVoltage(ElevatorConstants.kG) }
-  }
-
-  fun showSummaryStats(): Command {
-    return InstantCommand(::summaryStats)
   }
 
   fun stop(): Command {
@@ -239,11 +228,11 @@ open class Elevator(
     fun createStateSpaceElevator(robot: Robot): Elevator {
       val plant = LinearSystemId.createElevatorSystem(
         DCMotor(
-          ElevatorConstants.NOMINAL_VOLTAGE,
-          ElevatorConstants.STALL_TORQUE,
-          ElevatorConstants.STALL_CURRENT,
-          ElevatorConstants.FREE_CURRENT,
-          ElevatorConstants.FREE_SPEED,
+          MotorConstants.NOMINAL_VOLTAGE,
+          MotorConstants.STALL_TORQUE,
+          MotorConstants.STALL_CURRENT,
+          MotorConstants.FREE_CURRENT,
+          MotorConstants.FREE_SPEED,
           ElevatorConstants.NUM_MOTORS
         ),
         ElevatorConstants.CARRIAGE_MASS,

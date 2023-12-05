@@ -7,6 +7,7 @@ import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.util.sendable.SendableBuilder
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
+import frc.team449.robot2023.constants.MotorConstants
 import frc.team449.robot2023.constants.RobotConstants
 import frc.team449.robot2023.constants.subsystem.ElevatorConstants
 import frc.team449.robot2023.subsystems.Intake
@@ -23,11 +24,11 @@ class ElevatorSim(
 
   private val elevatorSim = TiltedElevatorSim(
     DCMotor(
-      ElevatorConstants.NOMINAL_VOLTAGE,
-      ElevatorConstants.STALL_TORQUE,
-      ElevatorConstants.STALL_CURRENT,
-      ElevatorConstants.FREE_CURRENT,
-      ElevatorConstants.FREE_SPEED,
+      MotorConstants.NOMINAL_VOLTAGE,
+      MotorConstants.STALL_TORQUE,
+      MotorConstants.STALL_CURRENT,
+      MotorConstants.FREE_CURRENT,
+      MotorConstants.FREE_SPEED,
       ElevatorConstants.NUM_MOTORS
     ),
     ElevatorConstants.EFFECTIVE_GEARING,

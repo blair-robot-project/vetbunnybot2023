@@ -7,7 +7,9 @@ import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.PneumaticsModuleType
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.SubsystemBase
+import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.team449.robot2023.constants.subsystem.IntakeConstants
 import frc.team449.system.SparkUtil
 
@@ -32,7 +34,12 @@ class Intake(
   }
 
   fun extend(): Command {
-    return this.runOnce { piston.set(DoubleSolenoid.Value.kForward) }
+    return SequentialCommandGroup(
+      this.runOnce {
+        piston.set(DoubleSolenoid.Value.kForward)
+      },
+      WaitCommand(IntakeConstants.EXTENSION_TIME)
+    )
   }
 
   fun retract(): Command {
@@ -62,7 +69,7 @@ class Intake(
 
   override fun initSendable(builder: SendableBuilder) {
     builder.publishConstString("1.0", "Piston")
-    builder.addStringProperty("Piston Status", { piston.get().toString() }, {})
+    builder.addStringProperty("1.1 Piston Status", { piston.get().toString() }, {})
 
     builder.publishConstString("2.0", "Motor Voltages")
     builder.addDoubleProperty("2.1 Last Voltage", { lastVoltage }, null)

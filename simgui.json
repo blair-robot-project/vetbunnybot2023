@@ -49,12 +49,8 @@
         }
       },
       "/SmartDashboard/Field": {
-        "bottom": 544,
-        "builtin": "2023 Charged Up",
         "height": 8.013679504394531,
-        "left": 46,
-        "right": 1088,
-        "top": 36,
+        "image": "C:\\Users\\jpoth\\Downloads\\field(1).png",
         "width": 16.541748046875,
         "window": {
           "visible": true
@@ -79,6 +75,9 @@
         "open": true,
         "robot": {
           "drive": {
+            "double[]##v_/Monologuing/robot/drive/1.1 Estimated Pose": {
+              "open": true
+            },
             "double[]##v_/Monologuing/robot/drive/Current Chassis Speeds": {
               "open": true
             },
@@ -86,11 +85,10 @@
               "open": true
             }
           },
-          "elevator": {
-            "open": true
-          },
           "intake": {
-            "open": true
+            "double[]##v_/Monologuing/robot/intake/3.1 Intake 3D Position": {
+              "open": true
+            }
           },
           "open": true
         }

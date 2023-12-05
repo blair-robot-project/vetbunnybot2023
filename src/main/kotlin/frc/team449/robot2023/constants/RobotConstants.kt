@@ -3,6 +3,7 @@ package frc.team449.robot2023.constants
 import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
+import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.wpilibj.RobotBase
 import frc.team449.robot2023.constants.drives.SwerveConstants
@@ -18,10 +19,21 @@ object RobotConstants {
   const val TRANSLATION_DEADBAND = .15
   const val ROTATION_DEADBAND = .15
 
+  /** In kilograms, include bumpers and battery and all */
+  const val ROBOT_WEIGHT = 60
+
   /** Drive configuration */
   const val MAX_LINEAR_SPEED = SwerveConstants.MAX_ATTAINABLE_MK4I_SPEED // m/s
   const val MAX_ROT_SPEED = PI // rad/s
-  val MAX_ACCEL = if (RobotBase.isSimulation()) 7.5 else 14.75 // m/s/s
+  val MAX_ACCEL = if (RobotBase.isSimulation()) 12.2625 else
+    4 * DCMotor(
+      MotorConstants.NOMINAL_VOLTAGE,
+      MotorConstants.STALL_TORQUE,
+      MotorConstants.STALL_CURRENT,
+      MotorConstants.FREE_CURRENT,
+      MotorConstants.FREE_SPEED,
+      1
+    ).getTorque(80.0) * SwerveConstants.DRIVE_GEARING / (Units.inchesToMeters(2.0) * ROBOT_WEIGHT) // m/s/s
   val INITIAL_POSE = Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0))
 
   const val LOOP_TIME = 0.020

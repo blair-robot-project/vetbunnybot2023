@@ -1,9 +1,7 @@
 package frc.team449
 
-import edu.wpi.first.wpilibj.DriverStation
+import edu.wpi.first.wpilibj.*
 import edu.wpi.first.wpilibj.RobotBase
-import edu.wpi.first.wpilibj.TimedRobot
-import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandScheduler
@@ -45,7 +43,7 @@ class RobotLoop : TimedRobot(), Logged {
     SmartDashboard.putData("Field", robot.field)
     SmartDashboard.putData("Routine Chooser", routineChooser)
     SmartDashboard.putData("Command Scheduler", CommandScheduler.getInstance())
-    SmartDashboard.putBoolean("Enable Logging?", true)
+    SmartDashboard.putBoolean("Enable Logging?", false)
 
     controllerBinder.bindButtons()
 
@@ -63,8 +61,10 @@ class RobotLoop : TimedRobot(), Logged {
 
     robot.field.getObject("bumpers").pose = robot.drive.pose
 
-    if (SmartDashboard.getBoolean("Enable Logging?", true)) {
+    if (SmartDashboard.getBoolean("Enable Logging?", false)) {
       Monologue.update()
+    } else {
+      Monologue.updateFileLog()
     }
   }
 

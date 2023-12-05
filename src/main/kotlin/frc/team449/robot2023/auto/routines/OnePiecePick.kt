@@ -17,7 +17,8 @@ class OnePiecePick(
     ChoreoRoutine(
       drive = robot.drive,
       parallelEventMap = hashMapOf(
-        0 to robot.elevator.high(),
+        0 to robot.intake.extend().andThen(
+          robot.elevator.high()),
         1 to robot.elevator.stow()
       ),
       stopEventMap = hashMapOf(

@@ -8,14 +8,6 @@ import kotlin.math.PI
 
 object ElevatorConstants {
 
-  /** NEO characteristics */
-  const val EFFICIENCY = 0.90
-  const val NOMINAL_VOLTAGE = 12.0
-  const val STALL_TORQUE = 3.36 * EFFICIENCY
-  const val STALL_CURRENT = 166.0
-  const val FREE_CURRENT = 1.3
-  val FREE_SPEED = Units.rotationsPerMinuteToRadiansPerSecond(5676.0)
-
   /** Mechanism2d Visual constants */
   const val ANGLE = 75.0
   const val MIN_LENGTH = 0.1
@@ -23,18 +15,18 @@ object ElevatorConstants {
   val COLOR = Color8Bit(255, 0, 255)
   val DESIRED_COLOR = Color8Bit(0, 255, 0)
 
-  const val LEFT_ID = 20
+  const val LEFT_ID = 60
   const val LEFT_INVERTED = false
-  const val RIGHT_ID = 21
+  const val RIGHT_ID = 61
   const val RIGHT_INVERTED = true
   const val EFFECTIVE_GEARING = 6.48 / 2
   const val PULLEY_RADIUS = 0.022352
   const val UPR = PULLEY_RADIUS * 2 * PI
 
   var kS = 0.0
-  var kG = 1.075
+  var kG = 1.26725
 
-  const val HIGH_DISTANCE = 1.4
+  const val HIGH_DISTANCE = 1.114425
   const val LOW_DISTANCE = 0.25
   const val STOW_DISTANCE = 0.0
 

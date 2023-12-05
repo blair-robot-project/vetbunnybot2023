@@ -1,6 +1,7 @@
 package frc.team449.control
 
 import edu.wpi.first.math.util.Units
+import frc.team449.robot2023.constants.MotorConstants
 import frc.team449.robot2023.constants.subsystem.ElevatorConstants
 import kotlin.math.*
 
@@ -32,10 +33,10 @@ class TrapezoidalExponentialProfile(
   }
 
   // NEO Motor Constants
-  val freeSpeed = ElevatorConstants.FREE_SPEED
-  val freeCurrent = ElevatorConstants.FREE_CURRENT
-  val stallCurrent = ElevatorConstants.STALL_CURRENT
-  val stallTorque = ElevatorConstants.STALL_TORQUE
+  val freeSpeed = MotorConstants.FREE_SPEED
+  val freeCurrent = MotorConstants.FREE_CURRENT
+  val stallCurrent = MotorConstants.STALL_CURRENT
+  val stallTorque = MotorConstants.STALL_TORQUE
 
   private fun expDecelIntercept(
     vFree: Double,

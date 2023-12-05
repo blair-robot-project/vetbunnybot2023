@@ -16,20 +16,31 @@ class ControllerBindings(
 
   fun bindButtons() {
     JoystickButton(mechanismController, XboxController.Button.kX.value).onTrue(
-      robot.elevator.low()
+      SequentialCommandGroup(
+        // How long does it take to extend and retract the intake? Is it the play to have mech manually extend intake right as we enter the
+        // community or have it automated such that it extends intake and moves elevator at the same time?
+//        robot.intake.extend(),
+        robot.elevator.low()
+      )
     )
 
     JoystickButton(mechanismController, XboxController.Button.kY.value).onTrue(
-      robot.elevator.high()
+      SequentialCommandGroup(
+//        robot.intake.extend(),
+        robot.elevator.high()
+      )
     )
 
     JoystickButton(mechanismController, XboxController.Button.kB.value).onTrue(
-      robot.elevator.stow()
+      SequentialCommandGroup(
+//        robot.intake.extend(),
+        robot.elevator.stow()
+      )
     )
 
     JoystickButton(mechanismController, XboxController.Button.kA.value).onTrue(
       SequentialCommandGroup(
-        robot.elevator.showSummaryStats(),
+        robot.elevator.summaryStats(),
         robot.elevator.tuneKG()
       )
     )
@@ -55,7 +66,9 @@ class ControllerBindings(
     )
 
     Trigger { abs(mechanismController.leftY) > 0.25 }.onTrue(
-      robot.elevator.manualMovement({ mechanismController.leftY })
+      robot.elevator.manualMovement({ -mechanismController.leftY })
+    ).onFalse(
+      robot.elevator.defaultCommand
     )
 
     Trigger { driveController.leftTriggerAxis > 0.8 }.onTrue(

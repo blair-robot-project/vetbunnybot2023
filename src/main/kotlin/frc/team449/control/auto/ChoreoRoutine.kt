@@ -44,7 +44,7 @@ class ChoreoRoutine(
 
     for (i in 0 until trajectories.size) {
       ezraGallun.addCommands(
-        ParallelCommandGroup(
+        ParallelDeadlineGroup(
           ChoreoFollower(
             drive,
             trajectories[i],
