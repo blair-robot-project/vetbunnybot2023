@@ -144,12 +144,14 @@ open class Elevator(
   fun manualMovement(movement: DoubleSupplier, rate: Double = 0.5 / 200): Command {
     return NotifierCommand(
       {
-        desiredState = if (movement.asDouble < 0 && currentState.first > ElevatorConstants.MIN_SAFE_POS + 0.1
-          || intake.piston.get() == DoubleSolenoid.Value.kForward
-          || movement.asDouble > 0 && currentState.first > ElevatorConstants.MIN_SAFE_POS) {
+        desiredState = if (movement.asDouble < 0 && currentState.first > ElevatorConstants.MIN_SAFE_POS + 0.1 ||
+          intake.piston.get() == DoubleSolenoid.Value.kForward ||
+          movement.asDouble > 0 && currentState.first > ElevatorConstants.MIN_SAFE_POS
+        ) {
           Pair(
             MathUtil.clamp(desiredState.first + movement.asDouble.pow(2) * rate * sign(movement.asDouble), 0.0, ElevatorConstants.HIGH_DISTANCE),
-            movement.asDouble.pow(2) * sign(movement.asDouble) * rate * 200)
+            movement.asDouble.pow(2) * sign(movement.asDouble) * rate * 200
+          )
         } else {
           Pair(desiredState.first, 0.0)
         }
@@ -186,8 +188,10 @@ open class Elevator(
     return ConditionalCommand(
       moveToPos(ElevatorConstants.STOW_DISTANCE),
       InstantCommand()
-    ) { currentState.first > ElevatorConstants.MIN_SAFE_POS && ElevatorConstants.STOW_DISTANCE > ElevatorConstants.MIN_SAFE_POS
-      || intake.piston.get() == DoubleSolenoid.Value.kForward }
+    ) {
+      currentState.first > ElevatorConstants.MIN_SAFE_POS && ElevatorConstants.STOW_DISTANCE > ElevatorConstants.MIN_SAFE_POS ||
+        intake.piston.get() == DoubleSolenoid.Value.kForward
+    }
   }
 
   fun tuneKG(): Command {

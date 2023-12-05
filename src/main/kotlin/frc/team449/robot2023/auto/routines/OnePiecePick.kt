@@ -18,19 +18,22 @@ class OnePiecePick(
       drive = robot.drive,
       parallelEventMap = hashMapOf(
         0 to robot.intake.extend().andThen(
-          robot.elevator.high()),
+          robot.elevator.high()
+        ),
         1 to robot.elevator.stow()
       ),
       stopEventMap = hashMapOf(
         1 to SequentialCommandGroup(
-          WaitCommand(1.0),
-          robot.manipulator.outtake()
+          WaitCommand(0.25),
+          robot.manipulator.outtake(),
+          WaitCommand(0.5)
         ),
         2 to SequentialCommandGroup(
+          WaitCommand(0.25),
           robot.intake.extend(),
           robot.intake.intake(),
           robot.manipulator.intake(),
-          WaitCommand(2.5)
+          WaitCommand(2.0)
         )
       )
     )

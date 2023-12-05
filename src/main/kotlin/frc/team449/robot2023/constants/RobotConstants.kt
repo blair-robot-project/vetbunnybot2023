@@ -25,7 +25,9 @@ object RobotConstants {
   /** Drive configuration */
   const val MAX_LINEAR_SPEED = SwerveConstants.MAX_ATTAINABLE_MK4I_SPEED // m/s
   const val MAX_ROT_SPEED = PI // rad/s
-  val MAX_ACCEL = if (RobotBase.isSimulation()) 12.2625 else
+  val MAX_ACCEL = if (RobotBase.isSimulation()) {
+    12.2625
+  } else {
     4 * DCMotor(
       MotorConstants.NOMINAL_VOLTAGE,
       MotorConstants.STALL_TORQUE,
@@ -34,6 +36,7 @@ object RobotConstants {
       MotorConstants.FREE_SPEED,
       1
     ).getTorque(80.0) * SwerveConstants.DRIVE_GEARING / (Units.inchesToMeters(2.0) * ROBOT_WEIGHT) // m/s/s
+  }
   val INITIAL_POSE = Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0))
 
   const val LOOP_TIME = 0.020
