@@ -151,9 +151,10 @@ open class Elevator(
     return NotifierCommand(
       {
         var setpoint = currentState.first
-        if (movement.asDouble < 0 && currentState.first > ElevatorConstants.MIN_SAFE_POS + 0.1
-          || intake.piston.get() == DoubleSolenoid.Value.kForward
-          || movement.asDouble > 0 && currentState.first > ElevatorConstants.MIN_SAFE_POS) {
+        if (movement.asDouble < 0 && currentState.first > ElevatorConstants.MIN_SAFE_POS + 0.1 ||
+          intake.piston.get() == DoubleSolenoid.Value.kForward ||
+          movement.asDouble > 0 && currentState.first > ElevatorConstants.MIN_SAFE_POS
+        ) {
           setpoint += currentState.first + movement.asDouble * rate
         }
 
@@ -190,8 +191,10 @@ open class Elevator(
     return ConditionalCommand(
       moveToPos(ElevatorConstants.STOW_DISTANCE),
       InstantCommand()
-    ) { currentState.first > ElevatorConstants.MIN_SAFE_POS && ElevatorConstants.STOW_DISTANCE > ElevatorConstants.MIN_SAFE_POS
-      || intake.piston.get() == DoubleSolenoid.Value.kForward }
+    ) {
+      currentState.first > ElevatorConstants.MIN_SAFE_POS && ElevatorConstants.STOW_DISTANCE > ElevatorConstants.MIN_SAFE_POS ||
+        intake.piston.get() == DoubleSolenoid.Value.kForward
+    }
   }
 
   fun tuneKG(): Command {

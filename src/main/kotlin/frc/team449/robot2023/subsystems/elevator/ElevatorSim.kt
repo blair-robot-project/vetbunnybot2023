@@ -75,7 +75,7 @@ class ElevatorSim(
           0.09 + sin(Units.degreesToRadians(ElevatorConstants.ANGLE)) * currentState.first,
           0.0,
           0.0,
-          0.0,
+          0.0
         )
       },
       null

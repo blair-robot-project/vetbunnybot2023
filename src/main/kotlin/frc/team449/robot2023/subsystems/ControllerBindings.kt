@@ -15,7 +15,6 @@ class ControllerBindings(
 ) {
 
   fun bindButtons() {
-
     JoystickButton(mechanismController, XboxController.Button.kX.value).onTrue(
       robot.elevator.low()
     )
