@@ -2,7 +2,7 @@ package frc.team449.system
 
 import edu.wpi.first.math.filter.LinearFilter
 import edu.wpi.first.math.geometry.Rotation2d
-import edu.wpi.first.wpilibj.SerialPort
+import edu.wpi.first.wpilibj.SPI
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.simulation.SimDeviceSim
 import frc.team449.util.simBooleanProp
@@ -50,7 +50,7 @@ class AHRS(
   }
 
   constructor(
-    port: SerialPort.Port = SerialPort.Port.kMXP
+    port: SPI.Port = SPI.Port.kMXP
   ) : this(
     com.kauailabs.navx.frc.AHRS(port)
   )

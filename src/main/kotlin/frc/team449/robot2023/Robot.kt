@@ -1,7 +1,7 @@
 package frc.team449.robot2023
 
 import edu.wpi.first.wpilibj.PowerDistribution
-import edu.wpi.first.wpilibj.SerialPort
+import edu.wpi.first.wpilibj.SPI
 import edu.wpi.first.wpilibj.XboxController
 import frc.team449.RobotBase
 import frc.team449.control.holonomic.SwerveDrive
@@ -20,7 +20,7 @@ class Robot : RobotBase(), Logged {
 
   val mechController = XboxController(1)
 
-  val ahrs = AHRS(SerialPort.Port.kMXP)
+  val ahrs = AHRS(SPI.Port.kMXP)
 
   // Instantiate/declare PDP and other stuff here
 

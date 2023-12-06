@@ -16,7 +16,7 @@ object SwerveConstants {
   /** Turning encoder channels */
   const val TURN_ENC_CHAN_FL = 6
   const val TURN_ENC_CHAN_FR = 9
-  const val TURN_ENC_CHAN_BL = 7
+  const val TURN_ENC_CHAN_BL = 5
   const val TURN_ENC_CHAN_BR = 8
 
   // BL 0.205474
@@ -24,10 +24,10 @@ object SwerveConstants {
   // FL 0.365650
   // FR 0.790104
   /** Offsets for the absolute encoders in rotations */
-  const val TURN_ENC_OFFSET_FL = 0.365650 + .5
-  const val TURN_ENC_OFFSET_FR = 0.540868
-  const val TURN_ENC_OFFSET_BL = 0.205474 + .5
-  const val TURN_ENC_OFFSET_BR = 0.620525 - .5
+  const val TURN_ENC_OFFSET_FL = 0.400578
+  const val TURN_ENC_OFFSET_FR = 0.395996
+  const val TURN_ENC_OFFSET_BL = 0.288496
+  const val TURN_ENC_OFFSET_BR = 0.215352
 
   /** PID gains for turning each module */
   const val TURN_KP = 0.8
