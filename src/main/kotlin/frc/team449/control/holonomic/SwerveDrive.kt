@@ -138,13 +138,17 @@ open class SwerveDrive(
   }
 
   /** @return An array of [SwerveModulePosition] for each module, containing distance and angle. */
-  private fun getPositions(): Array<SwerveModulePosition> {
+  fun getPositions(): Array<SwerveModulePosition> {
     return Array(modules.size) { i -> modules[i].position }
   }
 
   /** @return An array of [SwerveModuleState] for each module, containing speed and angle. */
-  private fun getStates(): Array<SwerveModuleState> {
+  fun getStates(): Array<SwerveModuleState> {
     return Array(modules.size) { i -> modules[i].state }
+  }
+
+  fun getVoltages(): Array<Double> {
+    return Array(modules.size) { i -> modules[i].lastDrivingVoltage() }
   }
 
   private fun setRobotPose() {

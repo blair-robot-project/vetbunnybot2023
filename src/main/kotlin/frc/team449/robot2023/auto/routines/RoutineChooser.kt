@@ -34,7 +34,7 @@ class RoutineChooser(private val robot: Robot) : SendableChooser<String>() {
     )
 
     this.addOption(
-      "One Piece and Drop",
+      "One Piece and Drop, WIP, Don't use.",
       if (isRed) {
         "RedOnePieceDrop"
       } else {
