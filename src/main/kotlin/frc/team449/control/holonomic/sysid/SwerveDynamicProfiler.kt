@@ -59,4 +59,9 @@ class SwerveDynamicProfiler(
       backLeftVel.append(velocities[3].speedMetersPerSecond)
     }
   }
+
+  override fun end(interrupted: Boolean) {
+    drive.set(ChassisSpeeds(0.0, 0.0, 0.0))
+    timer.stop()
+  }
 }
