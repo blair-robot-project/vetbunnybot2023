@@ -31,6 +31,7 @@
       "/LiveWindow/Ungrouped/PIDController[8]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
       "/LiveWindow/Ungrouped/navX-Sensor[1]": "Gyro",
+      "/Monologuing/robot/driveCommand": "Command",
       "/Monologuing/robot/elevator/mech": "Mechanism2d",
       "/SmartDashboard/Command Scheduler": "Scheduler",
       "/SmartDashboard/Elevator Visual": "Mechanism2d",

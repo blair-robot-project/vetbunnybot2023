@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.SPI
 import edu.wpi.first.wpilibj.XboxController
 import frc.team449.RobotBase
 import frc.team449.control.holonomic.SwerveDrive
-import frc.team449.control.holonomic.SwerveOrthogonalCommand
+import frc.team449.control.holonomic.sysid.SwerveQuasistaticProfiler
 import frc.team449.robot2023.constants.RobotConstants
 import frc.team449.robot2023.subsystems.Intake.Companion.createIntake
 import frc.team449.robot2023.subsystems.Manipulator.Companion.createManipulator
@@ -35,7 +35,8 @@ class Robot : RobotBase(), Logged {
   override val drive = SwerveDrive.createSwerve(ahrs, field)
 
   @LogBoth
-  override val driveCommand = SwerveOrthogonalCommand(drive, driveController)
+//  override val driveCommand = SwerveOrthogonalCommand(drive, driveController)
+  override val driveCommand = SwerveQuasistaticProfiler(drive)
 
   @LogBoth
   val intake = createIntake()

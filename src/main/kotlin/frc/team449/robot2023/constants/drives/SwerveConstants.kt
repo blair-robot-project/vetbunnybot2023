@@ -35,12 +35,12 @@ object SwerveConstants {
   const val TURN_KD = 0.0
 
   /** Feed forward values for driving each module */
-  const val DRIVE_KS = 0.18183
-  const val DRIVE_KV = 2.6237
-  const val DRIVE_KA = 0.42824
+  const val DRIVE_KS = 0.0
+  const val DRIVE_KV = 1.0
+  const val DRIVE_KA = 0.0
 
   /** PID gains for driving each module*/
-  const val DRIVE_KP = 0.4
+  const val DRIVE_KP = 0.0
   const val DRIVE_KI = 0.0
   const val DRIVE_KD = 0.0
 
@@ -48,7 +48,7 @@ object SwerveConstants {
   const val DRIVE_GEARING = 1 / 6.12
   const val DRIVE_UPR = 0.31818905832
   const val TURN_UPR = 2 * Math.PI
-  const val MAX_ATTAINABLE_MK4I_SPEED = (12 - DRIVE_KS) / DRIVE_KV
+  const val MAX_ATTAINABLE_MK4I_SPEED = (12.0 - DRIVE_KS) / DRIVE_KV
   const val DRIVE_CURRENT_LIM = 55
   const val STEERING_CURRENT_LIM = 40
 
