@@ -26,7 +26,7 @@ class ControllerBindings(
 
     JoystickButton(mechanismController, XboxController.Button.kY.value).onTrue(
       SequentialCommandGroup(
-//        robot.intake.extend(),
+        robot.intake.extend(),
         robot.elevator.high()
       )
     )
@@ -43,6 +43,10 @@ class ControllerBindings(
         robot.elevator.summaryStats(),
         robot.elevator.tuneKG()
       )
+    )
+
+    JoystickButton(mechanismController, XboxController.Button.kBack.value).onTrue(
+      robot.elevator.tuneKS()
     )
 
     JoystickButton(mechanismController, XboxController.Button.kRightBumper.value).onTrue(

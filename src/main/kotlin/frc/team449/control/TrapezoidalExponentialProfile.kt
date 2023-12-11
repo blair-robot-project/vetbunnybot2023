@@ -17,26 +17,19 @@ class TrapezoidalExponentialProfile(
   private val tolerance: Double = 0.05,
   private val vMax: Double = 5.0,
   startingDistance: Double = 0.0,
-  private var finalDistance: Double
+  private var finalDistance: Double,
+  private var aStop: Double = 9.81,
+  private val efficiency: Double = ElevatorConstants.EFFICIENCY
 ) {
   private val trueStartingDistance: Double = startingDistance
   private val trueFinalDistance: Double = finalDistance
   private var switchedStartingAndFinal: Boolean = false
 
-  init {
-    if (startingDistance > finalDistance) {
-      finalDistance = trueStartingDistance - trueFinalDistance
-      switchedStartingAndFinal = true
-    } else if (startingDistance > 0) {
-      finalDistance = trueFinalDistance - trueStartingDistance
-    }
-  }
-
   // NEO Motor Constants
   val freeSpeed = MotorConstants.FREE_SPEED
   val freeCurrent = MotorConstants.FREE_CURRENT
   val stallCurrent = MotorConstants.STALL_CURRENT
-  val stallTorque = MotorConstants.STALL_TORQUE
+  val stallTorque = MotorConstants.STALL_TORQUE * efficiency
 
   private fun expDecelIntercept(
     vFree: Double,
@@ -102,12 +95,23 @@ class TrapezoidalExponentialProfile(
     pulleyRadius * freeSpeed / effectiveGearing * (1 - (currentLimit - freeCurrent) / (stallCurrent - freeCurrent))
   private val effectiveStallTorque = stallTorque * numMotors
   private val effectiveGravity = 9.81 * sin(Units.degreesToRadians(angle))
-  private val aLim =
+  private var aLim =
     ((currentLimit - freeCurrent) / (stallCurrent - freeCurrent) * effectiveStallTorque * effectiveGearing) / (systemMass * pulleyRadius) - effectiveGravity
-  private val aStop = aLim + 2 * effectiveGravity
   private val vFree =
     pulleyRadius * freeSpeed / effectiveGearing * (1 - systemMass * effectiveGravity * pulleyRadius / effectiveGearing / effectiveStallTorque)
   private val vMax2 = min(vMax, vFree)
+
+  init {
+    if (startingDistance > finalDistance) {
+      finalDistance = trueStartingDistance - trueFinalDistance
+      val buffer = aStop
+      aStop = aLim
+      aLim = buffer
+      switchedStartingAndFinal = true
+    } else if (startingDistance > 0) {
+      finalDistance = trueFinalDistance - trueStartingDistance
+    }
+  }
 
   private val t12 = vLim / aLim
   private val t13 = vMax2 / aLim

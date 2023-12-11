@@ -13,6 +13,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics
 import edu.wpi.first.math.kinematics.SwerveModulePosition
 import edu.wpi.first.math.kinematics.SwerveModuleState
 import edu.wpi.first.util.sendable.SendableBuilder
+import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.RobotBase.isReal
 import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj2.command.SubsystemBase
@@ -53,6 +54,9 @@ open class SwerveDrive(
 
   /** The current speed of the robot's drive. */
   var currentSpeeds = ChassisSpeeds()
+
+  /** Current estimated vision pose */
+  var visionPose = Pose2d()
 
   /** Pose estimator that estimates the robot's position as a [Pose2d]. */
   private val poseEstimator = SwerveDrivePoseEstimator(
@@ -182,23 +186,28 @@ open class SwerveDrive(
           numTargets < 2 && tagDistance <= VisionConstants.MAX_DISTANCE_SINGLE_TAG ||
           numTargets >= 2 && tagDistance <= VisionConstants.MAX_DISTANCE_MULTI_TAG
         ) {
-          poseEstimator.addVisionMeasurement(
-            presentResult.estimatedPose.toPose2d(),
-            presentResult.timestampSeconds
-          )
+//          poseEstimator.addVisionMeasurement(
+//            presentResult.estimatedPose.toPose2d(),
+//            presentResult.timestampSeconds
+//          )
+          visionPose = presentResult.estimatedPose.toPose2d()
         }
       }
     }
   } catch (e: Error) {
-    print("!!!!!!!!! VISION ERROR !!!!!!! \n $e")
+    DriverStation.reportError(
+      "!!!!!!!!! VISION ERROR !!!!!!!",
+      e.stackTrace
+    )
   }
 
   override fun initSendable(builder: SendableBuilder) {
     builder.publishConstString("1.0", "Poses and ChassisSpeeds")
     builder.addDoubleArrayProperty("1.1 Estimated Pose", { doubleArrayOf(pose.x, pose.y, pose.rotation.radians) }, null)
-    builder.addDoubleArrayProperty("1.2 Current Chassis Speeds", { doubleArrayOf(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, currentSpeeds.omegaRadiansPerSecond) }, null)
-    builder.addDoubleArrayProperty("1.3 Desired Chassis Speeds", { doubleArrayOf(desiredSpeeds.vxMetersPerSecond, desiredSpeeds.vyMetersPerSecond, desiredSpeeds.omegaRadiansPerSecond) }, null)
-    builder.addDoubleProperty("1.4 Max Recorded Speed", { maxSpeed }, null)
+    builder.addDoubleArrayProperty("1.2 Vision Pose", { doubleArrayOf(visionPose.x, visionPose.y, visionPose.rotation.radians) }, null)
+    builder.addDoubleArrayProperty("1.3 Current Chassis Speeds", { doubleArrayOf(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond, currentSpeeds.omegaRadiansPerSecond) }, null)
+    builder.addDoubleArrayProperty("1.4 Desired Chassis Speeds", { doubleArrayOf(desiredSpeeds.vxMetersPerSecond, desiredSpeeds.vyMetersPerSecond, desiredSpeeds.omegaRadiansPerSecond) }, null)
+    builder.addDoubleProperty("1.5 Max Recorded Speed", { maxSpeed }, null)
 
     builder.publishConstString("2.0", "Steering Rotations")
     builder.addDoubleProperty("2.1 FL", { modules[0].position.angle.rotations }, null)

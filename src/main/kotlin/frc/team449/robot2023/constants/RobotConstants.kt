@@ -26,7 +26,7 @@ object RobotConstants {
   const val MAX_ROT_SPEED = PI // rad/s
   val MAX_ACCEL = 4 * DCMotor(
       MotorConstants.NOMINAL_VOLTAGE,
-      MotorConstants.STALL_TORQUE,
+      MotorConstants.STALL_TORQUE * SwerveConstants.EFFICIENCY,
       MotorConstants.STALL_CURRENT,
       MotorConstants.FREE_CURRENT,
       MotorConstants.FREE_SPEED,

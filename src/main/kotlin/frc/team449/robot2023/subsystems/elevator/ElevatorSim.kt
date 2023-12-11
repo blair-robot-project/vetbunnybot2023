@@ -1,5 +1,6 @@
 package frc.team449.robot2023.subsystems.elevator
 
+import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N2
 import edu.wpi.first.math.system.LinearSystemLoop
@@ -25,7 +26,7 @@ class ElevatorSim(
   private val elevatorSim = TiltedElevatorSim(
     DCMotor(
       MotorConstants.NOMINAL_VOLTAGE,
-      MotorConstants.STALL_TORQUE,
+      MotorConstants.STALL_TORQUE * ElevatorConstants.EFFICIENCY,
       MotorConstants.STALL_CURRENT,
       MotorConstants.FREE_CURRENT,
       MotorConstants.FREE_SPEED,
@@ -46,7 +47,7 @@ class ElevatorSim(
   var currentDraw = 0.0
 
   override fun periodic() {
-    elevatorSim.setInputVoltage(motor.lastVoltage)
+    elevatorSim.setInputVoltage(MathUtil.clamp(motor.lastVoltage, -12.0, 12.0))
 
     elevatorSim.update(RobotConstants.LOOP_TIME)
 

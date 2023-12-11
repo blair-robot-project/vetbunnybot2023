@@ -2,6 +2,7 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/LiveWindow/Ungrouped/DigitalInput[5]": "Digital Input",
       "/LiveWindow/Ungrouped/DigitalInput[6]": "Digital Input",
       "/LiveWindow/Ungrouped/DigitalInput[7]": "Digital Input",
       "/LiveWindow/Ungrouped/DigitalInput[8]": "Digital Input",
@@ -31,13 +32,26 @@
       "/LiveWindow/Ungrouped/PIDController[8]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[9]": "PIDController",
       "/LiveWindow/Ungrouped/navX-Sensor[1]": "Gyro",
+      "/LiveWindow/Ungrouped/navX-Sensor[4]": "Gyro",
+      "/Monologuing/field": "Field2d",
       "/Monologuing/robot/elevator/mech": "Mechanism2d",
+      "/Monologuing/routineChooser": "String Chooser",
+      "/Monologuing/scheduler": "Scheduler",
       "/SmartDashboard/Command Scheduler": "Scheduler",
       "/SmartDashboard/Elevator Visual": "Mechanism2d",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/Routine Chooser": "String Chooser"
     },
     "windows": {
+      "/Monologuing/field": {
+        "height": 8.229599952697754,
+        "image": "C:\\Users\\jpoth\\Downloads\\field(1).png",
+        "units": "feet",
+        "width": 16.459199905395508,
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/Command Scheduler": {
         "window": {
           "visible": true
@@ -74,15 +88,15 @@
         "open": true,
         "robot": {
           "drive": {
-            "double[]##v_/Monologuing/robot/drive/1.1 Estimated Pose": {
-              "open": true
-            },
             "double[]##v_/Monologuing/robot/drive/Current Chassis Speeds": {
               "open": true
             },
             "double[]##v_/Monologuing/robot/drive/Estimated Pose": {
               "open": true
             }
+          },
+          "elevator": {
+            "open": true
           },
           "intake": {
             "double[]##v_/Monologuing/robot/intake/3.1 Intake 3D Position": {
@@ -131,7 +145,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 266,
+          "height": 974,
           "series": [
             {
               "color": [
@@ -140,7 +154,7 @@
                 0.6901960968971252,
                 1.0
               ],
-              "id": "NT:/Shuffleboard/Robot/Elevator/Current Motor Pos"
+              "id": "NT:/Monologuing/robot/elevator/2.1 Current Pos"
             },
             {
               "color": [
@@ -149,7 +163,7 @@
                 0.32156863808631897,
                 1.0
               ],
-              "id": "NT:/Shuffleboard/Robot/Elevator/Current Motor Vel"
+              "id": "NT:/Monologuing/robot/elevator/2.2 Current Vel"
             },
             {
               "color": [
@@ -158,7 +172,7 @@
                 0.4078431725502014,
                 1.0
               ],
-              "id": "NT:/Shuffleboard/Robot/Elevator/Desired Motor Pos"
+              "id": "NT:/Monologuing/robot/elevator/2.3 Desired Pos"
             },
             {
               "color": [
@@ -167,14 +181,11 @@
                 0.32156863808631897,
                 1.0
               ],
-              "id": "NT:/Shuffleboard/Robot/Elevator/Desired Motor Vel"
+              "id": "NT:/Monologuing/robot/elevator/2.4 Desired Vel"
             }
           ]
         }
-      ],
-      "window": {
-        "visible": false
-      }
+      ]
     },
     "Plot <1>": {
       "plots": [
@@ -185,7 +196,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 303,
+          "height": 514,
           "series": [
             {
               "color": [
@@ -194,14 +205,11 @@
                 0.6901960968971252,
                 1.0
               ],
-              "id": "NT:/Shuffleboard/Robot/Elevator/Last motor voltage"
+              "id": "NT:/Monologuing/robot/elevator/1.1 Last voltage"
             }
           ]
         }
-      ],
-      "window": {
-        "visible": false
-      }
+      ]
     }
   }
 }

@@ -2,11 +2,10 @@ package frc.team449.robot2023.constants.subsystem
 
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.wpilibj.util.Color8Bit
-import frc.team449.system.encoder.NEOEncoder
-import frc.team449.system.motor.createSparkMax
 import kotlin.math.PI
 
 object ElevatorConstants {
+  const val EFFICIENCY = 0.875
 
   /** Mechanism2d Visual constants */
   const val ANGLE = 75.0
@@ -21,7 +20,7 @@ object ElevatorConstants {
   const val RIGHT_INVERTED = true
   const val EFFECTIVE_GEARING = 6.48 / 2
   const val PULLEY_RADIUS = 0.022352
-  const val UPR = PULLEY_RADIUS * 2 * PI
+  var UPR = PULLEY_RADIUS * 2 * PI
 
   var kS = 0.0
   var kG = 1.26725
@@ -34,22 +33,6 @@ object ElevatorConstants {
 
   // Mininum distance up the elevator to not hit the intake, calculated from CAD
   const val MIN_SAFE_POS = 0.485
-
-  // This is temporary, just so we can have two elevator subsystems to test out (internal smax and state space)
-  val motor = createSparkMax(
-    "Elevator Motor",
-    LEFT_ID,
-    NEOEncoder.creator(
-      UPR,
-      EFFECTIVE_GEARING
-    ),
-    enableBrakeMode = true,
-    inverted = LEFT_INVERTED,
-    currentLimit = CURRENT_LIMIT,
-    slaveSparks = mapOf(
-      Pair(RIGHT_ID, RIGHT_INVERTED)
-    )
-  )
 
   /** Elevator Sim constants. For carriage mass, it approximates both stages as a single stage */
   const val NUM_MOTORS = 2

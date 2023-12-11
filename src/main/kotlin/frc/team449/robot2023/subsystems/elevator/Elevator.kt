@@ -10,6 +10,7 @@ import edu.wpi.first.math.numbers.N2
 import edu.wpi.first.math.system.LinearSystemLoop
 import edu.wpi.first.math.system.plant.DCMotor
 import edu.wpi.first.math.system.plant.LinearSystemId
+import edu.wpi.first.math.util.Units
 import edu.wpi.first.util.sendable.SendableBuilder
 import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.RobotBase
@@ -23,13 +24,15 @@ import frc.team449.robot2023.Robot
 import frc.team449.robot2023.constants.MotorConstants
 import frc.team449.robot2023.constants.subsystem.ElevatorConstants
 import frc.team449.robot2023.subsystems.Intake
+import frc.team449.system.encoder.NEOEncoder
 import frc.team449.system.motor.WrappedMotor
+import frc.team449.system.motor.createSparkMax
 import java.util.function.DoubleSupplier
 import java.util.function.Supplier
 import kotlin.math.*
 
 open class Elevator(
-  private val motor: WrappedMotor,
+  private var motor: WrappedMotor,
   private val loop: LinearSystemLoop<N2, N1, N1>,
   private val intake: Intake
 ) : SubsystemBase() {
@@ -39,16 +42,27 @@ open class Elevator(
   protected val desiredElevatorVisual: MechanismLigament2d
 
   /** Position first, velocity second (Units: meters or meters/sec) */
-  protected var desiredState = Pair(motor.position, motor.velocity)
-  var currentState = Pair(motor.position, motor.velocity)
+  protected var desiredState =
+    Pair(
+      motor.position * ElevatorConstants.UPR * ElevatorConstants.EFFECTIVE_GEARING,
+      motor.velocity * ElevatorConstants.UPR * ElevatorConstants.EFFECTIVE_GEARING
+    )
+
+  var currentState =
+    Pair(
+      motor.position * ElevatorConstants.UPR * ElevatorConstants.EFFECTIVE_GEARING,
+      motor.velocity * ElevatorConstants.UPR * ElevatorConstants.EFFECTIVE_GEARING
+    )
 
   open val positionSupplier: Supplier<Double> =
-    Supplier { motor.position }
+    Supplier { motor.position * ElevatorConstants.UPR * ElevatorConstants.EFFECTIVE_GEARING }
 
   var startTime = Timer.getFPGATimestamp()
   var lastTime = Timer.getFPGATimestamp()
   val dtList = mutableListOf<Double>()
   var currentProfile: TrapezoidalExponentialProfile = TrapezoidalExponentialProfile(finalDistance = 1.0)
+
+  private var downwardAccel = 9.81 * sin(Units.degreesToRadians(ElevatorConstants.ANGLE)) * 1.5
 
   init {
     val rootElevator = mech.getRoot("elevator", 0.25, 0.25)
@@ -110,7 +124,8 @@ open class Elevator(
       InstantCommand({
         currentProfile = TrapezoidalExponentialProfile(
           startingDistance = currentState.first,
-          finalDistance = distance
+          finalDistance = distance,
+          aStop = downwardAccel
         )
         startTime = Timer.getFPGATimestamp()
         lastTime = startTime
@@ -188,14 +203,15 @@ open class Elevator(
     return ConditionalCommand(
       moveToPos(ElevatorConstants.STOW_DISTANCE),
       InstantCommand()
-    ) {
-      currentState.first > ElevatorConstants.MIN_SAFE_POS && ElevatorConstants.STOW_DISTANCE > ElevatorConstants.MIN_SAFE_POS ||
-        intake.piston.get() == DoubleSolenoid.Value.kForward
-    }
+    ) { intake.piston.get() == DoubleSolenoid.Value.kForward }
   }
 
   fun tuneKG(): Command {
     return this.run { motor.setVoltage(ElevatorConstants.kG) }
+  }
+
+  fun tuneKS(): Command {
+    return this.run { motor.setVoltage((ElevatorConstants.kG + ElevatorConstants.kS)) }
   }
 
   fun stop(): Command {
@@ -218,14 +234,20 @@ open class Elevator(
     builder.addDoubleProperty("1.1 Last voltage", { motor.lastVoltage }, {})
 
     builder.publishConstString("2.0", "Position and Velocities")
-    builder.addDoubleProperty("2.1 Current Pos", { currentState.first }, {})
-    builder.addDoubleProperty("2.2 Current Vel", { currentState.second }, {})
+    builder.addDoubleProperty("2.1 Estimated Pos", { currentState.first }, {})
+    builder.addDoubleProperty("2.2 Estimated Vel", { currentState.second }, {})
     builder.addDoubleProperty("2.3 Desired Pos", { desiredState.first }, {})
     builder.addDoubleProperty("2.4 Desired Vel", { desiredState.second }, {})
+    builder.addDoubleProperty("2.5 Motor Pos", { motor.position * ElevatorConstants.UPR * ElevatorConstants.EFFECTIVE_GEARING }, {})
+    builder.addDoubleProperty("2.6 Motor Vel", { motor.velocity * ElevatorConstants.UPR * ElevatorConstants.EFFECTIVE_GEARING }, {})
 
-    builder.publishConstString("3.0", "Feedforward")
+    /** Motor efficiency should also be something to be tuned, but too many objects
+     * rely on th efficiency constant that it's easier to just redeploy code. */
+    builder.publishConstString("3.0", "Tuning")
     builder.addDoubleProperty("3.1 kS", { ElevatorConstants.kS }, { value -> ElevatorConstants.kS = value })
     builder.addDoubleProperty("3.2 kG", { ElevatorConstants.kG }, { value -> ElevatorConstants.kG = value })
+    builder.addDoubleProperty("3.3 Max Downward Accel", { downwardAccel }, { value -> downwardAccel = value })
+    builder.addDoubleProperty("3.4 UPR", { ElevatorConstants.UPR }, { value -> ElevatorConstants.UPR = value })
   }
 
   companion object {
@@ -233,7 +255,7 @@ open class Elevator(
       val plant = LinearSystemId.createElevatorSystem(
         DCMotor(
           MotorConstants.NOMINAL_VOLTAGE,
-          MotorConstants.STALL_TORQUE,
+          MotorConstants.STALL_TORQUE * ElevatorConstants.EFFICIENCY,
           MotorConstants.STALL_CURRENT,
           MotorConstants.FREE_CURRENT,
           MotorConstants.FREE_SPEED,
@@ -274,15 +296,30 @@ open class Elevator(
         ElevatorConstants.DT
       )
 
+      val motor = createSparkMax(
+        "Elevator Motor",
+        ElevatorConstants.LEFT_ID,
+        NEOEncoder.creator(
+          1.0,
+          1.0
+        ),
+        enableBrakeMode = true,
+        inverted = ElevatorConstants.LEFT_INVERTED,
+        currentLimit = ElevatorConstants.CURRENT_LIMIT,
+        slaveSparks = mapOf(
+          Pair(ElevatorConstants.RIGHT_ID, ElevatorConstants.RIGHT_INVERTED)
+        )
+      )
+
       return if (RobotBase.isReal()) {
         Elevator(
-          ElevatorConstants.motor,
+          motor,
           loop,
           robot.intake
         )
       } else {
         ElevatorSim(
-          ElevatorConstants.motor,
+          motor,
           loop,
           robot.intake
         )

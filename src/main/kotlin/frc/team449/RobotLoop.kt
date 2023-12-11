@@ -11,14 +11,19 @@ import frc.team449.robot2023.constants.vision.VisionConstants
 import frc.team449.robot2023.subsystems.ControllerBindings
 import monologue.Logged
 import monologue.Monologue
+import monologue.Monologue.LogBoth
 import kotlin.jvm.optionals.getOrNull
 
 /** The main class of the robot, constructs all the subsystems and initializes default commands. */
 class RobotLoop : TimedRobot(), Logged {
 
-  @Monologue.LogBoth
+  @LogBoth
   private val robot = Robot()
+
   private val routineChooser: RoutineChooser = RoutineChooser(robot)
+
+  @LogBoth
+  private val field = robot.field
 
   private var autoCommand: Command? = null
   private var routineMap = hashMapOf<String, Command>()
@@ -40,7 +45,6 @@ class RobotLoop : TimedRobot(), Logged {
     routineMap = routineChooser.routineMap()
     println("DONE Generating Auto Routines : ${Timer.getFPGATimestamp()}")
 
-    SmartDashboard.putData("Field", robot.field)
     SmartDashboard.putData("Routine Chooser", routineChooser)
     SmartDashboard.putData("Command Scheduler", CommandScheduler.getInstance())
     SmartDashboard.putBoolean("Enable Logging?", false)
