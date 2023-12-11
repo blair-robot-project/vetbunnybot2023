@@ -95,9 +95,6 @@
               "open": true
             }
           },
-          "elevator": {
-            "open": true
-          },
           "intake": {
             "double[]##v_/Monologuing/robot/intake/3.1 Intake 3D Position": {
               "open": true

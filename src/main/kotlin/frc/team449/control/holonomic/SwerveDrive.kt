@@ -209,16 +209,19 @@ open class SwerveDrive(
     builder.addDoubleArrayProperty("1.4 Desired Chassis Speeds", { doubleArrayOf(desiredSpeeds.vxMetersPerSecond, desiredSpeeds.vyMetersPerSecond, desiredSpeeds.omegaRadiansPerSecond) }, null)
     builder.addDoubleProperty("1.5 Max Recorded Speed", { maxSpeed }, null)
 
-    builder.publishConstString("2.0", "Steering Rotations")
-    builder.addDoubleProperty("2.1 FL", { modules[0].position.angle.rotations }, null)
-    builder.addDoubleProperty("2.2 FR", { modules[1].position.angle.rotations }, null)
-    builder.addDoubleProperty("2.3 BL", { modules[2].position.angle.rotations }, null)
-    builder.addDoubleProperty("2.4 BR", { modules[3].position.angle.rotations }, null)
+    builder.publishConstString("2.0", "Steering Rot (Std Order FL, FR, BL, BR)")
+    builder.addDoubleArrayProperty(
+      "2.1 Current Rotation",
+      { DoubleArray(modules.size) { index -> modules[index].position.angle.rotations } },
+      null)
+    builder.addDoubleArrayProperty("2.2 Desired Rotation",
+      { DoubleArray(modules.size) { index -> modules[index].desiredState.angle.rotations } },
+      null)
 
-    builder.publishConstString("3.0", "Module Driving Speeds (Standard Order, FL, FR, BL, BR)")
+    builder.publishConstString("3.0", "Module Driving Speeds (Std Order FL, FR, BL, BR)")
     builder.addDoubleArrayProperty(
       "3.1 Desired Speed",
-      { DoubleArray(modules.size) { index -> modules[index].desiredSpeed } },
+      { DoubleArray(modules.size) { index -> modules[index].desiredState.speedMetersPerSecond } },
       null
     )
     builder.addDoubleArrayProperty(
@@ -244,6 +247,25 @@ open class SwerveDrive(
     builder.addDoubleProperty("5.2 Pitch Degrees", { ahrs.pitch.degrees }, null)
     builder.addDoubleProperty("5.3 Roll Degrees", { ahrs.roll.degrees }, null)
     builder.addDoubleProperty("5.4 Angular X Vel", { ahrs.angularXVel() }, null)
+
+    // Note: You should also tune UPR too
+    builder.publishConstString("6.0", "Tuning Values")
+    builder.addDoubleProperty("6.1 FL Drive P", { modules[0].driveController.p }, { value -> modules[0].driveController.p = value })
+    builder.addDoubleProperty("6.2 FL Drive D", { modules[0].driveController.d }, { value -> modules[0].driveController.d = value })
+    builder.addDoubleProperty("6.3 FL Turn P", { modules[0].turnController.p }, { value -> modules[0].turnController.p = value })
+    builder.addDoubleProperty("6.4 FL Turn D", { modules[0].turnController.d }, { value -> modules[0].turnController.d = value })
+    builder.addDoubleProperty("6.5 FR Drive P", { modules[1].driveController.p }, { value -> modules[1].driveController.p = value })
+    builder.addDoubleProperty("6.6 FR Drive D", { modules[1].driveController.d }, { value -> modules[1].driveController.d = value })
+    builder.addDoubleProperty("6.8 FR Turn P", { modules[1].turnController.p }, { value -> modules[1].turnController.p = value })
+    builder.addDoubleProperty("6.9 FR Turn D", { modules[1].turnController.d }, { value -> modules[1].turnController.d = value })
+    builder.addDoubleProperty("6.10 BL Drive P", { modules[2].driveController.p }, { value -> modules[2].driveController.p = value })
+    builder.addDoubleProperty("6.11 BL Drive D", { modules[2].driveController.d }, { value -> modules[2].driveController.d = value })
+    builder.addDoubleProperty("6.12 BL Turn P", { modules[2].turnController.p }, { value -> modules[2].turnController.p = value })
+    builder.addDoubleProperty("6.13 BL Turn D", { modules[2].turnController.d }, { value -> modules[2].turnController.d = value })
+    builder.addDoubleProperty("6.14 BR Drive P", { modules[3].driveController.p }, { value -> modules[3].driveController.p = value })
+    builder.addDoubleProperty("6.15 BR Drive D", { modules[3].driveController.d }, { value -> modules[3].driveController.d = value })
+    builder.addDoubleProperty("6.16 BR Turn P", { modules[3].turnController.p }, { value -> modules[3].turnController.p = value })
+    builder.addDoubleProperty("6.17 BR Turn D", { modules[3].turnController.d }, { value -> modules[3].turnController.d = value })
   }
 
   companion object {

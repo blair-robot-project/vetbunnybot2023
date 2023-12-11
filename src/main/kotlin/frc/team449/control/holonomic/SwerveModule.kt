@@ -28,8 +28,8 @@ open class SwerveModule(
   private val name: String,
   private val drivingMotor: WrappedMotor,
   private val turningMotor: WrappedMotor,
-  private val driveController: PIDController,
-  private val turnController: PIDController,
+  val driveController: PIDController,
+  val turnController: PIDController,
   private val driveFeedforward: SimpleMotorFeedforward,
   val location: Translation2d
 ) {
@@ -39,7 +39,10 @@ open class SwerveModule(
     turnController.reset()
   }
 
-  var desiredSpeed = 0.0
+  val desiredState = SwerveModuleState(
+    0.0,
+    Rotation2d()
+  )
 
   /** The module's [SwerveModuleState], containing speed and angle. */
   open var state: SwerveModuleState
@@ -49,20 +52,21 @@ open class SwerveModule(
         Rotation2d(turningMotor.position)
       )
     }
-    set(desiredState) {
-      if (abs(desiredState.speedMetersPerSecond) < .001) {
+    set(desState) {
+      if (abs(desState.speedMetersPerSecond) < .001) {
         stop()
         return
       }
       /** Ensure the module doesn't turn more than 90 degrees. */
-      val state = SwerveModuleState.optimize(
-        desiredState,
+      val optimizedState = SwerveModuleState.optimize(
+        desState,
         Rotation2d(turningMotor.position)
       )
 
-      turnController.setpoint = state.angle.radians
-      desiredSpeed = state.speedMetersPerSecond
-      driveController.setpoint = state.speedMetersPerSecond
+      turnController.setpoint = optimizedState.angle.radians
+      driveController.setpoint = optimizedState.speedMetersPerSecond
+      desiredState.speedMetersPerSecond = optimizedState.speedMetersPerSecond
+      desiredState.angle = optimizedState.angle
     }
 
   /** The module's [SwerveModulePosition], containing distance and angle. */
@@ -85,7 +89,7 @@ open class SwerveModule(
   /** Set module speed to zero but keep module angle the same. */
   fun stop() {
     turnController.setpoint = turningMotor.position
-    desiredSpeed = 0.0
+    desiredState.speedMetersPerSecond = 0.0
   }
 
   open fun update() {
@@ -94,7 +98,7 @@ open class SwerveModule(
       drivingMotor.velocity
     )
     val driveFF = driveFeedforward.calculate(
-      desiredSpeed
+      desiredState.speedMetersPerSecond
     )
     drivingMotor.setVoltage(drivePid + driveFF)
 
