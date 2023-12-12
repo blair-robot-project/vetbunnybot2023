@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import frc.team449.robot2023.Robot
 import frc.team449.robot2023.auto.routines.RoutineChooser
+import frc.team449.robot2023.commands.light.BlairChasing
 import frc.team449.robot2023.constants.vision.VisionConstants
 import frc.team449.robot2023.subsystems.ControllerBindings
 import monologue.Logged
@@ -53,7 +54,7 @@ class RobotLoop : TimedRobot(), Logged {
 
     Monologue.setupLogging(this, "/Monologuing")
 
-//    robot.light.defaultCommand = BlairAnimation(robot.light)
+    robot.light.defaultCommand = BlairChasing(robot.light)
   }
 
   override fun robotPeriodic() {

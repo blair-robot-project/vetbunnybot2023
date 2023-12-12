@@ -78,6 +78,14 @@ open class SwerveModule(
       )
     }
 
+  fun setVoltage(volts: Double) {
+    driveController.setpoint = 0.0
+    desiredState.speedMetersPerSecond = 0.0
+    desiredState.angle = Rotation2d()
+
+    drivingMotor.setVoltage(volts)
+  }
+
   fun lastDrivingVoltage(): Double {
     return drivingMotor.lastVoltage
   }

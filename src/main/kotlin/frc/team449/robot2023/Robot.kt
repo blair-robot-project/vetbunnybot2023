@@ -10,6 +10,7 @@ import frc.team449.robot2023.constants.RobotConstants
 import frc.team449.robot2023.subsystems.Intake.Companion.createIntake
 import frc.team449.robot2023.subsystems.Manipulator.Companion.createManipulator
 import frc.team449.robot2023.subsystems.elevator.Elevator.Companion.createStateSpaceElevator
+import frc.team449.robot2023.subsystems.light.Light
 import frc.team449.system.AHRS
 import monologue.Logged
 import monologue.Monologue.LogBoth
@@ -46,7 +47,7 @@ class Robot : RobotBase(), Logged {
   @LogBoth
   val elevator = createStateSpaceElevator(this)
 
-//  val light = Light.createLight()
+  val light = Light.createLight()
 //
 //  val infrared = DigitalInput(RobotConstants.IR_CHANNEL)
 }

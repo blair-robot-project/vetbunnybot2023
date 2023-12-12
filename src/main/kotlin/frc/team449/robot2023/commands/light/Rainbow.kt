@@ -1,6 +1,8 @@
 package frc.team449.robot2023.commands.light
 
+import edu.wpi.first.math.MathUtil
 import edu.wpi.first.wpilibj2.command.Command
+import frc.team449.robot2023.constants.subsystem.LightConstants
 import frc.team449.robot2023.subsystems.light.Light
 
 class Rainbow(
@@ -15,14 +17,22 @@ class Rainbow(
     return true
   }
 
-  private var firstHue = 100
+  private var firstHue = 0.0
 
   override fun execute() {
-    for (i in 0 until led.buffer.length) {
-      val hue = (firstHue + i * 180 / led.buffer.length) % 180
-      led.buffer.setHSV(i, hue, 255, 255)
+    for (i in LightConstants.SECTION_1_START..LightConstants.SECTION_1_END) {
+      val hue = MathUtil.inputModulus(firstHue + i * 180 / (LightConstants.SECTION_1_END - LightConstants.SECTION_1_START), 0.0, 180.0)
+
+      led.setHSV(i, hue.toInt(), 255, 255)
     }
-    firstHue += 1
-    firstHue %= 180
+
+    for (i in LightConstants.SECTION_2_START..LightConstants.SECTION_2_END) {
+      val hue = MathUtil.inputModulus(firstHue + (i - LightConstants.SECTION_2_START) * 180 / (LightConstants.SECTION_2_END - LightConstants.SECTION_2_START), 0.0, 180.0)
+
+      led.setHSV(i, hue.toInt(), 255, 255)
+    }
+
+    firstHue += 1.5
+    firstHue = MathUtil.inputModulus(firstHue, 0.0, 180.0)
   }
 }

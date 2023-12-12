@@ -1,11 +1,14 @@
 package frc.team449.robot2023.subsystems
 
+import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.XboxController
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.button.JoystickButton
 import edu.wpi.first.wpilibj2.command.button.Trigger
 import frc.team449.robot2023.Robot
+import frc.team449.robot2023.commands.characterization.Characterization
+import frc.team449.robot2023.commands.light.SolidColor
 import kotlin.math.abs
 
 class ControllerBindings(
@@ -57,6 +60,16 @@ class ControllerBindings(
       robot.intake.retract()
     )
 
+    JoystickButton(driveController, XboxController.Button.kA.value).onTrue(
+      Characterization(
+        robot.drive,
+        true,
+        Characterization.FeedForwardCharacterizationData("swerve drive"),
+        robot.drive::setVoltage,
+        robot.drive::getModuleVel
+      )
+    )
+
     Trigger { driveController.rightTriggerAxis > 0.8 }.onTrue(
       ParallelCommandGroup(
         robot.intake.intake(),
@@ -86,5 +99,12 @@ class ControllerBindings(
         robot.manipulator.stop()
       )
     )
+
+    Trigger { robot.intake.piston.get() == DoubleSolenoid.Value.kForward }.onTrue(
+      SolidColor(robot.light, 0, 255, 0)
+    ).onFalse(
+      robot.light.defaultCommand
+    )
+
   }
 }

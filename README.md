@@ -1,6 +1,8 @@
 # Bunnybots 2023
 Our source code for our veteran-led Bunnybot for our 2023 Bunnybots Game: Hibernation Harvest!
 
+Credit to 6328 for characterization commands and analysis.
+
 -----------------------------
 
 ## Workflows

@@ -93,6 +93,18 @@ open class SwerveDrive(
       module.update()
   }
 
+  fun setVoltage(volts: Double) {
+    modules.forEach {
+      it.setVoltage(volts)
+    }
+  }
+
+  fun getModuleVel(): Double {
+    var totalVel = 0.0
+    modules.forEach { totalVel += it.state.speedMetersPerSecond }
+    return totalVel / modules.size
+  }
+
   /** The measured pitch of the robot from the gyro sensor. */
   val pitch: Rotation2d
     get() = Rotation2d(MathUtil.angleModulus(ahrs.pitch.radians))

@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.team449.robot2023.subsystems.light.Light
 
+/** Description: Blink a certain color 5 times */
 class PickupBlink {
   fun blinkGreen(light: Light): Command {
     val cmdGroup = SequentialCommandGroup()
@@ -19,12 +20,14 @@ class PickupBlink {
       cmdGroup.addCommands(WaitCommand(0.1))
     }
 
+    cmdGroup.ignoringDisable(true)
+
     return cmdGroup
   }
 
   private fun setColor(led: Light, r: Int, g: Int, b: Int) {
     for (i in 0 until led.buffer.length) {
-      led.buffer.setRGB(i, r, g, b)
+      led.setRGB(i, r, g, b)
     }
   }
 }
