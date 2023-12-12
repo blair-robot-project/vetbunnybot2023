@@ -14,12 +14,12 @@ object ElevatorConstants {
   val COLOR = Color8Bit(255, 0, 255)
   val DESIRED_COLOR = Color8Bit(0, 255, 0)
 
-  const val LEFT_ID = 60
+  const val LEFT_ID = 15
   const val LEFT_INVERTED = false
   const val RIGHT_ID = 61
   const val RIGHT_INVERTED = true
-  const val EFFECTIVE_GEARING = 6.48 / 2
-  const val PULLEY_RADIUS = 0.022352
+  const val EFFECTIVE_GEARING = 2 / 6.4
+  const val PULLEY_RADIUS = 0.018415
   var UPR = PULLEY_RADIUS * 2 * PI
 
   var kS = 0.0

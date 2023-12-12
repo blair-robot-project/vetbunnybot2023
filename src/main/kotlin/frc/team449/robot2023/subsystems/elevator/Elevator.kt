@@ -13,6 +13,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.util.sendable.SendableBuilder
 import edu.wpi.first.wpilibj.DoubleSolenoid
+import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d
@@ -92,15 +93,19 @@ open class Elevator(
 
     this.defaultCommand = NotifierCommand(
       {
-        loop.setNextR(desiredState.first, 0.0)
-        loop.correct(VecBuilder.fill(positionSupplier.get()))
-        loop.predict(ElevatorConstants.DT)
+        if (DriverStation.isDisabled()) {
+          loop.correct(VecBuilder.fill(positionSupplier.get()))
+        } else {
+          loop.setNextR(desiredState.first, 0.0)
+          loop.correct(VecBuilder.fill(positionSupplier.get()))
+          loop.predict(ElevatorConstants.DT)
 
-        motor.setVoltage(loop.getU(0) + ElevatorConstants.kG)
+          motor.setVoltage(loop.getU(0) + ElevatorConstants.kG)
+        }
       },
       ElevatorConstants.DT,
       this
-    )
+    ).ignoringDisable(true)
   }
 
   fun summaryStats(): Command {
@@ -238,7 +243,7 @@ open class Elevator(
     builder.addDoubleProperty("2.2 Estimated Vel", { currentState.second }, {})
     builder.addDoubleProperty("2.3 Desired Pos", { desiredState.first }, {})
     builder.addDoubleProperty("2.4 Desired Vel", { desiredState.second }, {})
-    builder.addDoubleProperty("2.5 Motor Pos", { motor.position * ElevatorConstants.UPR * ElevatorConstants.EFFECTIVE_GEARING }, {})
+    builder.addDoubleProperty("2.5 Motor Pos", positionSupplier::get) {}
     builder.addDoubleProperty("2.6 Motor Vel", { motor.velocity * ElevatorConstants.UPR * ElevatorConstants.EFFECTIVE_GEARING }, {})
 
     /** Motor efficiency should also be something to be tuned, but too many objects
@@ -303,7 +308,7 @@ open class Elevator(
           1.0,
           1.0
         ),
-        enableBrakeMode = true,
+        enableBrakeMode = false,
         inverted = ElevatorConstants.LEFT_INVERTED,
         currentLimit = ElevatorConstants.CURRENT_LIMIT,
         slaveSparks = mapOf(
