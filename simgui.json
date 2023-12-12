@@ -105,10 +105,14 @@
               "open": true
             }
           },
+          "elevator": {
+            "open": true
+          },
           "intake": {
             "double[]##v_/Monologuing/robot/intake/3.1 Intake 3D Position": {
               "open": true
-            }
+            },
+            "open": true
           },
           "open": true
         }
@@ -152,7 +156,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 926,
+          "height": 306,
           "series": [
             {
               "color": [

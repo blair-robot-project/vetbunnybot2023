@@ -32,7 +32,7 @@ class ElevatorSim(
       MotorConstants.FREE_SPEED,
       ElevatorConstants.NUM_MOTORS
     ),
-    ElevatorConstants.EFFECTIVE_GEARING,
+    1 / ElevatorConstants.EFFECTIVE_GEARING,
     ElevatorConstants.CARRIAGE_MASS,
     ElevatorConstants.PULLEY_RADIUS,
     0.0,

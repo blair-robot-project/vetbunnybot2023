@@ -149,7 +149,9 @@ open class Elevator(
           loop.predict(ElevatorConstants.DT)
 
           motor.setVoltage(
-            loop.getU(0) + ElevatorConstants.kG + sign(desiredState.second) * ElevatorConstants.kS
+            loop.getU(0) +
+              ElevatorConstants.kG +
+              sign(desiredState.second) * ElevatorConstants.kS
           )
 
           dtList.add(dt)
@@ -268,7 +270,7 @@ open class Elevator(
         ),
         ElevatorConstants.CARRIAGE_MASS,
         ElevatorConstants.PULLEY_RADIUS,
-        ElevatorConstants.EFFECTIVE_GEARING
+        1 / ElevatorConstants.EFFECTIVE_GEARING
       )
 
       val observer = KalmanFilter(

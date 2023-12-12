@@ -11,7 +11,7 @@ class TrapezoidalExponentialProfile(
   pulleyRadius: Double = ElevatorConstants.PULLEY_RADIUS,
   currentLimit: Int = ElevatorConstants.CURRENT_LIMIT,
   numMotors: Int = ElevatorConstants.NUM_MOTORS,
-  effectiveGearing: Double = ElevatorConstants.EFFECTIVE_GEARING,
+  effectiveGearing: Double = 1 / ElevatorConstants.EFFECTIVE_GEARING,
   systemMass: Double = ElevatorConstants.CARRIAGE_MASS,
   angle: Double = ElevatorConstants.ANGLE,
   private val tolerance: Double = 0.05,
@@ -19,7 +19,7 @@ class TrapezoidalExponentialProfile(
   startingDistance: Double = 0.0,
   private var finalDistance: Double,
   private var aStop: Double = 9.81,
-  private val efficiency: Double = ElevatorConstants.EFFICIENCY
+  efficiency: Double = ElevatorConstants.EFFICIENCY
 ) {
   private val trueStartingDistance: Double = startingDistance
   private val trueFinalDistance: Double = finalDistance

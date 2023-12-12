@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton
 import edu.wpi.first.wpilibj2.command.button.Trigger
 import frc.team449.robot2023.Robot
 import frc.team449.robot2023.commands.characterization.Characterization
-import frc.team449.robot2023.commands.light.SolidColor
+import frc.team449.robot2023.commands.light.BreatheHue
 import kotlin.math.abs
 
 class ControllerBindings(
@@ -29,7 +29,7 @@ class ControllerBindings(
 
     JoystickButton(mechanismController, XboxController.Button.kY.value).onTrue(
       SequentialCommandGroup(
-        robot.intake.extend(),
+//        robot.intake.extend(),
         robot.elevator.high()
       )
     )
@@ -70,15 +70,17 @@ class ControllerBindings(
       )
     )
 
-    Trigger { driveController.rightTriggerAxis > 0.8 }.onTrue(
+    Trigger { mechanismController.rightTriggerAxis > 0.8 }.onTrue(
       ParallelCommandGroup(
         robot.intake.intake(),
-        robot.manipulator.intake()
+        robot.manipulator.intake(),
+        BreatheHue(robot.light, 30)
       )
     ).onFalse(
       ParallelCommandGroup(
         robot.intake.stop(),
-        robot.manipulator.stop()
+        robot.manipulator.stop(),
+        robot.light.defaultCommand
       )
     )
 
@@ -88,20 +90,23 @@ class ControllerBindings(
       robot.elevator.defaultCommand
     )
 
-    Trigger { driveController.leftTriggerAxis > 0.8 }.onTrue(
+    Trigger { mechanismController.leftTriggerAxis > 0.8 }.onTrue(
       ParallelCommandGroup(
         robot.intake.outtake(),
-        robot.manipulator.outtake()
+        robot.manipulator.outtake(),
+        BreatheHue(robot.light, 160)
+
       )
     ).onFalse(
       ParallelCommandGroup(
         robot.intake.stop(),
-        robot.manipulator.stop()
+        robot.manipulator.stop(),
+        robot.light.defaultCommand
       )
     )
 
     Trigger { robot.intake.piston.get() == DoubleSolenoid.Value.kForward }.onTrue(
-      SolidColor(robot.light, 0, 255, 0)
+      BreatheHue(robot.light, 60)
     ).onFalse(
       robot.light.defaultCommand
     )

@@ -5,9 +5,12 @@ import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandScheduler
+import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.team449.robot2023.Robot
 import frc.team449.robot2023.auto.routines.RoutineChooser
 import frc.team449.robot2023.commands.light.BlairChasing
+import frc.team449.robot2023.commands.light.BreatheHue
+import frc.team449.robot2023.commands.light.Rainbow
 import frc.team449.robot2023.constants.vision.VisionConstants
 import frc.team449.robot2023.subsystems.ControllerBindings
 import monologue.Logged
@@ -50,11 +53,11 @@ class RobotLoop : TimedRobot(), Logged {
     SmartDashboard.putData("Command Scheduler", CommandScheduler.getInstance())
     SmartDashboard.putBoolean("Enable Logging?", false)
 
+    robot.light.defaultCommand = BlairChasing(robot.light)
+
     controllerBinder.bindButtons()
 
     Monologue.setupLogging(this, "/Monologuing")
-
-    robot.light.defaultCommand = BlairChasing(robot.light)
   }
 
   override fun robotPeriodic() {
@@ -77,6 +80,12 @@ class RobotLoop : TimedRobot(), Logged {
     /** Every time auto starts, we update the chosen auto command */
     this.autoCommand = routineMap[routineChooser.selected]
     CommandScheduler.getInstance().schedule(this.autoCommand)
+
+    if (DriverStation.getAlliance().getOrNull() == DriverStation.Alliance.Red) {
+      BreatheHue(robot.light, 0).schedule()
+    } else {
+      BreatheHue(robot.light, 95).schedule()
+    }
   }
 
   override fun autonomousPeriodic() {}
@@ -88,6 +97,8 @@ class RobotLoop : TimedRobot(), Logged {
       CommandScheduler.getInstance().cancel(autoCommand)
     }
 
+    (robot.light.currentCommand?: InstantCommand()).cancel()
+
     robot.drive.defaultCommand = robot.driveCommand
   }
 
@@ -96,6 +107,8 @@ class RobotLoop : TimedRobot(), Logged {
 
   override fun disabledInit() {
     robot.drive.stop()
+
+    Rainbow(robot.light).schedule()
 
 //    if (VisionConstants.ESTIMATORS.isEmpty()) {
 //      VisionConstants.ESTIMATORS.add(

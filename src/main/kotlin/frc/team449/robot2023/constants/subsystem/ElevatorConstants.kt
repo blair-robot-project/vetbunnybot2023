@@ -23,7 +23,7 @@ object ElevatorConstants {
   var UPR = PULLEY_RADIUS * 2 * PI
 
   var kS = 0.0
-  var kG = 1.26725
+  var kG = 1.085
 
   const val HIGH_DISTANCE = 1.114425
   const val LOW_DISTANCE = 0.25
