@@ -11,7 +11,7 @@ import kotlin.math.PI
 object RobotConstants {
 
   /** Other CAN ID */
-  const val PDH_CAN = 49
+  const val PDH_CAN = 1
 
   /** Controller Configurations */
   const val RATE_LIMIT = 4.25 * PI

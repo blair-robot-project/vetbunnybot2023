@@ -27,8 +27,7 @@ class Robot : RobotBase(), Logged {
 
   @LogBoth
   override val powerDistribution: PowerDistribution = PowerDistribution(
-    RobotConstants
-      .PDH_CAN,
+    RobotConstants.PDH_CAN,
     PowerDistribution.ModuleType.kRev
   )
 
