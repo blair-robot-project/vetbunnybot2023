@@ -37,13 +37,15 @@ class SwerveOrthogonalCommand(
 
   private var atGoal = true
 
-  private var rotRamp = SlewRateLimiter(RobotConstants.ROT_RATE_LIMIT, RobotConstants.NEG_ROT_RATE_LIM, 0.0)
+  private var rotRamp = SlewRateLimiter(RobotConstants.ROT_RATE_LIMIT)
 
   private val timer = Timer()
 
   private val rotCtrl = RobotConstants.ORTHOGONAL_CONTROLLER
 
   private var skewConstant = 0.5
+
+  private var desiredVel = doubleArrayOf(0.0, 0.0, 0.0)
 
   init {
     addRequirements(drive)
@@ -65,7 +67,7 @@ class SwerveOrthogonalCommand(
 
     rotRamp = SlewRateLimiter(
       RobotConstants.ROT_RATE_LIMIT,
-      -RobotConstants.NEG_ROT_RATE_LIM,
+      RobotConstants.NEG_ROT_RATE_LIM,
       drive.currentSpeeds.omegaRadiansPerSecond
     )
 
@@ -131,14 +133,20 @@ class SwerveOrthogonalCommand(
        * by rotating it with offset proportional to how much we are rotating
        **/
       vel.rotateBy(Rotation2d(-rotScaled * dt * skewConstant))
-      drive.set(
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-          vel.x * directionCompensation.invoke(),
-          vel.y * directionCompensation.invoke(),
-          rotScaled,
-          drive.heading
-        )
+
+      val desVel = ChassisSpeeds.fromFieldRelativeSpeeds(
+        vel.x * directionCompensation.invoke(),
+        vel.y * directionCompensation.invoke(),
+        rotScaled,
+        drive.heading
       )
+      drive.set(
+        desVel
+      )
+
+      desiredVel[0] = desVel.vxMetersPerSecond
+      desiredVel[1] = desVel.vyMetersPerSecond
+      desiredVel[2] = desVel.omegaRadiansPerSecond
     } else {
       drive.set(
         ChassisSpeeds(
@@ -168,5 +176,8 @@ class SwerveOrthogonalCommand(
 
     builder.publishConstString("4.0", "Turning Skew")
     builder.addDoubleProperty("4.1 skew constant", { skewConstant }, { k: Double -> skewConstant = k })
+
+    builder.publishConstString("5.0", "Given Speeds")
+    builder.addDoubleArrayProperty("Chassis Speed", { desiredVel }, null)
   }
 }

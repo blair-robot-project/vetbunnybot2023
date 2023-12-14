@@ -24,21 +24,21 @@ class BlairChasing(
   override fun execute() {
     for (i in LightConstants.SECTION_1_START..LightConstants.SECTION_1_END) {
       // This number is related to how many lights will show up between the high and low intensity (which technically also affects how fast itll cycle)
-      val saturation = MathUtil.inputModulus(firstSaturation1 + i * 300.0 / led.buffer.length, 0.0, 255.0)
+      val saturation = MathUtil.inputModulus(firstSaturation1 + i * 200.0 / led.buffer.length, 0.0, 255.0)
       led.setHSV(i, 0, saturation.toInt(), 255)
 
       // The i * 255.0 relates to how fast it will cycle in between the high and low intensity
-      firstSaturation1 += 0.0375
+      firstSaturation1 += 0.135
       firstSaturation1 = MathUtil.inputModulus(firstSaturation1, 0.0, 255.0)
     }
 
     for (i in LightConstants.SECTION_2_START..LightConstants.SECTION_2_END) {
       // This number is related to how many lights will show up between the high and low intensity (which technically also affects how fast itll cycle)
-      val saturation = MathUtil.inputModulus(firstSaturation2 + (i - LightConstants.SECTION_2_START) * 300.0 / led.buffer.length, 0.0, 255.0)
+      val saturation = MathUtil.inputModulus(firstSaturation2 + (i - LightConstants.SECTION_2_START) * 200.0 / led.buffer.length, 0.0, 255.0)
       led.setHSV(i, 0, saturation.toInt(), 255)
 
       // The i * 255.0 relates to how fast it will cycle in between the high and low intensity
-      firstSaturation2 += 0.0375
+      firstSaturation2 += 0.135
       firstSaturation2 = MathUtil.inputModulus(firstSaturation2, 0.0, 255.0)
     }
   }

@@ -26,22 +26,22 @@ class BreatheHue(
   override fun execute() {
     for (i in LightConstants.SECTION_1_START..LightConstants.SECTION_1_END) {
       // This number is related to how many lights will show up between the high and low intensity
-      val intensity = MathUtil.inputModulus(firstIntensity1 + i * 32.5 / led.buffer.length, 175.0, 255.0)
+      val intensity = MathUtil.inputModulus(firstIntensity1 + i * 32.5 / led.buffer.length, 125.0, 255.0)
       led.setHSV(i, hue, 255, intensity.toInt())
 
       // The i * 255.0 relates to how fast it will cycle in between the high and low intensity
-      firstIntensity1 += 0.045
-      firstIntensity1 = MathUtil.inputModulus(firstIntensity1, 175.0, 255.0)
+      firstIntensity1 += 0.1
+      firstIntensity1 = MathUtil.inputModulus(firstIntensity1, 125.0, 255.0)
     }
 
     for (i in LightConstants.SECTION_2_START..LightConstants.SECTION_2_END) {
       // This number is related to how many lights will show up between the high and low intensity
-      val intensity = MathUtil.inputModulus(firstIntensity2 + (i - LightConstants.SECTION_2_START) * 32.5 / led.buffer.length, 175.0, 255.0)
+      val intensity = MathUtil.inputModulus(firstIntensity2 + (i - LightConstants.SECTION_2_START) * 32.5 / led.buffer.length, 125.0, 255.0)
       led.setHSV(i, hue, 255, intensity.toInt())
 
       // The i * 255.0 relates to how fast it will cycle in between the high and low intensity
-      firstIntensity2 += 0.045
-      firstIntensity2 = MathUtil.inputModulus(firstIntensity2, 175.0, 255.0)
+      firstIntensity2 += 0.1
+      firstIntensity2 = MathUtil.inputModulus(firstIntensity2, 125.0, 255.0)
     }
   }
 }

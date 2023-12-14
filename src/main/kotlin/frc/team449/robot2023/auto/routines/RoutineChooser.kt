@@ -11,8 +11,8 @@ class RoutineChooser(private val robot: Robot) : SendableChooser<String>() {
       "DoNothing" to DoNothing(robot).createCommand(),
       "BlueOnePiecePick" to OnePiecePick(robot, false).createCommand(),
       "RedOnePiecePick" to OnePiecePick(robot, true).createCommand(),
-      "BlueOnePieceDrop" to OnePieceDrop(robot, false).createCommand(),
-      "RedOnePieceDrop" to OnePieceDrop(robot, true).createCommand()
+      "BlueOnePieceTaxi" to OnePieceTaxi(robot, false).createCommand(),
+      "RedOnePieceTaxi" to OnePieceTaxi(robot, true).createCommand()
     )
   }
 
@@ -34,11 +34,11 @@ class RoutineChooser(private val robot: Robot) : SendableChooser<String>() {
     )
 
     this.addOption(
-      "One Piece and Drop",
+      "One Piece and Taxi",
       if (isRed) {
-        "RedOnePieceDrop"
+        "RedOnePieceTaxi"
       } else {
-        "BlueOnePieceDrop"
+        "BlueOnePieceTaxi"
       }
     )
   }
