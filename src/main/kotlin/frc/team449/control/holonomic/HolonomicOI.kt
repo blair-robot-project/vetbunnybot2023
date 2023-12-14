@@ -132,7 +132,7 @@ class HolonomicOI(
         { if (abs(driveController.leftY) < RobotConstants.TRANSLATION_DEADBAND) .0 else -driveController.leftY },
         { if (abs(driveController.leftX) < RobotConstants.TRANSLATION_DEADBAND) .0 else -driveController.leftX },
         { if (abs(driveController.getRawAxis(4)) < RobotConstants.ROTATION_DEADBAND) .0 else -driveController.getRawAxis(4) },
-        SlewRateLimiter(RobotConstants.RATE_LIMIT),
+        SlewRateLimiter(RobotConstants.ROT_RATE_LIMIT, RobotConstants.NEG_ROT_RATE_LIM, 0.0),
         RobotConstants.MAX_ACCEL,
         { true }
       )
