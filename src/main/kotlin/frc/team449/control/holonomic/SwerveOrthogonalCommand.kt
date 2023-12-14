@@ -37,7 +37,7 @@ class SwerveOrthogonalCommand(
 
   private var atGoal = true
 
-  private var rotRamp = SlewRateLimiter(RobotConstants.RATE_LIMIT)
+  private var rotRamp = SlewRateLimiter(RobotConstants.ROT_RATE_LIMIT, RobotConstants.NEG_ROT_RATE_LIM, 0.0)
 
   private val timer = Timer()
 
@@ -64,8 +64,8 @@ class SwerveOrthogonalCommand(
     magAccClamped = 0.0
 
     rotRamp = SlewRateLimiter(
-      RobotConstants.RATE_LIMIT,
-      -RobotConstants.RATE_LIMIT,
+      RobotConstants.ROT_RATE_LIMIT,
+      -RobotConstants.NEG_ROT_RATE_LIM,
       drive.currentSpeeds.omegaRadiansPerSecond
     )
 
