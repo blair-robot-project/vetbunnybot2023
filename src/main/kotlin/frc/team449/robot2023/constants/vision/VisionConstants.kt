@@ -48,13 +48,13 @@ VisionConstants {
 
   /** List of cameras that we want to use */
   val ESTIMATORS: ArrayList<VisionEstimator> = arrayListOf(
-    VisionEstimator(
-      TAG_LAYOUT,
-      "NEW_CAM_NAME",
-      robotToCamera
-    )
+//    VisionEstimator(
+//      TAG_LAYOUT,
+//      "arducam",
+//      robotToCamera
+//    )
   )
 
-  val ENCODER_TRUST = MatBuilder(Nat.N3(), Nat.N1()).fill(.075, .075, .025)
-  val VISION_TRUST = MatBuilder(Nat.N3(), Nat.N1()).fill(.0275, .0275, .75)
+  val ENCODER_TRUST = MatBuilder(Nat.N3(), Nat.N1()).fill(.10, .10, .025)
+  val VISION_TRUST = MatBuilder(Nat.N3(), Nat.N1()).fill(.375, .0375, .5)
 }

@@ -10,5 +10,5 @@ object IntakeConstants {
 
   const val INTAKE_VOLTAGE = 8.0
 
-  const val EXTENSION_TIME = 0.25
+  const val EXTENSION_TIME = 0.35
 }

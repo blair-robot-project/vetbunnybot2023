@@ -22,21 +22,22 @@ object ElevatorConstants {
   const val PULLEY_RADIUS = 0.018415
   var UPR = PULLEY_RADIUS * 2 * PI
 
-  var kS = 0.0
-  var kG = 1.085
+  var kS = 0.895 - 0.2205
+  var kG = 0.2205
 
   const val HIGH_DISTANCE = 1.114425
-  const val LOW_DISTANCE = 0.25
+  const val LOW_DISTANCE = 0.5
   const val STOW_DISTANCE = 0.0
 
-  const val CURRENT_LIMIT = 60
+  const val CURRENT_LIMIT = 40
+  const val PROFILE_CURR_LIM = 25
 
   // Mininum distance up the elevator to not hit the intake, calculated from CAD
   const val MIN_SAFE_POS = 0.485
 
   /** Elevator Sim constants. For carriage mass, it approximates both stages as a single stage */
   const val NUM_MOTORS = 2
-  val CARRIAGE_MASS = 9.75
+  val CARRIAGE_MASS = 9.25
 
   /** State Space constants */
   val MODEL_POS_STDDEV = Units.inchesToMeters(3.0)

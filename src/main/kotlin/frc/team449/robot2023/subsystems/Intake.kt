@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.PneumaticsModuleType
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.ConditionalCommand
+import edu.wpi.first.wpilibj2.command.InstantCommand
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.WaitCommand
@@ -34,12 +36,15 @@ class Intake(
   }
 
   fun extend(): Command {
-    return SequentialCommandGroup(
-      this.runOnce {
-        piston.set(DoubleSolenoid.Value.kForward)
-      },
-      WaitCommand(IntakeConstants.EXTENSION_TIME)
-    )
+    return ConditionalCommand(
+      SequentialCommandGroup(
+        this.runOnce {
+          piston.set(DoubleSolenoid.Value.kForward)
+        },
+        WaitCommand(IntakeConstants.EXTENSION_TIME)
+      ),
+      InstantCommand()
+    ) { piston.get() != DoubleSolenoid.Value.kForward }
   }
 
   fun retract(): Command {

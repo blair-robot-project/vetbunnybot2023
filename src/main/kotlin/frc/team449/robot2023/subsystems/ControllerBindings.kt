@@ -2,13 +2,14 @@ package frc.team449.robot2023.subsystems
 
 import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.XboxController
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
+import edu.wpi.first.wpilibj2.command.*
 import edu.wpi.first.wpilibj2.command.button.JoystickButton
 import edu.wpi.first.wpilibj2.command.button.Trigger
 import frc.team449.robot2023.Robot
 import frc.team449.robot2023.commands.characterization.Characterization
+import frc.team449.robot2023.commands.light.BlairChasing
 import frc.team449.robot2023.commands.light.BreatheHue
+import frc.team449.robot2023.commands.light.ElevatorMoving
 import kotlin.math.abs
 
 class ControllerBindings(
@@ -20,23 +21,21 @@ class ControllerBindings(
   fun bindButtons() {
     JoystickButton(mechanismController, XboxController.Button.kX.value).onTrue(
       SequentialCommandGroup(
-        // How long does it take to extend and retract the intake? Is it the play to have mech manually extend intake right as we enter the
-        // community or have it automated such that it extends intake and moves elevator at the same time?
-//        robot.intake.extend(),
+        robot.intake.extend(),
         robot.elevator.low()
       )
     )
 
     JoystickButton(mechanismController, XboxController.Button.kY.value).onTrue(
       SequentialCommandGroup(
-//        robot.intake.extend(),
-        robot.elevator.high()
+        robot.intake.extend(),
+        robot.elevator.high(),
       )
     )
 
     JoystickButton(mechanismController, XboxController.Button.kB.value).onTrue(
       SequentialCommandGroup(
-//        robot.intake.extend(),
+        robot.intake.extend(),
         robot.elevator.stow()
       )
     )
@@ -54,6 +53,7 @@ class ControllerBindings(
 
     JoystickButton(mechanismController, XboxController.Button.kRightBumper.value).onTrue(
       robot.intake.extend()
+
     )
 
     JoystickButton(mechanismController, XboxController.Button.kLeftBumper.value).onTrue(
@@ -64,10 +64,12 @@ class ControllerBindings(
       Characterization(
         robot.drive,
         true,
-        Characterization.FeedForwardCharacterizationData("swerve drive"),
+        "swerve drive",
         robot.drive::setVoltage,
         robot.drive::getModuleVel
       )
+    ).onFalse(
+      robot.driveCommand
     )
 
     Trigger { mechanismController.rightTriggerAxis > 0.8 }.onTrue(
@@ -79,12 +81,12 @@ class ControllerBindings(
     ).onFalse(
       ParallelCommandGroup(
         robot.intake.stop(),
-        robot.manipulator.stop(),
-        robot.light.defaultCommand
+        robot.manipulator.hold(),
+        BlairChasing(robot.light)
       )
     )
 
-    Trigger { abs(mechanismController.leftY) > 0.25 }.onTrue(
+    Trigger { abs(mechanismController.leftY) > 0.175 }.onTrue(
       robot.elevator.manualMovement({ -mechanismController.leftY })
     ).onFalse(
       robot.elevator.defaultCommand
@@ -95,20 +97,28 @@ class ControllerBindings(
         robot.intake.outtake(),
         robot.manipulator.outtake(),
         BreatheHue(robot.light, 160)
-
       )
     ).onFalse(
       ParallelCommandGroup(
         robot.intake.stop(),
         robot.manipulator.stop(),
-        robot.light.defaultCommand
+        BlairChasing(robot.light)
       )
     )
 
     Trigger { robot.intake.piston.get() == DoubleSolenoid.Value.kForward }.onTrue(
       BreatheHue(robot.light, 60)
     ).onFalse(
-      robot.light.defaultCommand
+      BlairChasing(robot.light)
+    )
+
+    Trigger { robot.elevator.inMotion }.onTrue(
+      ElevatorMoving(robot)
+    ).onFalse(
+      SequentialCommandGroup(
+        WaitCommand(0.5),
+        BlairChasing(robot.light)
+      )
     )
 
   }

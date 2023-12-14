@@ -9,7 +9,7 @@ import kotlin.math.*
 //  and figure out to do for current vel > 0 situations (ideas: don't do anything, or use a trap profile in that case idk)
 class TrapezoidalExponentialProfile(
   pulleyRadius: Double = ElevatorConstants.PULLEY_RADIUS,
-  currentLimit: Int = ElevatorConstants.CURRENT_LIMIT,
+  currentLimit: Int = ElevatorConstants.PROFILE_CURR_LIM,
   numMotors: Int = ElevatorConstants.NUM_MOTORS,
   effectiveGearing: Double = 1 / ElevatorConstants.EFFECTIVE_GEARING,
   systemMass: Double = ElevatorConstants.CARRIAGE_MASS,
@@ -186,6 +186,8 @@ class TrapezoidalExponentialProfile(
   private val t4f = t40 + v40 / aStop
   private val x4f = x40 + v40 * (t4f - t40) - 0.5 * aStop * (t4f - t40).pow(2)
   private val v4f = v40 - aStop * (t4f - t40)
+
+  val finalTime = t4f
 
   private fun sample1(t: Double): Pair<Double, Double> {
     return if (switchedStartingAndFinal) {

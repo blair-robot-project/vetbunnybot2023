@@ -34,6 +34,13 @@ class Manipulator(
     }
   }
 
+  fun hold(): Command {
+    return this.runOnce {
+      motor.setVoltage(ManipulatorConstants.HOLD_VOLTAGE)
+      lastVoltage = ManipulatorConstants.HOLD_VOLTAGE
+    }
+  }
+
   fun outtake(): Command {
     return this.runOnce {
       motor.setVoltage(-ManipulatorConstants.INTAKE_VOLTAGE)

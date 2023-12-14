@@ -108,6 +108,7 @@ class RobotLoop : TimedRobot(), Logged {
   override fun disabledInit() {
     robot.drive.stop()
 
+    (robot.light.currentCommand?: InstantCommand()).cancel()
     Rainbow(robot.light).schedule()
 
 //    if (VisionConstants.ESTIMATORS.isEmpty()) {
