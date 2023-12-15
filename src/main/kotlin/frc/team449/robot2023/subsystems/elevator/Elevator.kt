@@ -261,7 +261,6 @@ open class Elevator(
     builder.addDoubleProperty("3.1 kS", { ElevatorConstants.kS }, { value -> ElevatorConstants.kS = value })
     builder.addDoubleProperty("3.2 kG", { ElevatorConstants.kG }, { value -> ElevatorConstants.kG = value })
     builder.addDoubleProperty("3.3 Max Downward Accel", { downwardAccel }, { value -> downwardAccel = value })
-    builder.addDoubleProperty("3.4 UPR", { ElevatorConstants.UPR }, { value -> ElevatorConstants.UPR = value })
   }
 
   companion object {
@@ -317,7 +316,7 @@ open class Elevator(
           1.0,
           1.0
         ),
-        enableBrakeMode = false,
+        enableBrakeMode = ElevatorConstants.BRAKE_MODE,
         inverted = ElevatorConstants.LEFT_INVERTED,
         currentLimit = ElevatorConstants.CURRENT_LIMIT,
         slaveSparks = mapOf(

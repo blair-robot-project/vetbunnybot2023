@@ -1,7 +1,5 @@
 package frc.team449.robot2023.subsystems
 
-import com.revrobotics.CANSparkMax
-import com.revrobotics.CANSparkMaxLowLevel
 import edu.wpi.first.util.sendable.SendableBuilder
 import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.PneumaticsModuleType
@@ -13,27 +11,14 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import edu.wpi.first.wpilibj2.command.WaitCommand
 import frc.team449.robot2023.constants.subsystem.IntakeConstants
-import frc.team449.system.SparkUtil
+import frc.team449.system.encoder.NEOEncoder
+import frc.team449.system.motor.WrappedMotor
+import frc.team449.system.motor.createSparkMax
 
 class Intake(
   val piston: DoubleSolenoid,
-  motorID: Int
+  private val motor: WrappedMotor
 ) : SubsystemBase() {
-
-  private val motor = CANSparkMax(motorID, CANSparkMaxLowLevel.MotorType.kBrushless)
-  private val encoder = motor.encoder
-
-  private var lastVoltage = 0.0
-
-  init {
-    SparkUtil.applySparkSettings(
-      motor,
-      inverted = IntakeConstants.INVERTED,
-      encoder = encoder,
-      unitPerRotation = 1.0,
-      gearing = 1.0
-    )
-  }
 
   fun extend(): Command {
     return ConditionalCommand(
@@ -54,21 +39,18 @@ class Intake(
   fun intake(): Command {
     return this.runOnce {
       motor.setVoltage(IntakeConstants.INTAKE_VOLTAGE)
-      lastVoltage = IntakeConstants.INTAKE_VOLTAGE
     }
   }
 
   fun outtake(): Command {
     return this.runOnce {
       motor.setVoltage(-IntakeConstants.INTAKE_VOLTAGE)
-      lastVoltage = -IntakeConstants.INTAKE_VOLTAGE
     }
   }
 
   fun stop(): Command {
     return this.runOnce {
       motor.stopMotor()
-      lastVoltage = 0.0
     }
   }
 
@@ -77,7 +59,7 @@ class Intake(
     builder.addStringProperty("1.1 Piston Status", { piston.get().toString() }, {})
 
     builder.publishConstString("2.0", "Motor Voltages")
-    builder.addDoubleProperty("2.1 Last Voltage", { lastVoltage }, null)
+    builder.addDoubleProperty("2.1 Last Voltage", { motor.lastVoltage }, null)
 
     if (RobotBase.isSimulation()) {
       builder.publishConstString("3.0", "Advantage Scope 3D Pos")
@@ -113,9 +95,20 @@ class Intake(
 
   companion object {
     fun createIntake(): Intake {
+      val motor = createSparkMax(
+        "Intake",
+        IntakeConstants.MOTOR_ID,
+        NEOEncoder.creator(
+          1.0,
+          1.0
+        ),
+        inverted = IntakeConstants.INVERTED,
+        currentLimit = IntakeConstants.CURRENT_LIM
+      )
+
       return Intake(
         DoubleSolenoid(PneumaticsModuleType.CTREPCM, IntakeConstants.FORWARD, IntakeConstants.REVERSE),
-        IntakeConstants.MOTOR_ID
+        motor
       )
     }
   }

@@ -10,6 +10,8 @@ import frc.team449.robot2023.commands.characterization.Characterization
 import frc.team449.robot2023.commands.light.BlairChasing
 import frc.team449.robot2023.commands.light.BreatheHue
 import frc.team449.robot2023.commands.light.ElevatorMoving
+import frc.team449.robot2023.constants.RobotConstants
+import kotlin.math.PI
 import kotlin.math.abs
 
 class ControllerBindings(
@@ -19,6 +21,17 @@ class ControllerBindings(
 ) {
 
   fun bindButtons() {
+    // slow drive
+    Trigger { driveController.rightTriggerAxis >= .75 }.onTrue(
+      InstantCommand({ robot.drive.maxLinearSpeed = 1.0 }).andThen(
+        InstantCommand({ robot.drive.maxRotSpeed = PI / 4 })
+      )
+    ).onFalse(
+      InstantCommand({ robot.drive.maxLinearSpeed = RobotConstants.MAX_LINEAR_SPEED }).andThen(
+        InstantCommand({ robot.drive.maxRotSpeed = RobotConstants.MAX_ROT_SPEED })
+      )
+    )
+
     JoystickButton(mechanismController, XboxController.Button.kX.value).onTrue(
       SequentialCommandGroup(
         robot.intake.extend(),

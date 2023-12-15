@@ -2,7 +2,6 @@ package frc.team449.robot2023.constants.subsystem
 
 import edu.wpi.first.math.util.Units
 import edu.wpi.first.wpilibj.util.Color8Bit
-import kotlin.math.PI
 
 object ElevatorConstants {
   const val EFFICIENCY = 0.875
@@ -20,7 +19,10 @@ object ElevatorConstants {
   const val RIGHT_INVERTED = true
   const val EFFECTIVE_GEARING = 2 / 6.4
   const val PULLEY_RADIUS = 0.018415
-  var UPR = PULLEY_RADIUS * 2 * PI
+  const val UPR = 0.11487263851412484
+
+  // TODO: turn this on before comp
+  const val BRAKE_MODE = false
 
   var kS = 0.895 - 0.2205
   var kG = 0.2205
@@ -37,7 +39,7 @@ object ElevatorConstants {
 
   /** Elevator Sim constants. For carriage mass, it approximates both stages as a single stage */
   const val NUM_MOTORS = 2
-  val CARRIAGE_MASS = 9.25
+  val CARRIAGE_MASS = 9.45
 
   /** State Space constants */
   val MODEL_POS_STDDEV = Units.inchesToMeters(3.0)
