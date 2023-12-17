@@ -6,6 +6,7 @@ object ManipulatorConstants {
   const val INVERTED = true
   const val CURRENT_LIM = 20
 
-  const val INTAKE_VOLTAGE = 3.5
+  const val INTAKE_VOLTAGE = 6.0
+  const val INTAKE_OUT = -12.0
   const val HOLD_VOLTAGE = 1.5
 }

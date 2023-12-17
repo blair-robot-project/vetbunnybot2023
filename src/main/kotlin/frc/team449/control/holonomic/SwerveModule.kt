@@ -81,8 +81,9 @@ open class SwerveModule(
   fun setVoltage(volts: Double) {
     driveController.setpoint = 0.0
     desiredState.speedMetersPerSecond = 0.0
-    desiredState.angle = Rotation2d()
+    turnController.setpoint = 0.0
 
+    turningMotor.setVoltage(turnController.calculate(turningMotor.position))
     drivingMotor.setVoltage(volts)
   }
 

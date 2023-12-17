@@ -15,10 +15,10 @@ class ChoreoRoutine(
   private val drive: HolonomicDrive,
   private val stopEventMap: HashMap<Int, Command> = HashMap(),
   private val parallelEventMap: HashMap<Int, Command> = HashMap(),
-  private val poseTol: Pose2d = Pose2d(0.05, 0.05, Rotation2d(0.05)),
+  private val poseTol: Pose2d = Pose2d(0.05, 0.05, Rotation2d.fromDegrees(1.5)),
   private val resetPosition: Boolean = false,
   private val resetPositionTolerance: Pose2d = Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0)),
-  private val timeout: Double = 0.35
+  private val timeout: Double = 1.5
 ) {
 
   private fun resetPose(trajectory: ChoreoTrajectory): Command {

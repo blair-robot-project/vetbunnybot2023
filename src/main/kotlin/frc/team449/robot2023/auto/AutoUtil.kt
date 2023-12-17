@@ -40,8 +40,8 @@ object AutoUtil {
           FieldConstants.fieldWidth - currentMatrix[0, 1],
           MathUtil.angleModulus(PI + currentMatrix[0, 2]),
           -currentMatrix[1, 0],
-          currentMatrix[1, 1],
-          -currentMatrix[1, 2]
+          -currentMatrix[1, 1],
+          currentMatrix[1, 2]
         )
 
         pathGroup[index].stateMap.put(time, newMatrix)

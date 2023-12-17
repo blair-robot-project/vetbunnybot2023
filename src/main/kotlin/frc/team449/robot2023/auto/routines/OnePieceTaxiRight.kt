@@ -8,7 +8,7 @@ import frc.team449.control.auto.ChoreoTrajectory
 import frc.team449.robot2023.Robot
 import frc.team449.robot2023.auto.AutoUtil
 
-class OnePieceTaxi(
+class OnePieceTaxiRight(
   robot: Robot,
   isRed: Boolean
 ) : ChoreoRoutineStructure {
@@ -35,9 +35,9 @@ class OnePieceTaxi(
   override val trajectory: MutableList<ChoreoTrajectory> =
     if (isRed) {
       AutoUtil.transformForRed(
-        ChoreoTrajectory.createTrajectory("1PieceTaxi")
+        ChoreoTrajectory.createTrajectory("1PieceTaxiRight")
       )
     } else {
-      ChoreoTrajectory.createTrajectory("1PieceTaxi")
+      ChoreoTrajectory.createTrajectory("1PieceTaxiRight")
     }
 }

@@ -43,7 +43,7 @@ class SwerveOrthogonalCommand(
 
   private val rotCtrl = RobotConstants.ORTHOGONAL_CONTROLLER
 
-  private var skewConstant = 0.5
+  private var skewConstant = 11.5
 
   private var desiredVel = doubleArrayOf(0.0, 0.0, 0.0)
 

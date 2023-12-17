@@ -32,7 +32,7 @@ class Rainbow(
       led.setHSV(i, hue.toInt(), 255, 255)
     }
 
-    firstHue += 2.15
+    firstHue += 6.15
     firstHue = MathUtil.inputModulus(firstHue, 0.0, 180.0)
   }
 }

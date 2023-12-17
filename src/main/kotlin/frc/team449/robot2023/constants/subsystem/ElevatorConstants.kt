@@ -31,7 +31,7 @@ object ElevatorConstants {
   const val LOW_DISTANCE = 0.5
   const val STOW_DISTANCE = 0.0
 
-  const val CURRENT_LIMIT = 40
+  const val CURRENT_LIMIT = 50
   const val PROFILE_CURR_LIM = 25
 
   // Mininum distance up the elevator to not hit the intake, calculated from CAD

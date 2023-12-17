@@ -26,7 +26,7 @@ class Manipulator(
 
   fun outtake(): Command {
     return this.runOnce {
-      motor.setVoltage(-ManipulatorConstants.INTAKE_VOLTAGE)
+      motor.setVoltage(ManipulatorConstants.INTAKE_OUT)
     }
   }
 

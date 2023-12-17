@@ -12,7 +12,11 @@ class RoutineChooser(private val robot: Robot) : SendableChooser<String>() {
       "BlueOnePiecePick" to OnePiecePick(robot, false).createCommand(),
       "RedOnePiecePick" to OnePiecePick(robot, true).createCommand(),
       "BlueOnePieceTaxi" to OnePieceTaxi(robot, false).createCommand(),
-      "RedOnePieceTaxi" to OnePieceTaxi(robot, true).createCommand()
+      "RedOnePieceTaxi" to OnePieceTaxi(robot, true).createCommand(),
+      "RedOnePieceTaxiRight" to OnePieceTaxiRight(robot, true).createCommand(),
+      "BlueOnePieceTaxiRight" to OnePieceTaxiRight(robot, false).createCommand(),
+      "Blue686Trust" to BovineAuto(robot, false).createCommand(),
+      "Red686Trust" to BovineAuto(robot, true).createCommand()
     )
   }
 
@@ -34,11 +38,29 @@ class RoutineChooser(private val robot: Robot) : SendableChooser<String>() {
     )
 
     this.addOption(
+      "Bovine Auto",
+      if (isRed){
+        "Red686Trust"
+      } else {
+        "Blue686Trust"
+      }
+    )
+
+    this.addOption(
       "One Piece and Taxi",
       if (isRed) {
         "RedOnePieceTaxi"
       } else {
         "BlueOnePieceTaxi"
+      }
+    )
+
+    this.addOption(
+      "One Piece and Taxi Right",
+      if (isRed) {
+        "RedOnePieceTaxiRight"
+      } else {
+        "BlueOnePieceTaxiRight"
       }
     )
   }

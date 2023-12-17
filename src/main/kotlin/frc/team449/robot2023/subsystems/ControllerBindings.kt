@@ -1,5 +1,6 @@
 package frc.team449.robot2023.subsystems
 
+import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.wpilibj.DoubleSolenoid
 import edu.wpi.first.wpilibj.XboxController
 import edu.wpi.first.wpilibj2.command.*
@@ -37,6 +38,12 @@ class ControllerBindings(
         robot.intake.extend(),
         robot.elevator.low()
       )
+    )
+
+    JoystickButton(driveController, XboxController.Button.kStart.value).onTrue(
+      InstantCommand({
+        robot.drive.heading = Rotation2d()
+      })
     )
 
     JoystickButton(mechanismController, XboxController.Button.kY.value).onTrue(
@@ -80,7 +87,7 @@ class ControllerBindings(
         "swerve drive",
         robot.drive::setVoltage,
         robot.drive::getModuleVel
-      )
+      ).withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
     ).onFalse(
       robot.driveCommand
     )

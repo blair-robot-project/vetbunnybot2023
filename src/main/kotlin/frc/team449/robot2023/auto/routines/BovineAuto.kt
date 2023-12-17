@@ -8,7 +8,7 @@ import frc.team449.control.auto.ChoreoTrajectory
 import frc.team449.robot2023.Robot
 import frc.team449.robot2023.auto.AutoUtil
 
-class OnePieceTaxi(
+class BovineAuto(
   robot: Robot,
   isRed: Boolean
 ) : ChoreoRoutineStructure {
@@ -17,17 +17,18 @@ class OnePieceTaxi(
     ChoreoRoutine(
       drive = robot.drive,
       parallelEventMap = hashMapOf(
-        0 to robot.intake.extend().andThen(
+        1 to robot.intake.extend().andThen(
           robot.elevator.high()
-        ),
-        1 to robot.elevator.stow()
+        )
       ),
       stopEventMap = hashMapOf(
-        1 to SequentialCommandGroup(
-          WaitCommand(2.5),
+        1 to WaitCommand(4.5),
+        2 to SequentialCommandGroup(
+          WaitCommand(1.35),
           robot.manipulator.outtake(),
-          WaitCommand(2.0),
-          robot.manipulator.stop()
+          WaitCommand(1.5),
+          robot.manipulator.stop(),
+          robot.elevator.stow()
         )
       )
     )
@@ -35,9 +36,9 @@ class OnePieceTaxi(
   override val trajectory: MutableList<ChoreoTrajectory> =
     if (isRed) {
       AutoUtil.transformForRed(
-        ChoreoTrajectory.createTrajectory("1PieceTaxi")
+        ChoreoTrajectory.createTrajectory("686Auto")
       )
     } else {
-      ChoreoTrajectory.createTrajectory("1PieceTaxi")
+      ChoreoTrajectory.createTrajectory("686Auto")
     }
 }

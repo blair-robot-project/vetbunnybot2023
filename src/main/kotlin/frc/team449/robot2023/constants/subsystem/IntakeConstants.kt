@@ -9,7 +9,7 @@ object IntakeConstants {
   const val FORWARD = 4
   const val REVERSE = 5
 
-  const val INTAKE_VOLTAGE = 8.0
+  const val INTAKE_VOLTAGE = 12.0
 
   const val EXTENSION_TIME = 0.35
 }
