@@ -8,16 +8,13 @@ import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Transform2d
 import edu.wpi.first.math.geometry.Translation2d
-import edu.wpi.first.math.kinematics.ChassisSpeeds
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics
-import edu.wpi.first.math.kinematics.SwerveModulePosition
-import edu.wpi.first.math.kinematics.SwerveModuleState
+import edu.wpi.first.math.kinematics.*
 import edu.wpi.first.util.sendable.SendableBuilder
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.RobotBase.isReal
 import edu.wpi.first.wpilibj.smartdashboard.Field2d
 import edu.wpi.first.wpilibj2.command.SubsystemBase
-import frc.team449.control.VisionEstimator
+import frc.team449.control.vision.VisionSubsystem
 import frc.team449.robot2023.constants.RobotConstants
 import frc.team449.robot2023.constants.drives.SwerveConstants
 import frc.team449.robot2023.constants.vision.VisionConstants
@@ -25,9 +22,7 @@ import frc.team449.system.AHRS
 import frc.team449.system.encoder.AbsoluteEncoder
 import frc.team449.system.encoder.NEOEncoder
 import frc.team449.system.motor.createSparkMax
-import kotlin.math.hypot
-import kotlin.math.pow
-import kotlin.math.sqrt
+import kotlin.math.*
 
 /**
  * A Swerve Drive chassis.
@@ -39,16 +34,23 @@ import kotlin.math.sqrt
  * @param field The SmartDashboard [Field2d] widget that shows the robot's pose.
  */
 open class SwerveDrive(
-  private val modules: List<SwerveModule>,
-  private val ahrs: AHRS,
+  protected val modules: List<SwerveModule>,
+  protected val ahrs: AHRS,
   override var maxLinearSpeed: Double,
   override var maxRotSpeed: Double,
-  private val cameras: List<VisionEstimator> = mutableListOf(),
-  private val field: Field2d
+  protected val cameras: List<VisionSubsystem> = mutableListOf(),
+  protected val field: Field2d
 ) : SubsystemBase(), HolonomicDrive {
 
+  /** Vision statistics */
+  protected var numTargets = DoubleArray(cameras.size)
+  protected var tagDistance = DoubleArray(cameras.size)
+  protected var avgAmbiguity = DoubleArray(cameras.size)
+  protected var heightError = DoubleArray(cameras.size)
+  protected var usedVision = BooleanArray(cameras.size)
+
   /** The kinematics that convert [ChassisSpeeds] into multiple [SwerveModuleState] objects. */
-  private val kinematics = SwerveDriveKinematics(
+  protected val kinematics = SwerveDriveKinematics(
     *this.modules.map { it.location }.toTypedArray()
   )
 
@@ -59,18 +61,18 @@ open class SwerveDrive(
   var visionPose = Pose2d()
 
   /** Pose estimator that estimates the robot's position as a [Pose2d]. */
-  private val poseEstimator = SwerveDrivePoseEstimator(
+  protected val poseEstimator = SwerveDrivePoseEstimator(
     kinematics,
     ahrs.heading,
     getPositions(),
     RobotConstants.INITIAL_POSE,
     VisionConstants.ENCODER_TRUST,
-    VisionConstants.VISION_TRUST
+    VisionConstants.MULTI_TAG_TRUST
   )
 
   var desiredSpeeds: ChassisSpeeds = ChassisSpeeds()
 
-  private var maxSpeed: Double = 0.0
+  protected var maxSpeed: Double = 0.0
 
   override fun set(desiredSpeeds: ChassisSpeeds) {
     this.desiredSpeeds = desiredSpeeds
@@ -80,10 +82,11 @@ open class SwerveDrive(
       this.kinematics.toSwerveModuleStates(this.desiredSpeeds)
 
     // Scale down module speed if a module is going faster than the max speed, and prevent early desaturation.
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-      desiredModuleStates,
-      SwerveConstants.MAX_ATTAINABLE_MK4I_SPEED
-    )
+    normalizeDrive(desiredModuleStates, desiredSpeeds)
+//    SwerveDriveKinematics.desaturateWheelSpeeds(
+//      desiredModuleStates,
+//      SwerveConstants.MAX_ATTAINABLE_MK4I_SPEED
+//    )
 
     for (i in this.modules.indices) {
       this.modules[i].state = desiredModuleStates[i]
@@ -91,6 +94,31 @@ open class SwerveDrive(
 
     for (module in modules)
       module.update()
+  }
+
+  // TODO: Do you notice a difference with this normalize function?
+  private fun normalizeDrive(desiredStates: Array<SwerveModuleState>, speeds: ChassisSpeeds) {
+    val translationalK: Double = hypot(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond) / RobotConstants.MAX_LINEAR_SPEED
+    val rotationalK: Double = abs(speeds.omegaRadiansPerSecond) / RobotConstants.MAX_ROT_SPEED
+    val k = max(translationalK, rotationalK)
+
+    // Find how fast the fastest spinning drive motor is spinning
+    var realMaxSpeed = 0.0
+    for (moduleState in desiredStates) {
+      realMaxSpeed = max(realMaxSpeed, abs(moduleState.speedMetersPerSecond))
+    }
+
+    val scale =
+      if (realMaxSpeed > 0 && k < 1)
+        k * SwerveConstants.MAX_ATTAINABLE_MK4I_SPEED / realMaxSpeed
+      else if (realMaxSpeed > 0)
+        SwerveConstants.MAX_ATTAINABLE_MK4I_SPEED / realMaxSpeed
+      else
+        1.0
+
+    for (moduleState in desiredStates) {
+      moduleState.speedMetersPerSecond *= scale
+    }
   }
 
   fun setVoltage(volts: Double) {
@@ -136,13 +164,13 @@ open class SwerveDrive(
     val transVel = hypot(currentSpeeds.vxMetersPerSecond, currentSpeeds.vyMetersPerSecond)
     if (transVel > maxSpeed) maxSpeed = transVel
 
-    if (cameras.isNotEmpty()) localize()
-
     // Update the robot's pose using the gyro heading and the SwerveModulePositions of each module.
     this.poseEstimator.update(
       ahrs.heading,
       getPositions()
     )
+
+    if (cameras.isNotEmpty()) localize()
 
     // Sets the robot's pose and individual module rotations on the SmartDashboard [Field2d] widget.
     setRobotPose()
@@ -154,7 +182,7 @@ open class SwerveDrive(
   }
 
   /** @return An array of [SwerveModulePosition] for each module, containing distance and angle. */
-  private fun getPositions(): Array<SwerveModulePosition> {
+  protected fun getPositions(): Array<SwerveModulePosition> {
     return Array(modules.size) { i -> modules[i].position }
   }
 
@@ -163,7 +191,7 @@ open class SwerveDrive(
     return Array(modules.size) { i -> modules[i].state }
   }
 
-  private fun setRobotPose() {
+  protected fun setRobotPose() {
     this.field.robotPose = this.pose
     this.field.getObject("FL").pose = this.pose.plus(Transform2d(Translation2d(SwerveConstants.WHEELBASE / 2, SwerveConstants.TRACKWIDTH / 2), this.getPositions()[0].angle))
     this.field.getObject("FR").pose = this.pose.plus(Transform2d(Translation2d(SwerveConstants.WHEELBASE / 2, -SwerveConstants.TRACKWIDTH / 2), this.getPositions()[1].angle))
@@ -171,38 +199,45 @@ open class SwerveDrive(
     this.field.getObject("BR").pose = this.pose.plus(Transform2d(Translation2d(-SwerveConstants.WHEELBASE / 2, -SwerveConstants.TRACKWIDTH / 2), this.getPositions()[0].angle))
   }
 
-  private fun localize() = try {
-    for (camera in cameras) {
-      val result = camera.estimatedPose(pose.rotation)
+  protected open fun localize() = try {
+    for ((index, camera) in cameras.withIndex()) {
+      val result = camera.estimatedPose(Pose2d(pose.x, pose.y, ahrs.heading))
       if (result.isPresent) {
         val presentResult = result.get()
-        val numTargets = presentResult.targetsUsed.size
-        var tagDistance = 0.0
-        var avgAmbiguity = 0.0
+        numTargets[index] = presentResult.targetsUsed.size.toDouble()
+        tagDistance[index] = 0.0
+        avgAmbiguity[index] = 0.0
+        heightError[index] = abs(presentResult.estimatedPose.z - camera.robotToCam.z)
 
         for (tag in presentResult.targetsUsed) {
-          val tagPose = camera.fieldTags.getTagPose(tag.fiducialId)
+          val tagPose = camera.estimator.fieldTags.getTagPose(tag.fiducialId)
           if (tagPose.isPresent) {
             val estimatedToTag = presentResult.estimatedPose.minus(tagPose.get())
-            tagDistance += sqrt(estimatedToTag.x.pow(2) + estimatedToTag.y.pow(2)) / numTargets
-            avgAmbiguity = tag.poseAmbiguity / numTargets
+            tagDistance[index] += sqrt(estimatedToTag.x.pow(2) + estimatedToTag.y.pow(2)) / numTargets[index]
+            avgAmbiguity[index] = tag.poseAmbiguity / numTargets[index]
           } else {
-            tagDistance = Double.MAX_VALUE
-            avgAmbiguity = Double.MAX_VALUE
+            tagDistance[index] = Double.MAX_VALUE
+            avgAmbiguity[index] = Double.MAX_VALUE
             break
           }
         }
 
+        visionPose = presentResult.estimatedPose.toPose2d()
+
         if (presentResult.timestampSeconds > 0 &&
-          avgAmbiguity <= VisionConstants.MAX_AMBIGUITY &&
-          numTargets < 2 && tagDistance <= VisionConstants.MAX_DISTANCE_SINGLE_TAG ||
-          numTargets >= 2 && tagDistance <= VisionConstants.MAX_DISTANCE_MULTI_TAG
+          avgAmbiguity[index] <= VisionConstants.MAX_AMBIGUITY &&
+          numTargets[index] < 2 && tagDistance[index] <= VisionConstants.MAX_DISTANCE_SINGLE_TAG ||
+          numTargets[index] >= 2 && tagDistance[index] <= VisionConstants.MAX_DISTANCE_MULTI_TAG * (1 + (numTargets[index] - 2) * VisionConstants.TAG_MULTIPLIER) &&
+          heightError[index] < VisionConstants.MAX_HEIGHT_ERR_METERS
         ) {
-//          poseEstimator.addVisionMeasurement(
-//            presentResult.estimatedPose.toPose2d(),
-//            presentResult.timestampSeconds
-//          )
-          visionPose = presentResult.estimatedPose.toPose2d()
+          poseEstimator.addVisionMeasurement(
+            visionPose,
+            presentResult.timestampSeconds,
+            camera.getEstimationStdDevs(numTargets[index].toInt(), tagDistance[index])
+          )
+          usedVision[index] = true
+        } else {
+          usedVision[index] = false
         }
       }
     }
@@ -221,63 +256,73 @@ open class SwerveDrive(
     builder.addDoubleArrayProperty("1.4 Desired Chassis Speeds", { doubleArrayOf(desiredSpeeds.vxMetersPerSecond, desiredSpeeds.vyMetersPerSecond, desiredSpeeds.omegaRadiansPerSecond) }, null)
     builder.addDoubleProperty("1.5 Max Recorded Speed", { maxSpeed }, null)
 
-    builder.publishConstString("2.0", "Steering Rot (Std Order FL, FR, BL, BR)")
-    builder.addDoubleArrayProperty(
-      "2.1 Current Rotation",
-      { DoubleArray(modules.size) { index -> modules[index].position.angle.rotations } },
-      null)
-    builder.addDoubleArrayProperty("2.2 Desired Rotation",
-      { DoubleArray(modules.size) { index -> modules[index].desiredState.angle.rotations } },
-      null)
+    builder.publishConstString("2.0", "Vision Stats")
+    builder.addBooleanArrayProperty("2.1 Used Last Vision Estimate?", { usedVision }, null)
+    builder.addDoubleArrayProperty("2.2 Number of Targets", { numTargets }, null)
+    builder.addDoubleArrayProperty("2.3 Avg Tag Distance", { tagDistance }, null)
+    builder.addDoubleArrayProperty("2.4 Average Ambiguity", { avgAmbiguity }, null)
+    builder.addDoubleArrayProperty("2.5 Cam Height Error", { heightError }, null)
 
-    builder.publishConstString("3.0", "Module Driving Speeds (Std Order FL, FR, BL, BR)")
+    builder.publishConstString("3.0", "Steering Rot (Std Order FL, FR, BL, BR)")
     builder.addDoubleArrayProperty(
-      "3.1 Desired Speed",
+      "3.1 Current Rotation",
+      { DoubleArray(modules.size) { index -> modules[index].position.angle.rotations } },
+      null
+    )
+    builder.addDoubleArrayProperty(
+      "3.2 Desired Rotation",
+      { DoubleArray(modules.size) { index -> modules[index].desiredState.angle.rotations } },
+      null
+    )
+
+    builder.publishConstString("4.0", "Module Driving Speeds (Std Order FL, FR, BL, BR)")
+    builder.addDoubleArrayProperty(
+      "4.1 Desired Speed",
       { DoubleArray(modules.size) { index -> modules[index].desiredState.speedMetersPerSecond } },
       null
     )
     builder.addDoubleArrayProperty(
-      "3.2 Current Speeds",
+      "4.2 Current Speeds",
       { DoubleArray(modules.size) { index -> modules[index].state.speedMetersPerSecond } },
       null
     )
 
-    builder.publishConstString("4.0", "Last Module Voltages (Standard Order, FL, FR, BL, BR)")
+    builder.publishConstString("5.0", "Last Module Voltages (Standard Order, FL, FR, BL, BR)")
     builder.addDoubleArrayProperty(
-      "4.1 Driving",
+      "5.1 Driving",
       { DoubleArray(modules.size) { index -> modules[index].lastDrivingVoltage() } },
       null
     )
     builder.addDoubleArrayProperty(
-      "4.2 Steering",
+      "5.2 Steering",
       { DoubleArray(modules.size) { index -> modules[index].lastSteeringVoltage() } },
       null
     )
 
-    builder.publishConstString("5.0", "AHRS Values")
-    builder.addDoubleProperty("5.1 Heading Degrees", { ahrs.heading.degrees }, null)
-    builder.addDoubleProperty("5.2 Pitch Degrees", { ahrs.pitch.degrees }, null)
-    builder.addDoubleProperty("5.3 Roll Degrees", { ahrs.roll.degrees }, null)
-    builder.addDoubleProperty("5.4 Angular X Vel", { ahrs.angularXVel() }, null)
+    builder.publishConstString("6.0", "AHRS Values")
+    builder.addDoubleProperty("6.1 Heading Degrees", { ahrs.heading.degrees }, null)
+    builder.addDoubleProperty("6.2 Pitch Degrees", { ahrs.pitch.degrees }, null)
+    builder.addDoubleProperty("6.3 Roll Degrees", { ahrs.roll.degrees }, null)
+    builder.addDoubleProperty("6.4 Angular X Vel", { ahrs.angularXVel() }, null)
 
     // Note: You should also tune UPR too
-    builder.publishConstString("6.0", "Tuning Values")
-    builder.addDoubleProperty("6.1 FL Drive P", { modules[0].driveController.p }, { value -> modules[0].driveController.p = value })
-    builder.addDoubleProperty("6.2 FL Drive D", { modules[0].driveController.d }, { value -> modules[0].driveController.d = value })
-    builder.addDoubleProperty("6.3 FL Turn P", { modules[0].turnController.p }, { value -> modules[0].turnController.p = value })
-    builder.addDoubleProperty("6.4 FL Turn D", { modules[0].turnController.d }, { value -> modules[0].turnController.d = value })
-    builder.addDoubleProperty("6.5 FR Drive P", { modules[1].driveController.p }, { value -> modules[1].driveController.p = value })
-    builder.addDoubleProperty("6.6 FR Drive D", { modules[1].driveController.d }, { value -> modules[1].driveController.d = value })
-    builder.addDoubleProperty("6.8 FR Turn P", { modules[1].turnController.p }, { value -> modules[1].turnController.p = value })
-    builder.addDoubleProperty("6.9 FR Turn D", { modules[1].turnController.d }, { value -> modules[1].turnController.d = value })
-    builder.addDoubleProperty("6.10 BL Drive P", { modules[2].driveController.p }, { value -> modules[2].driveController.p = value })
-    builder.addDoubleProperty("6.11 BL Drive D", { modules[2].driveController.d }, { value -> modules[2].driveController.d = value })
-    builder.addDoubleProperty("6.12 BL Turn P", { modules[2].turnController.p }, { value -> modules[2].turnController.p = value })
-    builder.addDoubleProperty("6.13 BL Turn D", { modules[2].turnController.d }, { value -> modules[2].turnController.d = value })
-    builder.addDoubleProperty("6.14 BR Drive P", { modules[3].driveController.p }, { value -> modules[3].driveController.p = value })
-    builder.addDoubleProperty("6.15 BR Drive D", { modules[3].driveController.d }, { value -> modules[3].driveController.d = value })
-    builder.addDoubleProperty("6.16 BR Turn P", { modules[3].turnController.p }, { value -> modules[3].turnController.p = value })
-    builder.addDoubleProperty("6.17 BR Turn D", { modules[3].turnController.d }, { value -> modules[3].turnController.d = value })
+    builder.publishConstString("7.0", "Tuning Values")
+    builder.addDoubleProperty("7.1 FL Drive P", { modules[0].driveController.p }, { value -> modules[0].driveController.p = value })
+    builder.addDoubleProperty("7.2 FL Drive D", { modules[0].driveController.d }, { value -> modules[0].driveController.d = value })
+    builder.addDoubleProperty("7.3 FL Turn P", { modules[0].turnController.p }, { value -> modules[0].turnController.p = value })
+    builder.addDoubleProperty("7.4 FL Turn D", { modules[0].turnController.d }, { value -> modules[0].turnController.d = value })
+    builder.addDoubleProperty("7.5 FR Drive P", { modules[1].driveController.p }, { value -> modules[1].driveController.p = value })
+    builder.addDoubleProperty("7.6 FR Drive D", { modules[1].driveController.d }, { value -> modules[1].driveController.d = value })
+    builder.addDoubleProperty("7.8 FR Turn P", { modules[1].turnController.p }, { value -> modules[1].turnController.p = value })
+    builder.addDoubleProperty("7.9 FR Turn D", { modules[1].turnController.d }, { value -> modules[1].turnController.d = value })
+    builder.addDoubleProperty("7.10 BL Drive P", { modules[2].driveController.p }, { value -> modules[2].driveController.p = value })
+    builder.addDoubleProperty("7.11 BL Drive D", { modules[2].driveController.d }, { value -> modules[2].driveController.d = value })
+    builder.addDoubleProperty("7.12 BL Turn P", { modules[2].turnController.p }, { value -> modules[2].turnController.p = value })
+    builder.addDoubleProperty("7.13 BL Turn D", { modules[2].turnController.d }, { value -> modules[2].turnController.d = value })
+    builder.addDoubleProperty("7.14 BR Drive P", { modules[3].driveController.p }, { value -> modules[3].driveController.p = value })
+    builder.addDoubleProperty("7.15 BR Drive D", { modules[3].driveController.d }, { value -> modules[3].driveController.d = value })
+    builder.addDoubleProperty("7.16 BR Turn P", { modules[3].turnController.p }, { value -> modules[3].turnController.p = value })
+    builder.addDoubleProperty("7.17 BR Turn D", { modules[3].turnController.d }, { value -> modules[3].turnController.d = value })
   }
 
   companion object {

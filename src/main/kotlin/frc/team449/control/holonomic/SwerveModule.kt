@@ -8,10 +8,12 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition
 import edu.wpi.first.math.kinematics.SwerveModuleState
 import edu.wpi.first.wpilibj.RobotBase
 import edu.wpi.first.wpilibj.Timer
+import frc.team449.robot2023.constants.drives.SwerveConstants
 import frc.team449.system.encoder.Encoder
 import frc.team449.system.motor.WrappedMotor
 import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.sign
 
 /**
  * Controls a Swerve Module.
@@ -115,7 +117,12 @@ open class SwerveModule(
     val turnPid = turnController.calculate(
       turningMotor.position
     )
-    turningMotor.set(turnPid)
+
+    turningMotor.set(
+      turnPid +
+        sign(desiredState.angle.radians - turningMotor.position) *
+        SwerveConstants.STEER_KS
+    )
   }
 
   companion object {

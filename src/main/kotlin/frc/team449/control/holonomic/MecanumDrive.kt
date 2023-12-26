@@ -13,6 +13,7 @@ import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj2.command.SubsystemBase
+import frc.team449.control.vision.VisionSubsystem
 import frc.team449.robot2023.constants.RobotConstants
 import frc.team449.robot2023.constants.drives.MecanumConstants
 import frc.team449.robot2023.constants.vision.VisionConstants
@@ -20,7 +21,6 @@ import frc.team449.system.AHRS
 import frc.team449.system.encoder.NEOEncoder
 import frc.team449.system.motor.WrappedMotor
 import frc.team449.system.motor.createSparkMax
-import org.photonvision.PhotonPoseEstimator
 
 /**
  * @param frontLeftMotor the front left motor
@@ -50,7 +50,7 @@ open class MecanumDrive(
   override var maxRotSpeed: Double,
   private val feedForward: SimpleMotorFeedforward,
   private val controller: () -> PIDController,
-  private val cameras: List<PhotonPoseEstimator> = mutableListOf()
+  private val cameras: List<VisionSubsystem> = mutableListOf()
 ) : HolonomicDrive, SubsystemBase() {
 
   private val flController = controller()
@@ -155,7 +155,7 @@ open class MecanumDrive(
 
   private fun localize() {
     for (camera in cameras) {
-      val result = camera.update()
+      val result = camera.estimatedPose(Pose2d(pose.x, pose.y, ahrs.heading))
       if (result.isPresent) {
         poseEstimator.addVisionMeasurement(
           result.get().estimatedPose.toPose2d(),

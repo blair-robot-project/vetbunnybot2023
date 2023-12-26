@@ -1,11 +1,14 @@
 package frc.team449
 
-import edu.wpi.first.wpilibj.*
+import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.RobotBase
+import edu.wpi.first.wpilibj.TimedRobot
+import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandScheduler
 import edu.wpi.first.wpilibj2.command.InstantCommand
+import frc.team449.control.holonomic.SwerveSim
 import frc.team449.robot2023.Robot
 import frc.team449.robot2023.auto.routines.RoutineChooser
 import frc.team449.robot2023.commands.light.BlairChasing
@@ -71,6 +74,8 @@ class RobotLoop : TimedRobot(), Logged {
 
     if (SmartDashboard.getBoolean("Enable Logging?", false)) {
       Monologue.update()
+    } else if (RobotBase.isSimulation()) {
+      Monologue.updateNT()
     } else {
       Monologue.updateFileLog()
     }
@@ -91,13 +96,11 @@ class RobotLoop : TimedRobot(), Logged {
   override fun autonomousPeriodic() {}
 
   override fun teleopInit() {
-    VisionConstants.ESTIMATORS.clear()
-
     if (autoCommand != null) {
       CommandScheduler.getInstance().cancel(autoCommand)
     }
 
-    (robot.light.currentCommand?: InstantCommand()).cancel()
+    (robot.light.currentCommand ?: InstantCommand()).cancel()
 
     robot.drive.defaultCommand = robot.driveCommand
   }
@@ -108,25 +111,8 @@ class RobotLoop : TimedRobot(), Logged {
   override fun disabledInit() {
     robot.drive.stop()
 
-    (robot.light.currentCommand?: InstantCommand()).cancel()
+    (robot.light.currentCommand ?: InstantCommand()).cancel()
     Rainbow(robot.light).schedule()
-
-//    if (VisionConstants.ESTIMATORS.isEmpty()) {
-//      VisionConstants.ESTIMATORS.add(
-//        VisionEstimator(
-//          VisionConstants.TAG_LAYOUT,
-//          "Spinel",
-//          VisionConstants.robotToCamera
-//        )
-//      )
-//    } else {
-//      VisionConstants.ESTIMATORS[0] =
-//        VisionEstimator(
-//          VisionConstants.TAG_LAYOUT,
-//          "Spinel",
-//          VisionConstants.robotToCamera
-//        )
-//    }
   }
 
   override fun disabledPeriodic() {
@@ -143,5 +129,13 @@ class RobotLoop : TimedRobot(), Logged {
 
   override fun simulationInit() {}
 
-  override fun simulationPeriodic() {}
+  override fun simulationPeriodic() {
+    robot.drive as SwerveSim
+
+    VisionConstants.ESTIMATORS.forEach {
+      it.simulationPeriodic(robot.drive.odoPose)
+    }
+
+    VisionConstants.VISION_SIM.debugField.getObject("EstimatedRobot").pose = robot.drive.pose
+  }
 }

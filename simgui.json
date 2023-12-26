@@ -34,7 +34,19 @@
       "/LiveWindow/Ungrouped/PIDController[22]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[23]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[24]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[25]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[26]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[27]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[28]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[29]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[2]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[30]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[31]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[32]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[33]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[34]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[35]": "PIDController",
+      "/LiveWindow/Ungrouped/PIDController[36]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[3]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[4]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[5]": "PIDController",
@@ -51,24 +63,32 @@
       "/SmartDashboard/Command Scheduler": "Scheduler",
       "/SmartDashboard/Elevator Visual": "Mechanism2d",
       "/SmartDashboard/Field": "Field2d",
-      "/SmartDashboard/Routine Chooser": "String Chooser"
+      "/SmartDashboard/Routine Chooser": "String Chooser",
+      "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d"
     },
     "windows": {
       "/Monologuing/field": {
+        "bumpers": {
+          "length": 0.9271000027656555,
+          "width": 0.8510000109672546
+        },
         "height": 8.229599952697754,
         "image": "C:\\Users\\jpoth\\Downloads\\field(1).png",
-        "units": "feet",
+        "odo": {
+          "color": [
+            0.7647056579589844,
+            0.0,
+            1.0,
+            255.0
+          ]
+        },
+        "units": "meters",
         "width": 16.459199905395508,
         "window": {
           "visible": true
         }
       },
       "/SmartDashboard/Command Scheduler": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/Elevator Visual": {
         "window": {
           "visible": true
         }
@@ -84,22 +104,101 @@
         "window": {
           "visible": true
         }
+      },
+      "/SmartDashboard/VisionSystemSim-main/Sim Field": {
+        "EstimatedRobot": {
+          "color": [
+            0.7058820724487305,
+            0.0,
+            1.0,
+            255.0
+          ]
+        },
+        "Robot": {
+          "color": [
+            0.0,
+            1.0,
+            0.08823513984680176,
+            255.0
+          ]
+        },
+        "VisionEstimation": {
+          "color": [
+            0.17647027969360352,
+            0.0,
+            1.0,
+            255.0
+          ]
+        },
+        "bottom": 544,
+        "builtin": "2023 Charged Up",
+        "cameras": {
+          "arrows": false,
+          "style": "Track"
+        },
+        "height": 8.013679504394531,
+        "left": 46,
+        "right": 1088,
+        "top": 36,
+        "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
       }
     }
   },
   "NetworkTables": {
-    "Persistent Values": {
-      "open": false
-    },
     "Retained Values": {
       "open": false
     },
     "transitory": {
+      "CameraPublisher": {
+        "arducam-processed": {
+          "open": true,
+          "string[]##v_/CameraPublisher/arducam-processed/streams": {
+            "open": true
+          }
+        },
+        "open": true
+      },
       "Monologuing": {
         "open": true,
         "robot": {
           "drive": {
-            "double[]##v_/Monologuing/robot/drive/4.1 Driving": {
+            "boolean[]##v_/Monologuing/robot/drive/2.1 Used Last Vision Estimate?": {
+              "open": true
+            },
+            "double[]##v_/Monologuing/robot/drive/1.1 Estimated Pose": {
+              "open": true
+            },
+            "double[]##v_/Monologuing/robot/drive/1.2 Vision Pose": {
+              "open": true
+            },
+            "double[]##v_/Monologuing/robot/drive/1.3 Current Chassis Speeds": {
+              "open": true
+            },
+            "double[]##v_/Monologuing/robot/drive/1.4 Desired Chassis Speeds": {
+              "open": true
+            },
+            "double[]##v_/Monologuing/robot/drive/1.7 Vision Stats": {
+              "open": true
+            },
+            "double[]##v_/Monologuing/robot/drive/2.1 Current Rotation": {
+              "open": true
+            },
+            "double[]##v_/Monologuing/robot/drive/2.2 Desired Rotation": {
+              "open": true
+            },
+            "double[]##v_/Monologuing/robot/drive/2.2 Number of Targets": {
+              "open": true
+            },
+            "double[]##v_/Monologuing/robot/drive/2.3 Avg Tag Distance": {
+              "open": true
+            },
+            "double[]##v_/Monologuing/robot/drive/2.4 Average Ambiguity": {
+              "open": true
+            },
+            "double[]##v_/Monologuing/robot/drive/2.5 Cam Height Error": {
               "open": true
             },
             "double[]##v_/Monologuing/robot/drive/Current Chassis Speeds": {
@@ -107,9 +206,7 @@
             },
             "double[]##v_/Monologuing/robot/drive/Estimated Pose": {
               "open": true
-            }
-          },
-          "elevator": {
+            },
             "open": true
           },
           "intake": {
@@ -139,15 +236,26 @@
         "open": true
       },
       "SmartDashboard": {
+        "VisionSystemSim-main": {
+          "open": true
+        },
+        "open": true
+      },
+      "photonvision": {
+        "arducam": {
+          "open": true
+        },
         "open": true
       }
     }
   },
   "NetworkTables Info": {
-    "Server": {
+    "Connections": {
       "open": true
     },
-    "visible": true
+    "Server": {
+      "open": true
+    }
   },
   "Plot": {
     "Plot <0>": {
@@ -199,7 +307,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <1>": {
       "plots": [
@@ -232,7 +343,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     }
   }
 }

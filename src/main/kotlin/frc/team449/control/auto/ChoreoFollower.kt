@@ -18,7 +18,8 @@ class ChoreoFollower(
   private val thetaController: PIDController = PIDController(AutoConstants.DEFAULT_ROTATION_KP, 0.0, 0.0),
   poseTol: Pose2d = Pose2d(0.035, 0.035, Rotation2d(0.035)),
   private val timeout: Double = 0.65,
-  private val resetPose: Boolean = false
+  private val resetPose: Boolean = false,
+  private val debug: Boolean = false
 ) : Command() {
 
   private val timer = Timer()
@@ -46,7 +47,11 @@ class ChoreoFollower(
     val yPID = yController.calculate(currPose.y, desState.yPos)
     val angPID = thetaController.calculate(currPose.rotation.radians, desState.theta)
 
-    return ChassisSpeeds.fromFieldRelativeSpeeds(xFF + xPID, yFF + yPID, angFF + angPID, currPose.rotation)
+    return if (debug) {
+      ChassisSpeeds.fromFieldRelativeSpeeds(xFF, yFF, angFF, currPose.rotation)
+    } else {
+      ChassisSpeeds.fromFieldRelativeSpeeds(xFF + xPID, yFF + yPID, angFF + angPID, currPose.rotation)
+    }
   }
 
   private fun allControllersAtReference(): Boolean {

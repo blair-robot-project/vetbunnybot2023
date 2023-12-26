@@ -1,4 +1,4 @@
-package frc.team449.control
+package frc.team449.control.vision
 
 import edu.wpi.first.apriltag.AprilTag
 import edu.wpi.first.apriltag.AprilTagFieldLayout
@@ -18,6 +18,7 @@ import org.photonvision.targeting.PhotonPipelineResult
 import org.photonvision.targeting.PhotonTrackedTarget
 import org.photonvision.targeting.TargetCorner
 import java.util.Optional
+import kotlin.math.PI
 import kotlin.math.abs
 
 /**
@@ -26,16 +27,16 @@ import kotlin.math.abs
  */
 class VisionEstimator(
   private val tagLayout: AprilTagFieldLayout,
-  camName: String,
+  val camera: PhotonCamera,
   private val robotToCam: Transform3d
-) : PhotonPoseEstimator(tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_RIO, PhotonCamera(camName), robotToCam) {
-
-  private val camera = PhotonCamera(camName)
+) : PhotonPoseEstimator(tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_RIO, camera, robotToCam) {
   private val reportedErrors: HashSet<Int> = HashSet()
   private var driveHeading: Rotation2d? = null
+  private var lastPose: Pose3d? = null
 
-  fun estimatedPose(currHeading: Rotation2d): Optional<EstimatedRobotPose> {
-    driveHeading = currHeading
+  fun estimatedPose(currPose: Pose2d): Optional<EstimatedRobotPose> {
+    driveHeading = currPose.rotation
+    lastPose = Pose3d(currPose.x, currPose.y, 0.0, Rotation3d(0.0, 0.0, currPose.rotation.radians))
     return updatePose(camera.latestResult)
   }
 
@@ -61,6 +62,18 @@ class VisionEstimator(
       Optional.empty()
     } else {
       multiTagPNPStrategy(cameraResult)
+    }
+  }
+
+  private fun checkBest(check: Pose3d?, opt1: Pose3d?, opt2: Pose3d?): Pose3d? {
+    if (check == null || opt1 == null || opt2 == null) return null
+    val dist1 = check.translation.toTranslation2d().getDistance(opt1.translation.toTranslation2d())
+    val dist2 = check.translation.toTranslation2d().getDistance(opt2.translation.toTranslation2d())
+
+    return if (dist1 < dist2) {
+      opt1
+    } else {
+      opt2
     }
   }
 
@@ -103,8 +116,18 @@ class VisionEstimator(
       val best = Pose3d()
         .plus(pnpResults.best) // field-to-camera
         .plus(robotToCam.inverse()) // field-to-robot
+
+      val alternate = Pose3d()
+        .plus(pnpResults.alt)
+        .plus(robotToCam.inverse())
+
       return Optional.of(
-        EstimatedRobotPose(best, result.timestampSeconds, result.targets, PoseStrategy.MULTI_TAG_PNP_ON_RIO)
+        EstimatedRobotPose(
+          checkBest(lastPose, best, alternate) ?: best,
+          result.timestampSeconds,
+          result.targets,
+          PoseStrategy.MULTI_TAG_PNP_ON_RIO
+        )
       )
     }
 
@@ -141,21 +164,64 @@ class VisionEstimator(
       return Optional.empty()
     }
 
-    val cameraToTarget = Transform3d(
-      lowestAmbiguityTarget.bestCameraToTarget.translation,
-      Rotation3d(
-        lowestAmbiguityTarget.bestCameraToTarget.rotation.x,
-        lowestAmbiguityTarget.bestCameraToTarget.rotation.y,
-        driveHeading!!.radians + robotToCam.rotation.z - targetPosition.get().rotation.z
-      )
-    )
+    val bestPose = targetPosition
+      .get()
+      .transformBy(Transform3d(
+        lowestAmbiguityTarget.bestCameraToTarget.translation,
+        Rotation3d(
+          lowestAmbiguityTarget.bestCameraToTarget.rotation.x,
+          lowestAmbiguityTarget.bestCameraToTarget.rotation.y,
+          driveHeading!!.radians + robotToCam.rotation.z - targetPosition.get().rotation.z
+        )
+      ).inverse())
+      .transformBy(robotToCam.inverse())
+
+    val altPose = targetPosition
+      .get()
+      .transformBy(Transform3d(
+        lowestAmbiguityTarget.alternateCameraToTarget.translation,
+        Rotation3d(
+          lowestAmbiguityTarget.alternateCameraToTarget.rotation.x,
+          lowestAmbiguityTarget.alternateCameraToTarget.rotation.y,
+          driveHeading!!.radians + robotToCam.rotation.z - targetPosition.get().rotation.z
+        )
+      ).inverse())
+      .transformBy(robotToCam.inverse())
+
+    val usedPose = checkBest(lastPose, bestPose, altPose) ?: bestPose
+
+    if (usedPose == bestPose) {
+      val camBestPose = targetPosition
+        .get()
+        .transformBy(Transform3d(
+          lowestAmbiguityTarget.bestCameraToTarget.translation,
+          lowestAmbiguityTarget.bestCameraToTarget.rotation
+        ).inverse())
+        .transformBy(robotToCam.inverse())
+
+      if (abs(camBestPose.rotation.z * (180 / (2 * PI)) - driveHeading!!.degrees) > VisionConstants.SINGLE_TAG_HEADING_MAX_DEV_DEG){
+        DriverStation.reportWarning("Best Single Tag Heading over Max Deviation, deviated by ${abs(camBestPose.rotation.z * (180 / (2 * PI)) - driveHeading!!.degrees)}", false)
+        return Optional.empty()
+      }
+    } else {
+
+      val camAltPose = targetPosition
+        .get()
+        .transformBy(Transform3d(
+          lowestAmbiguityTarget.alternateCameraToTarget.translation,
+          lowestAmbiguityTarget.alternateCameraToTarget.rotation
+        ).inverse())
+        .transformBy(robotToCam.inverse())
+
+      if (abs(camAltPose.rotation.z * (180 / (2 * PI)) - driveHeading!!.degrees) > VisionConstants.SINGLE_TAG_HEADING_MAX_DEV_DEG){
+        DriverStation.reportWarning("Alt Single Tag Heading over Max Deviation, deviated by ${abs(camAltPose.rotation.z * (180 / (2 * PI)) - driveHeading!!.degrees)}", false)
+        return Optional.empty()
+      }
+    }
 
     return Optional.of(
       EstimatedRobotPose(
-        targetPosition
-          .get()
-          .transformBy(cameraToTarget.inverse())
-          .transformBy(robotToCam.inverse()),
+        checkBest(lastPose, bestPose, altPose) ?: bestPose,
         result.timestampSeconds,
         mutableListOf(lowestAmbiguityTarget),
         PoseStrategy.LOWEST_AMBIGUITY

@@ -58,7 +58,7 @@ class ChoreoTrajectory(
     fun createTrajectory(
       filename: String
     ): MutableList<ChoreoTrajectory> {
-      val path = Filesystem.getDeployDirectory().absolutePath.plus("/choreo/$filename.json")
+      val path = Filesystem.getDeployDirectory().absolutePath.plus("/choreo/$filename.chor")
       val document = (JSONParser().parse(FileReader(File(path).absolutePath)) as JSONObject)["paths"] as HashMap<*, *>
 
       val trajList = mutableListOf<ChoreoTrajectory>()

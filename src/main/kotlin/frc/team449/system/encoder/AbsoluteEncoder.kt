@@ -1,5 +1,6 @@
 package frc.team449.system.encoder
 
+import edu.wpi.first.math.MathUtil
 import edu.wpi.first.math.filter.MedianFilter
 import edu.wpi.first.wpilibj.DutyCycleEncoder
 import edu.wpi.first.wpilibj.Timer
@@ -28,9 +29,22 @@ open class AbsoluteEncoder(
   /** This returns the absolute position of the module */
   override fun getPositionNative(): Double {
     return if (inverted) {
-      filter.calculate(1 - (enc.absolutePosition - offset) % 1)
+      filter.calculate(
+        MathUtil.inputModulus(
+          1 - (enc.absolutePosition - offset),
+          -0.5,
+          0.5
+        )
+      )
     } else {
-      filter.calculate((enc.absolutePosition - offset) % 1)
+      filter.calculate(
+        MathUtil.inputModulus(
+          (enc.absolutePosition - offset),
+          -0.5,
+          0.5
+        )
+
+      )
     }
   }
 

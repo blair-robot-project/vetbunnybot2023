@@ -29,7 +29,8 @@ class OnePieceTaxi(
           WaitCommand(2.0),
           robot.manipulator.stop()
         )
-      )
+      ),
+      debug = true
     )
 
   override val trajectory: MutableList<ChoreoTrajectory> =

@@ -39,7 +39,7 @@ class RoutineChooser(private val robot: Robot) : SendableChooser<String>() {
 
     this.addOption(
       "Bovine Auto",
-      if (isRed){
+      if (isRed) {
         "Red686Trust"
       } else {
         "Blue686Trust"

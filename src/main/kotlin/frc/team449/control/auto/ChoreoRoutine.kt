@@ -18,7 +18,8 @@ class ChoreoRoutine(
   private val poseTol: Pose2d = Pose2d(0.05, 0.05, Rotation2d.fromDegrees(1.5)),
   private val resetPosition: Boolean = false,
   private val resetPositionTolerance: Pose2d = Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0.0)),
-  private val timeout: Double = 1.5
+  private val timeout: Double = 1.5,
+  private val debug: Boolean = false
 ) {
 
   private fun resetPose(trajectory: ChoreoTrajectory): Command {
@@ -30,8 +31,6 @@ class ChoreoRoutine(
     ) {
       return PrintCommand("Pose not reset.")
     }
-
-    println(trajectory.name)
 
     return InstantCommand({ drive.pose = trajectory.initialPose() })
   }
@@ -53,7 +52,8 @@ class ChoreoRoutine(
             thetaController,
             poseTol,
             timeout,
-            resetPosition
+            resetPosition,
+            debug
           ),
           parallelEventMap.getOrDefault(i, InstantCommand())
         )

@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.XboxController
 import edu.wpi.first.wpilibj2.command.Command
 import frc.team449.robot2023.constants.RobotConstants
+import frc.team449.robot2023.constants.drives.SwerveConstants
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.*
 
@@ -79,10 +80,15 @@ class SwerveOrthogonalCommand(
     dt = currTime - prevTime
     prevTime = currTime
 
-    val xScaled = (if (abs(controller.leftY) < RobotConstants.TRANSLATION_DEADBAND) .0 else -controller.leftY.pow(2)) *
-      drive.maxLinearSpeed * sign(controller.leftY)
-    val yScaled = (if (abs(controller.leftX) < RobotConstants.TRANSLATION_DEADBAND) .0 else -controller.leftX.pow(2)) *
-      drive.maxLinearSpeed * sign(controller.leftX)
+    val ctrlX = if (abs(controller.leftY) < RobotConstants.TRANSLATION_DEADBAND) .0 else -controller.leftY
+    val ctrlY = if (abs(controller.leftX) < RobotConstants.TRANSLATION_DEADBAND) .0 else -controller.leftX
+
+    val ctrlRadius = sqrt(ctrlX.pow(2) + ctrlY.pow(2)).pow(SwerveConstants.JOYSTICK_FILTER_ORDER)
+
+    val ctrlTheta = atan2(ctrlY, ctrlX)
+
+    val xScaled = ctrlRadius * cos(ctrlTheta) * RobotConstants.MAX_LINEAR_SPEED
+    val yScaled = ctrlRadius * sin(ctrlTheta) * RobotConstants.MAX_LINEAR_SPEED
 
     dx = xScaled - prevX
     dy = yScaled - prevY

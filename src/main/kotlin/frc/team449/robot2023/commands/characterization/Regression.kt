@@ -41,6 +41,7 @@ class Regression @JvmOverloads constructor(
   private val sse // sum of squares due to error
     : Double
   private var sst = 0.0 // total sum of squares
+
   init {
     val n = x.size
     var qr: QRDecomposition?

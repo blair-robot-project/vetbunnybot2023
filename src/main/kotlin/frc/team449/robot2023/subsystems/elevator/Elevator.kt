@@ -29,7 +29,9 @@ import frc.team449.system.motor.WrappedMotor
 import frc.team449.system.motor.createSparkMax
 import java.util.function.DoubleSupplier
 import java.util.function.Supplier
-import kotlin.math.*
+import kotlin.math.pow
+import kotlin.math.sign
+import kotlin.math.sqrt
 
 open class Elevator(
   private var motor: WrappedMotor,
