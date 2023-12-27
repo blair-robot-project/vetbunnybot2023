@@ -66,8 +66,6 @@ class RobotLoop : TimedRobot(), Logged {
   override fun robotPeriodic() {
     CommandScheduler.getInstance().run()
 
-//    Logger.updateEntries()
-
     robot.field.robotPose = robot.drive.pose
 
     robot.field.getObject("bumpers").pose = robot.drive.pose

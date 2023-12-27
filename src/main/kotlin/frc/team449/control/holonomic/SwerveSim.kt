@@ -58,7 +58,7 @@ class SwerveSim(
         numTargets[index] = presentResult.targetsUsed.size.toDouble()
         tagDistance[index] = 0.0
         avgAmbiguity[index] = 0.0
-        heightError[index] = abs(presentResult.estimatedPose.z - camera.robotToCam.z)
+        heightError[index] = abs(presentResult.estimatedPose.z)
 
         for (tag in presentResult.targetsUsed) {
           val tagPose = camera.estimator.fieldTags.getTagPose(tag.fiducialId)
@@ -78,8 +78,8 @@ class SwerveSim(
         if (presentResult.timestampSeconds > 0 &&
           avgAmbiguity[index] <= VisionConstants.MAX_AMBIGUITY &&
           numTargets[index] < 2 && tagDistance[index] <= VisionConstants.MAX_DISTANCE_SINGLE_TAG ||
-          numTargets[index] >= 2 && tagDistance[index] <= VisionConstants.MAX_DISTANCE_MULTI_TAG * (1 + (numTargets[index] - 2) * VisionConstants.TAG_MULTIPLIER)
-//          heightError[index] < VisionConstants.MAX_HEIGHT_ERR_METERS
+          numTargets[index] >= 2 && tagDistance[index] <= VisionConstants.MAX_DISTANCE_MULTI_TAG * (1 + (numTargets[index] - 2) * VisionConstants.TAG_MULTIPLIER) &&
+          heightError[index] < VisionConstants.MAX_HEIGHT_ERR_METERS
         ) {
           poseEstimator.addVisionMeasurement(
             visionPose,

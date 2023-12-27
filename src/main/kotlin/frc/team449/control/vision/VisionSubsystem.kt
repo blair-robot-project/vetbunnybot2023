@@ -15,7 +15,6 @@ import org.photonvision.PhotonCamera
 import org.photonvision.simulation.PhotonCameraSim
 import org.photonvision.simulation.SimCameraProperties
 import org.photonvision.simulation.VisionSystemSim
-import org.photonvision.targeting.PhotonPipelineResult
 import java.util.Optional
 import kotlin.math.abs
 import kotlin.math.pow
@@ -56,10 +55,6 @@ class VisionSubsystem(
     }
   }
 
-  fun getLatestResult(): PhotonPipelineResult {
-    return estimator.camera.latestResult
-  }
-
   private fun getSimDebugField(): Field2d? {
     return if (!RobotBase.isSimulation()) null else visionSystemSim!!.debugField
   }
@@ -76,11 +71,11 @@ class VisionSubsystem(
         }
       ) { if (newResult) getSimDebugField()!!.getObject("VisionEstimation").setPoses() }
     }
-    if (newResult) {
+    return if (newResult) {
       lastEstTimestamp = latestTimestamp
-      return visionEst
+      visionEst
     } else {
-      return Optional.empty()
+      Optional.empty()
     }
   }
 

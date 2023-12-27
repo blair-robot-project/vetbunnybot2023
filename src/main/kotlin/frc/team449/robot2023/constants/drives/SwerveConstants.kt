@@ -3,7 +3,7 @@ package frc.team449.robot2023.constants.drives
 import edu.wpi.first.math.util.Units
 
 object SwerveConstants {
-  const val EFFICIENCY = 0.90
+  const val EFFICIENCY = 0.95
 
   /** Drive motor ports */
   const val DRIVE_MOTOR_FL = 11
